@@ -1,0 +1,46 @@
+{
+  "name": "aurum-privee-store",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/**/*.test.ts",
+    "test:migrations": "bash scripts/test-migrations.sh",
+    "preflight:production": "tsx --env-file-if-exists=.env.local scripts/production-preflight.ts",
+    "sync:loyverse:local": "tsx --env-file=.env.local scripts/sync-loyverse-local.ts",
+    "images:check": "tsx scripts/import-product-images.ts --dry-run",
+    "images:import": "tsx scripts/import-product-images.ts",
+    "images:mirror-loyverse": "tsx scripts/mirror-loyverse-images.ts"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "@supabase/supabase-js": "^2.49.4",
+    "next": "15.5.23",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "resend": "^4.2.0",
+    "stripe": "22.5.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@types/node": "^20.17.24",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "15.5.23",
+    "tsx": "^4.20.5",
+    "typescript": "^5.8.2"
+  },
+  "overrides": {
+    "postcss": "8.5.26",
+    "sharp": "0.35.3"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  }
+}

@@ -1,0 +1,12 @@
+node_modules
+.next
+.env
+.env.local
+.vercel
+.netlify
+supabase/.temp
+*.log
+.DS_Store
+tsconfig.tsbuildinfo
+product-image-intake/*
+!product-image-intake/README.md

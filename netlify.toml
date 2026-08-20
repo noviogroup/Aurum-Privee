@@ -1,0 +1,39 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[functions]
+  node_bundler = "zisi"
+
+[functions."loyverse-nightly-reconcile"]
+  schedule = "17 5 * * *"
+
+[functions."loyverse-order-retry"]
+  schedule = "*/15 * * * *"
+
+[functions."transactional-email-retry"]
+  schedule = "*/10 * * * *"
+
+[functions."inventory-reservation-cleanup"]
+  schedule = "*/5 * * * *"
+
+[functions."store-health-monitor"]
+  schedule = "7 * * * *"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' https://api.loyverse.com data:; font-src 'self'; connect-src 'self'; frame-src https://checkout.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"
+
+# The Next.js runtime emits this function during the Netlify build. Keeping the
+# route explicit makes both local CLI deploys and Netlify-hosted builds resolve
+# application routes consistently while still preferring generated static files.
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/___netlify-server-handler"
+  status = 200
