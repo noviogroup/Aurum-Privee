@@ -16,7 +16,7 @@ function signingSecret() {
 }
 
 export function operatorCookieName() {
-  return process.env.NODE_ENV === "production" ? "__Host-lola_lily_ops" : "lola_lily_ops";
+  return process.env.NODE_ENV === "production" ? "__Host-aurum_privee_ops" : "aurum_privee_ops";
 }
 
 export function createOperatorSession(now = Date.now()) {
@@ -70,4 +70,3 @@ export function isSameOriginRequest(request: Request) {
     return false;
   }
 }
-

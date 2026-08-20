@@ -15,7 +15,7 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
   const [family, setFamily] = useState<CatalogFilter>(initialFilter);
   const [query, setQuery] = useState(initialQuery);
   const [sort, setSort] = useState<CatalogSort>((["featured", "price-asc", "price-desc", "name"].includes(initialSort) ? initialSort : "featured") as CatalogSort);
-  const [visibleCount, setVisibleCount] = useState(compact ? 8 : 24);
+  const [visibleCount, setVisibleCount] = useState(compact ? 6 : 24);
   const [remoteProducts, setRemoteProducts] = useState(products);
   const [remoteTotal, setRemoteTotal] = useState(catalogTotal ?? products.length);
   const [loading, setLoading] = useState(false);

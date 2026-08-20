@@ -16,9 +16,7 @@ type CartContextValue = {
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
-// Keep the legacy namespace so existing local carts survive the brand rename.
-const storageKey = "lola-lily-cart-v2";
-const legacyStorageKey = "lola-lily-cart";
+const storageKey = "aurum-privee-cart-v1";
 
 function readSavedCart(value: string | null): CartItem[] {
   if (!value) return [];
@@ -50,7 +48,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       let savedItems: CartItem[] = [];
       try {
         savedItems = readSavedCart(window.localStorage.getItem(storageKey));
-        window.localStorage.removeItem(legacyStorageKey);
       } catch {
         window.localStorage.removeItem(storageKey);
       }

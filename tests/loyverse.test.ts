@@ -72,8 +72,8 @@ test("escapes all dynamic HTML text for email rendering", () => {
 });
 
 test("removes email-header newlines from order identifiers", () => {
-  const orderNumber = "LL-100\r\nBcc: attacker@example.com";
-  assert.equal(orderNumber.replace(/[\r\n]/g, ""), "LL-100Bcc: attacker@example.com");
+  const orderNumber = "AP-100\r\nBcc: attacker@example.com";
+  assert.equal(orderNumber.replace(/[\r\n]/g, ""), "AP-100Bcc: attacker@example.com");
 });
 
 test("rejects request bodies above an endpoint byte limit", async () => {
@@ -102,10 +102,10 @@ test("never authenticates a placeholder webhook token", () => {
 });
 
 test("builds a protected HTTPS callback for personal-token webhooks", () => {
-  process.env.NEXT_PUBLIC_SITE_URL = "https://shop.lolalily.bs/path-that-is-ignored";
+  process.env.NEXT_PUBLIC_SITE_URL = "https://aurum-privee.example/path-that-is-ignored";
   process.env.LOYVERSE_WEBHOOK_AUTH_MODE = "token";
   process.env.LOYVERSE_WEBHOOK_TOKEN = "12345678901234567890123456789012";
-  assert.equal(getLoyverseWebhookUrl(), "https://shop.lolalily.bs/api/loyverse/webhook?token=12345678901234567890123456789012");
+  assert.equal(getLoyverseWebhookUrl(), "https://aurum-privee.example/api/loyverse/webhook?token=12345678901234567890123456789012");
   delete process.env.NEXT_PUBLIC_SITE_URL;
   delete process.env.LOYVERSE_WEBHOOK_AUTH_MODE;
   delete process.env.LOYVERSE_WEBHOOK_TOKEN;
@@ -138,12 +138,12 @@ test("finds order receipts by scanning supported receipt pages", async () => {
   globalThis.fetch = async (url) => {
     requestedUrls.push(String(url));
     if (String(url).includes("cursor=page-2")) {
-      return Response.json({ receipts: [{ receipt_number: "2-101", receipt_type: "SALE", order: "LL-TARGET", total_money: 110 }] });
+      return Response.json({ receipts: [{ receipt_number: "2-101", receipt_type: "SALE", order: "AP-TARGET", total_money: 110 }] });
     }
     return Response.json({ receipts: [{ receipt_number: "2-100", receipt_type: "SALE", order: "OTHER", total_money: 50 }], cursor: "page-2" });
   };
   try {
-    const receipts = await listLoyverseReceiptsByOrder("LL-TARGET", "2026-08-12T12:00:00.000Z");
+    const receipts = await listLoyverseReceiptsByOrder("AP-TARGET", "2026-08-12T12:00:00.000Z");
     assert.equal(receipts.length, 1);
     assert.equal(receipts[0].receipt_number, "2-101");
     assert.equal(requestedUrls.length, 2);
@@ -176,7 +176,7 @@ test("excludes variable-price and store-disabled variants", () => {
 });
 
 test("creates stable URL-safe product slugs", () => {
-  assert.equal(slugifyProduct("Lola Lily Éclat No. 5"), "lola-lily-eclat-no-5");
+  assert.equal(slugifyProduct("Aurum Privée Éclat No. 5"), "aurum-privee-eclat-no-5");
 });
 
 test("normalizes fragrance brands and gendered categories", () => {
@@ -200,7 +200,7 @@ test("normalizes unavailable and negative inventory without inventing stock", ()
 
 test("adds delivery and reconciles the Loyverse receipt payment total", () => {
   const prepared = prepareLoyverseReceipt({
-    orderNumber: "LL-1001",
+    orderNumber: "AP-1001",
     customerName: "Ava Smith",
     customerEmail: "ava@example.com",
     shippingAmount: 8,
@@ -216,7 +216,7 @@ test("adds delivery and reconciles the Loyverse receipt payment total", () => {
 
 test("allocates indivisible promotion discounts without a one-cent receipt mismatch", () => {
   const prepared = prepareLoyverseReceipt({
-    orderNumber: "LL-1003",
+    orderNumber: "AP-1003",
     customerName: "Ava Smith",
     customerEmail: "ava@example.com",
     lines: [{ name: "Santal Noir", quantity: 3, amount: 284, unitPrice: 284 / 3, loyverseVariantId: "variant-1" }],
@@ -231,7 +231,7 @@ test("allocates indivisible promotion discounts without a one-cent receipt misma
 
 test("preserves included tax IDs on product and delivery receipt lines", () => {
   const prepared = prepareLoyverseReceipt({
-    orderNumber: "LL-1004",
+    orderNumber: "AP-1004",
     customerName: "Ava Smith",
     customerEmail: "ava@example.com",
     shippingAmount: 10,
@@ -246,7 +246,7 @@ test("preserves included tax IDs on product and delivery receipt lines", () => {
 test("charges added Loyverse VAT once and reconciles the paid total", () => {
   const vat = { id: "vat-added", name: "Value Added Tax - 10", type: "ADDED" as const, rate: 10 };
   const prepared = prepareLoyverseReceipt({
-    orderNumber: "LL-1006",
+    orderNumber: "AP-1006",
     customerName: "Ava Smith",
     customerEmail: "ava@example.com",
     shippingAmount: 10,
@@ -275,7 +275,7 @@ test("calculates added tax on the pre-tax base when included taxes coexist", () 
 test("blocks Loyverse receipt sync when tax math differs from the payment", () => {
   const vat = { id: "vat-added", name: "Value Added Tax - 10", type: "ADDED" as const, rate: 10 };
   assert.throws(() => prepareLoyverseReceipt({
-    orderNumber: "LL-1007",
+    orderNumber: "AP-1007",
     customerName: "Ava Smith",
     customerEmail: "ava@example.com",
     paidTotal: 100,
@@ -301,7 +301,7 @@ test("sends explicit included taxes to Loyverse without allowing default added t
 
   try {
     await createLoyverseReceipt({
-      orderNumber: "LL-1005",
+      orderNumber: "AP-1005",
       moneyAmount: 100,
       lines: [{ variantId: "variant-1", quantity: 1, price: 100, taxIds: ["vat-included"] }],
     });
@@ -350,7 +350,7 @@ test("creates a Loyverse full refund from the original receipt line IDs", async 
 
 test("refuses receipt creation when a product has no Loyverse mapping", () => {
   assert.throws(() => prepareLoyverseReceipt({
-    orderNumber: "LL-1002",
+    orderNumber: "AP-1002",
     customerName: "Ava Smith",
     customerEmail: "ava@example.com",
     lines: [{ name: "Unmapped scent", quantity: 1, amount: 75, unitPrice: 75 }],
@@ -366,7 +366,7 @@ test("retries transient Loyverse API failures", async () => {
     if (calls === 1) return new Response("temporarily unavailable", { status: 503, headers: { "retry-after": "0" } });
     return Response.json({
       id: "merchant-1",
-      business_name: "Lola Lily",
+      business_name: "Aurum Privée",
       email: "owner@example.com",
       country: "BS",
       currency: { code: "BSD", decimal_places: 2 },
@@ -375,7 +375,7 @@ test("retries transient Loyverse API failures", async () => {
 
   try {
     const merchant = await getLoyverseMerchant();
-    assert.equal(merchant.business_name, "Lola Lily");
+    assert.equal(merchant.business_name, "Aurum Privée");
     assert.equal(calls, 2);
   } finally {
     globalThis.fetch = originalFetch;

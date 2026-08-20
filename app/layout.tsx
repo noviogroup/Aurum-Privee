@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Aurum Privée",
     description: siteConfig.description,
-    images: [{ url: "/images/hero-still-life.png", width: 1536, height: 1024 }],
+    images: [{ url: "/images/hero-merchandising-background-v2.webp", width: 1672, height: 941 }],
     locale: "en_BS",
     siteName: siteConfig.name,
     type: "website",

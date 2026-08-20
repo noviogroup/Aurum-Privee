@@ -8,7 +8,7 @@ async function withResendResponse<T>(status: number, body: object, run: () => Pr
   const originalFrom = process.env.RESEND_FROM_EMAIL;
   const originalNotification = process.env.STORE_NOTIFICATION_EMAIL;
   process.env.RESEND_API_KEY = "re_test_transactional_email";
-  process.env.RESEND_FROM_EMAIL = "Lola Lily <orders@example.com>";
+  process.env.RESEND_FROM_EMAIL = "Aurum Privée <orders@example.com>";
   process.env.STORE_NOTIFICATION_EMAIL = "store@example.com";
   const calls: Array<{ url: string; headers: Headers; body: string }> = [];
   globalThis.fetch = async (url, init) => {
@@ -27,7 +27,7 @@ async function withResendResponse<T>(status: number, body: object, run: () => Pr
 test("order confirmation fails loudly when Resend returns an API error", async () => {
   await assert.rejects(
     () => withResendResponse(422, { name: "validation_error", message: "Sending domain is not verified", statusCode: 422 }, () => sendOrderEmails({
-      orderNumber: "LL-EMAIL-1", customerName: "Client", customerEmail: "client@example.com", total: 110,
+      orderNumber: "AP-EMAIL-1", customerName: "Client", customerEmail: "client@example.com", total: 110,
       items: [{ name: "Test Fragrance", quantity: 1, amount: 100 }],
     })),
     /Sending domain is not verified/,
@@ -36,20 +36,20 @@ test("order confirmation fails loudly when Resend returns an API error", async (
 
 test("order confirmation uses stable customer and merchant idempotency keys", async () => {
   const { calls } = await withResendResponse(200, { id: "email-id" }, () => sendOrderEmails({
-    orderNumber: "LL-EMAIL-2", customerName: "Client", customerEmail: "client@example.com", total: 110,
+    orderNumber: "AP-EMAIL-2", customerName: "Client", customerEmail: "client@example.com", total: 110,
     items: [{ name: "Test Fragrance", quantity: 1, amount: 100 }],
   }));
   assert.equal(calls.length, 2);
   assert.deepEqual(calls.map((call) => call.headers.get("idempotency-key")).sort(), [
-    "lola-lily/order-confirmation/LL-EMAIL-2/customer",
-    "lola-lily/order-confirmation/LL-EMAIL-2/merchant",
+    "aurum-privee/order-confirmation/AP-EMAIL-2/customer",
+    "aurum-privee/order-confirmation/AP-EMAIL-2/merchant",
   ]);
 });
 
 test("contact notification fails loudly when Resend returns an API error", async () => {
   await assert.rejects(
     () => withResendResponse(500, { name: "application_error", message: "Temporary failure", statusCode: 500 }, () => sendContactInquiryNotification({
-      reference: "LLC-TEST", name: "Client", email: "client@example.com", topic: "Order help", message: "Please help me with my recent fragrance order.",
+      reference: "APC-TEST", name: "Client", email: "client@example.com", topic: "Order help", message: "Please help me with my recent fragrance order.",
     })),
     /Temporary failure/,
   );

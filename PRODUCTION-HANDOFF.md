@@ -4,7 +4,7 @@ Do not place credentials in chat, tickets or this repository. Enter them directl
 
 ## Owner decisions
 
-- Rename the Loyverse business and selected store from the legacy `Iola Lily` name to `Aurum Privée`, or document an explicitly approved legal/operating-name exception.
+- Rename the Loyverse business and selected store from the former operating name to `Aurum Privée`, or document an explicitly approved legal/operating-name exception.
 - Confirm BSD as the storefront and settlement currency.
 - Choose the acquiring/payment provider. As of August 2026, The Bahamas is absent from Stripe's supported-business-country list. Bank of The Bahamas advertises a BSD e-commerce payment gateway, and Scotiabank Bahamas advertises hosted checkout and a web-service API. Ask the selected bank for sandbox credentials, hosted-checkout/API documentation, callback signing rules, refund API details and production onboarding requirements.
 - Approve creation or selection of a fixed-price, non-stock `New Providence Delivery` item in Loyverse.

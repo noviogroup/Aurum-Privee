@@ -115,7 +115,7 @@ export async function POST(request: Request) {
       customer_creation: "always",
       billing_address_collection: "auto",
       phone_number_collection: { enabled: true },
-      payment_intent_data: { metadata: { channel: "lola-lily-web", checkout_reference: checkoutReference } },
+      payment_intent_data: { metadata: { channel: "aurum-privee-web", checkout_reference: checkoutReference } },
       shipping_address_collection: { allowed_countries: ["BS"] },
       shipping_options: [
         { shipping_rate_data: { type: "fixed_amount", fixed_amount: { amount: 0, currency: siteConfig.currency.toLowerCase() }, display_name: siteConfig.pickupLabel } },
@@ -123,7 +123,7 @@ export async function POST(request: Request) {
       ],
       expires_at: Math.floor(sessionExpiresAt.getTime() / 1000),
       metadata: {
-        channel: "lola-lily-web",
+        channel: "aurum-privee-web",
         checkout_reference: checkoutReference,
         delivery_base_amount: deliveryBaseAmount.toFixed(2),
         delivery_added_tax_rate: deliveryAddedTaxRate.toString(),

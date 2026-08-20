@@ -4,7 +4,7 @@ import { productCurationSchema, splitCurationNotes } from "@/lib/product-curatio
 
 const valid = {
   productId: "10000000-0000-0000-0000-000000000001",
-  description: "A complete fragrance description approved by Lola Lily.",
+  description: "A complete fragrance description approved by Aurum Privée.",
   scentFamily: "Floral",
   notes: { top: ["Bergamot"], heart: ["Rose"], base: ["Musk"] },
   featured: true,

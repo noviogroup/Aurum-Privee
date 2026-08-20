@@ -36,15 +36,15 @@ test("operator password verification and cookie mode are explicit", () => {
   assert.equal(verifyOperatorPassword("a-unique-local-operator-password"), true);
   assert.equal(verifyOperatorPassword("a-unique-local-operator-passworx"), false);
   Object.assign(process.env, { NODE_ENV: "development" });
-  assert.equal(operatorCookieName(), "lola_lily_ops");
+  assert.equal(operatorCookieName(), "aurum_privee_ops");
   Object.assign(process.env, { NODE_ENV: "production" });
-  assert.equal(operatorCookieName(), "__Host-lola_lily_ops");
+  assert.equal(operatorCookieName(), "__Host-aurum_privee_ops");
 });
 
 test("state-changing operator requests require the configured origin", () => {
   Object.assign(process.env, { NODE_ENV: "production" });
-  process.env.NEXT_PUBLIC_SITE_URL = "https://shop.lolalily.example";
-  assert.equal(isSameOriginRequest(new Request("https://shop.lolalily.example/api/operations/session", { headers: { origin: "https://shop.lolalily.example" } })), true);
-  assert.equal(isSameOriginRequest(new Request("https://shop.lolalily.example/api/operations/session", { headers: { origin: "https://attacker.example" } })), false);
-  assert.equal(isSameOriginRequest(new Request("https://shop.lolalily.example/api/operations/session")), false);
+  process.env.NEXT_PUBLIC_SITE_URL = "https://aurum-privee.example";
+  assert.equal(isSameOriginRequest(new Request("https://aurum-privee.example/api/operations/session", { headers: { origin: "https://aurum-privee.example" } })), true);
+  assert.equal(isSameOriginRequest(new Request("https://aurum-privee.example/api/operations/session", { headers: { origin: "https://attacker.example" } })), false);
+  assert.equal(isSameOriginRequest(new Request("https://aurum-privee.example/api/operations/session")), false);
 });

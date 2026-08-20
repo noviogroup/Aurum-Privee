@@ -17,7 +17,7 @@ async function getVerifiedOrder(sessionId: string) {
   if (!isConfiguredSecret(stripeKey) || !supabase) return null;
   const stripe = new Stripe(stripeKey, { apiVersion: "2026-02-25.clover" as Stripe.LatestApiVersion });
   const session = await stripe.checkout.sessions.retrieve(sessionId);
-  if (session.metadata?.channel !== "lola-lily-web" || session.payment_status !== "paid") return null;
+  if (session.metadata?.channel !== "aurum-privee-web" || session.payment_status !== "paid") return null;
   const { data } = await supabase.from("orders")
     .select("order_number,total,currency,customer_email,line_items,shipping_amount,fulfillment_status,confirmation_email_status")
     .eq("stripe_session_id", session.id)
@@ -48,7 +48,7 @@ export default async function OrderSuccessPage({ searchParams }: { searchParams:
 
   const { session, order } = verified;
   const isDelivery = Number(order?.shipping_amount || 0) > 0;
-  const orderNumber = order?.order_number || `LL-${session.id.slice(-8).toUpperCase()}`;
+  const orderNumber = order?.order_number || `AP-${session.id.slice(-8).toUpperCase()}`;
   const lines = (order?.line_items || []) as OrderLine[];
   const rawEmail = order?.customer_email || session.customer_details?.email;
   const email = rawEmail ? rawEmail.replace(/^(.{1,2}).*(@.*)$/, "$1•••$2") : null;

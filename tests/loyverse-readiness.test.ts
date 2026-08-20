@@ -5,7 +5,7 @@ import { deliveryItemRequirement, expectedLoyverseBusinessName, loyverseBusiness
 test("Loyverse readiness defaults to the approved Aurum Privée brand", () => {
   assert.equal(expectedLoyverseBusinessName({}), "Aurum Privée");
   assert.equal(loyverseBusinessNameMatches(" aurum  privée ", "Aurum Privée"), true);
-  assert.equal(loyverseBusinessNameMatches("Iola Lily", "Aurum Privée"), false);
+  assert.equal(loyverseBusinessNameMatches("Legacy Store", "Aurum Privée"), false);
 });
 
 test("delivery readiness tells an operator exactly what must be created", () => {

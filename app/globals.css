@@ -259,10 +259,11 @@ h3 { font-size: 1.65rem; }
 .hero-scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(248, 245, 239, .96) 0%, rgba(248, 245, 239, .74) 36%, rgba(248, 245, 239, .02) 72%);
+  background: linear-gradient(90deg, rgba(248, 245, 239, .96) 0%, rgba(248, 245, 239, .76) 34%, rgba(248, 245, 239, 0) 60%);
 }
 .hero-content {
   position: relative;
+  z-index: 3;
   width: min(1360px, calc(100% - 64px));
   margin: 0 auto;
   padding: 48px 0;
@@ -274,8 +275,18 @@ h3 { font-size: 1.65rem; }
 .hero-content .utility-label { margin-bottom: 22px; }
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
+.hero-merchandise { position: absolute; z-index: 2; inset: 7% 2% 2% 42%; pointer-events: none; }
+.hero-product { position: absolute; display: block; pointer-events: auto; transition: transform .55s cubic-bezier(.16, 1, .3, 1); }
+.hero-product:hover { transform: translateY(-8px); }
+.hero-product img { object-fit: contain; filter: drop-shadow(0 18px 16px rgba(47, 35, 22, .16)); }
+.hero-product-dior { width: 34%; height: 61%; left: 2%; bottom: 1%; }
+.hero-product-tom-ford { width: 32%; height: 68%; left: 35%; bottom: 15%; }
+.hero-product-afnan { width: 30%; height: 57%; left: 65%; bottom: 2%; }
+
 /* Retail-rich home direction */
-.home-page .hero { min-height: clamp(560px, 62vw, 760px); }
+.home-page .hero { min-height: clamp(500px, 43vw, 620px); }
+.home-page .hero-content h1 { max-width: 520px; font-size: clamp(4.5rem, 6.4vw, 7rem); }
+.home-page .hero-content > p:not(.utility-label) { max-width: 390px; font-size: 15px; }
 .home-assurance-bar { width: min(1440px, 100%); min-height: 104px; margin: 0 auto; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: repeat(4, 1fr); background: var(--surface); }
 .home-assurance-bar article { min-width: 0; padding: 24px clamp(20px, 3vw, 44px); border-right: 1px solid var(--line); display: flex; align-items: center; gap: 16px; }
 .home-assurance-bar article:last-child { border-right: 0; }
@@ -283,7 +294,7 @@ h3 { font-size: 1.65rem; }
 .home-assurance-bar div { min-width: 0; display: grid; gap: 3px; }
 .home-assurance-bar strong { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
 .home-assurance-bar span { color: var(--muted); font-size: 10px; }
-.home-collections { padding-block: 96px 118px; }
+.home-collections { padding-block: 58px 82px; }
 .home-section-title { margin-bottom: 32px; display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 6px 30px; }
 .home-section-title .utility-label { grid-column: 1; margin: 0; color: var(--accent); }
 .home-section-title h2 { grid-column: 1; margin: 0; font-size: clamp(2.8rem, 4.4vw, 5rem); }
@@ -291,24 +302,42 @@ h3 { font-size: 1.65rem; }
 .home-section-title-centered { text-align: center; grid-template-columns: 1fr auto 1fr; }
 .home-section-title-centered .utility-label, .home-section-title-centered h2 { grid-column: 2; }
 .home-section-title-centered > a { grid-column: 3; justify-self: end; }
-.collection-cabinet { display: grid; grid-template-columns: 1.35fr repeat(4, 1fr); gap: 12px; }
-.collection-tile { position: relative; min-height: 370px; overflow: hidden; background: #fff; color: #fff; }
+.collection-heading { margin-bottom: 22px; }
+.collection-heading h2 { font-size: clamp(2.1rem, 2.8vw, 3.4rem); letter-spacing: .03em; text-transform: uppercase; }
+.collection-cabinet { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.collection-tile { position: relative; min-height: 280px; overflow: hidden; background: #fff; color: #fff; }
 .collection-tile img { object-fit: cover; transition: transform .8s cubic-bezier(.16, 1, .3, 1); }
-.collection-tile:nth-child(3) img, .collection-tile:nth-child(4) img { filter: brightness(.84); }
 .collection-tile::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(28,23,17,.76), rgba(28,23,17,.03) 62%); }
 .collection-tile:hover img { transform: scale(1.035); }
-.collection-tile > span { position: absolute; z-index: 1; inset: auto 22px 22px; display: grid; gap: 5px; }
+.collection-tile > span { position: absolute; z-index: 1; inset: auto 18px 18px; display: grid; justify-items: center; gap: 5px; text-align: center; }
 .collection-tile small { font-size: 8px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
-.collection-tile strong { font-family: var(--font-display), serif; font-size: clamp(1.7rem, 2.25vw, 2.8rem); font-weight: 500; line-height: .95; }
+.collection-tile strong { font-family: var(--font-display), serif; font-size: clamp(1.55rem, 1.8vw, 2.25rem); font-weight: 500; line-height: .95; }
 .collection-tile b { width: fit-content; margin-top: 8px; border-bottom: 1px solid currentColor; font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.collection-tile-real img { object-fit: contain; padding: 6px 8px 56px; mix-blend-mode: multiply; transform: scale(1.22); }
+.collection-tile-real:hover img { transform: scale(1.28); }
+.collection-for-her { background: #eadfdc; }
+.collection-for-him { background: #a2a8a6; }
+.collection-unisex { background: #b89b73; }
+.collection-arabian { background: #7e6b5e; }
+.collection-discovery { background: #c8b69c; }
 .home-storefront { padding-bottom: 110px; }
-.home-storefront .product-grid-compact { grid-template-columns: repeat(4, 1fr); gap: 44px 20px; }
-.home-storefront .product-card-info { grid-template-columns: 1fr; gap: 10px; }
+.home-storefront .product-grid-compact { grid-template-columns: repeat(6, 1fr); gap: 20px; }
+.home-storefront .product-card { display: flex; flex-direction: column; }
+.home-storefront .product-image-wrap { aspect-ratio: 1 / 1.08; }
+.home-storefront .product-card-info { min-height: 180px; display: flex; flex: 1; flex-direction: column; gap: 12px; }
+.home-storefront .product-card-info > div:first-child { min-height: 106px; }
 .home-storefront .product-card-info h3 { font-size: 1.25rem; line-height: 1.05; }
-.home-storefront .product-price { flex-direction: row; align-items: center; justify-content: space-between; }
+.home-storefront .product-price { margin-top: auto; align-items: stretch; gap: 10px; text-align: center; }
+.home-storefront .product-price .quick-add { width: 100%; min-height: 36px; border: 1px solid var(--accent); padding: 8px 10px; color: var(--accent-hover); text-transform: uppercase; letter-spacing: .08em; transition: background .2s ease, color .2s ease; }
+.home-storefront .product-price .quick-add:hover { background: var(--accent); color: var(--on-accent); }
 .home-storefront .wish-button { width: 32px; height: 32px; top: 10px; right: 10px; }
-.brand-rail { min-height: 106px; padding: 20px max(32px, calc((100vw - 1360px) / 2)); border-block: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 36px; overflow-x: auto; background: var(--surface); }
-.brand-rail span { flex: 0 0 auto; font-family: var(--font-display), serif; font-size: clamp(1.25rem, 2vw, 2rem); letter-spacing: .03em; }
+.brand-rail { min-height: 106px; padding: 20px max(32px, calc((100vw - 1360px) / 2)); border-block: 1px solid var(--line); display: flex; align-items: center; gap: 52px; overflow-x: auto; background: var(--surface); scrollbar-width: none; }
+.brand-rail::-webkit-scrollbar { display: none; }
+.brand-wordmark { flex: 0 0 auto; color: var(--ink); font-family: var(--font-display), serif; font-size: clamp(1.15rem, 1.8vw, 1.8rem); letter-spacing: .04em; white-space: nowrap; transition: color .2s ease, transform .2s ease; }
+.brand-wordmark:hover { color: var(--accent); transform: translateY(-2px); }
+.brand-tom-ford, .brand-gucci, .brand-versace, .brand-armani, .brand-afnan, .brand-lattafa, .brand-montblanc, .brand-carolina-herrera { font-family: var(--font-sans), sans-serif; font-weight: 600; letter-spacing: .1em; }
+.brand-creed { font-style: italic; letter-spacing: .08em; }
+.brand-dior, .brand-xerjoff, .brand-bvlgari { letter-spacing: .08em; }
 .home-editorial { margin-block: 118px; display: grid; grid-template-columns: 1.6fr .7fr .7fr; background: var(--surface); }
 .home-editorial article { min-height: 390px; }
 .home-editorial-primary { position: relative; min-height: 520px !important; overflow: hidden; color: #fff; }
@@ -691,7 +720,7 @@ h3 { font-size: 1.65rem; }
   .home-assurance-bar article:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
   .collection-cabinet { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .collection-tile-wide { grid-column: span 2; }
-  .home-storefront .product-grid-compact { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-storefront .product-grid-compact { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .home-editorial { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .home-editorial-primary { grid-column: 1 / -1; }
   .home-feature { gap: 6vw; }
@@ -719,6 +748,10 @@ h3 { font-size: 1.65rem; }
   .hero-content .utility-label { margin-bottom: 14px; }
   .hero-content h1 { margin-bottom: 14px; }
   .hero-content > p:not(.utility-label) { font-size: 15px; max-width: 340px; margin-bottom: 22px; }
+  .hero-merchandise { inset: 2% -8% auto 24%; height: 48%; }
+  .hero-product-dior { width: 48%; height: 90%; left: 0; bottom: 0; }
+  .hero-product-tom-ford { width: 48%; height: 94%; left: 38%; bottom: 2%; }
+  .hero-product-afnan { display: none; }
   .button { min-height: 46px; padding-inline: 20px; }
   .home-assurance-bar { grid-template-columns: 1fr 1fr; }
   .home-assurance-bar article { min-height: 118px; padding: 20px 16px; align-items: flex-start; flex-direction: column; gap: 10px; }
@@ -729,8 +762,8 @@ h3 { font-size: 1.65rem; }
   .home-section-title { margin-bottom: 30px; grid-template-columns: 1fr; align-items: end; gap: 18px; }
   .home-section-title > a { justify-self: start; }
   .collection-cabinet { grid-template-columns: 1fr 1fr; gap: 10px; }
-  .collection-tile { min-height: 300px; }
-  .collection-tile-wide { min-height: 360px; grid-column: 1 / -1; }
+  .collection-tile { min-height: 250px; }
+  .collection-tile:last-child { grid-column: 1 / -1; }
   .collection-tile-copy { padding: 24px 18px; }
   .collection-tile-copy h3 { font-size: 2rem; }
   .home-storefront .product-grid-compact { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 34px 12px; }

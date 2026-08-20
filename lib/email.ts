@@ -32,10 +32,10 @@ export async function sendOrderEmails(order: OrderEmail) {
   const safeOrderNumber = escapeHtml(order.orderNumber);
   const html = `<div style="font-family:Arial,sans-serif;color:#1d1c19;max-width:600px;margin:auto"><p style="color:#aa8140;letter-spacing:.18em;text-transform:uppercase;font-size:11px">Aurum Privée</p><h1 style="font-family:Georgia,serif;font-weight:400">Your fragrance is reserved.</h1><p>Hi ${escapeHtml(order.customerName)}, we received order ${safeOrderNumber}. We will email you again when it is ready for pickup or delivery.</p><table style="width:100%;border-collapse:collapse">${rows}<tr><td style="padding:16px 0;border-top:1px solid #d8cfc1"><strong>Total</strong></td><td style="padding:16px 0;border-top:1px solid #d8cfc1;text-align:right"><strong>${formatMoney(order.total)}</strong></td></tr></table><p style="color:#6d675e">Aurum Privée<br>Nassau, The Bahamas</p></div>`;
 
-  const customer = resend.emails.send({ from, to: order.customerEmail, subject: `Order ${order.orderNumber.replace(/[\r\n]/g, "")} confirmed`, html }, { idempotencyKey: `lola-lily/order-confirmation/${order.orderNumber}/customer` });
+  const customer = resend.emails.send({ from, to: order.customerEmail, subject: `Order ${order.orderNumber.replace(/[\r\n]/g, "")} confirmed`, html }, { idempotencyKey: `aurum-privee/order-confirmation/${order.orderNumber}/customer` });
   const notificationEmail = process.env.STORE_NOTIFICATION_EMAIL;
   const merchant = isConfiguredSecret(notificationEmail)
-    ? resend.emails.send({ from, to: notificationEmail, subject: `New Aurum Privée order ${order.orderNumber.replace(/[\r\n]/g, "")}`, html }, { idempotencyKey: `lola-lily/order-confirmation/${order.orderNumber}/merchant` })
+    ? resend.emails.send({ from, to: notificationEmail, subject: `New Aurum Privée order ${order.orderNumber.replace(/[\r\n]/g, "")}`, html }, { idempotencyKey: `aurum-privee/order-confirmation/${order.orderNumber}/merchant` })
     : Promise.resolve(null);
 
   const [customerResult, merchantResult] = await Promise.all([customer, merchant]);
@@ -84,7 +84,7 @@ export async function sendContactInquiryNotification(input: {
     replyTo: input.email,
     subject: `Aurum Privée inquiry ${safeReference}: ${input.topic}`.replace(/[\r\n]/g, "").slice(0, 150),
     html,
-  }, { idempotencyKey: `lola-lily/contact/${safeReference}` });
+  }, { idempotencyKey: `aurum-privee/contact/${safeReference}` });
   if (delivery.error) throw new Error(delivery.error.message);
   return delivery;
 }
@@ -107,7 +107,7 @@ export async function sendContactInquiryReply(input: {
     to: input.customerEmail,
     subject: `Aurum Privée reply · ${safeReference}`.replace(/[\r\n]/g, ""),
     html,
-  }, { idempotencyKey: `lola-lily/contact-reply/${input.replyId}` });
+  }, { idempotencyKey: `aurum-privee/contact-reply/${input.replyId}` });
   if (delivery.error) throw new Error(delivery.error.message);
   return delivery;
 }
@@ -132,7 +132,7 @@ export async function sendFulfillmentEmail(input: {
       ? { subject: `Order ${input.orderNumber} is complete`, title: "A beautiful trace, delivered.", body: input.isDelivery ? "Your order has been delivered. We hope it becomes part of a memorable ritual." : "Your order has been collected. We hope it becomes part of a memorable ritual." }
       : { subject: `Order ${input.orderNumber} was cancelled`, title: "Your order was cancelled.", body: "This order will not be fulfilled. If a payment was captured, our team will contact you about its refund status." };
   const html = `<div style="font-family:Arial,sans-serif;color:#1d1c19;max-width:600px;margin:auto"><p style="color:#aa8140;letter-spacing:.18em;text-transform:uppercase;font-size:11px">Aurum Privée</p><h1 style="font-family:Georgia,serif;font-weight:400">${content.title}</h1><p>Hi ${safeName}, ${content.body}</p><p><strong>Order ${safeNumber}</strong></p><p style="color:#6d675e">Aurum Privée<br>Nassau, The Bahamas</p></div>`;
-  const delivery = await new Resend(apiKey).emails.send({ from, to: input.customerEmail, subject: content.subject.replace(/[\r\n]/g, ""), html }, { idempotencyKey: `lola-lily/${input.orderNumber}/${input.status}` });
+  const delivery = await new Resend(apiKey).emails.send({ from, to: input.customerEmail, subject: content.subject.replace(/[\r\n]/g, ""), html }, { idempotencyKey: `aurum-privee/${input.orderNumber}/${input.status}` });
   if (delivery.error) throw new Error(delivery.error.message);
   return delivery;
 }

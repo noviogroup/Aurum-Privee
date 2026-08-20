@@ -12,7 +12,7 @@ test("readiness never exposes configured secret values", () => {
   const accessToken = strong("private-loyverse-token");
   const serviceRole = strong("private-service-role");
   const result = buildConfigurationReadiness({
-    NEXT_PUBLIC_SITE_URL: "https://shop.lolalily.com",
+    NEXT_PUBLIC_SITE_URL: "https://aurum-privee.example",
     NEXT_PUBLIC_CHECKOUT_ENABLED: "false",
     NEXT_PUBLIC_STORE_CURRENCY: "BSD",
     LOYVERSE_ACCESS_TOKEN: accessToken,
@@ -28,8 +28,8 @@ test("readiness never exposes configured secret values", () => {
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "pk_live_public",
     STRIPE_WEBHOOK_SECRET: strong("stripe-webhook"),
     RESEND_API_KEY: "re_private",
-    RESEND_FROM_EMAIL: "Lola Lily <orders@lolalily.com>",
-    STORE_NOTIFICATION_EMAIL: "orders@lolalily.com",
+    RESEND_FROM_EMAIL: "Aurum Privée <orders@aurum-privee.example>",
+    STORE_NOTIFICATION_EMAIL: "orders@aurum-privee.example",
     SYNC_SECRET: strong("sync"),
     RATE_LIMIT_SECRET: strong("rate"),
     HEALTH_MONITOR_SECRET: strong("health"),

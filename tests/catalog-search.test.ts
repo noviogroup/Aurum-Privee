@@ -11,7 +11,7 @@ const product: Product = {
   concentration: "EDT",
   size: "3.3 oz",
   price: 65,
-  description: "Selected by Lola Lily.",
+  description: "Selected by Aurum Privée.",
   family: "Woody",
   notes: { top: [], heart: [], base: [] },
   image: "/product.webp",

@@ -110,11 +110,11 @@ export async function getOperationsOrders(limit = 250) {
         configured: false as const,
         preview: true as const,
         orders: [
-          demo({ id: "10000000-0000-0000-0000-000000000001", orderNumber: "LL-1048", customerName: "Amara Clarke", total: 126 }),
-          demo({ id: "10000000-0000-0000-0000-000000000002", orderNumber: "LL-1047", customerName: "Marcus Rolle", total: 184.5, shippingAmount: 10, deliveryDetails: { address: { line1: "West Bay Street", city: "Nassau", country: "BS" } }, createdAt: new Date(now - 42 * 60_000).toISOString() }),
-          demo({ id: "10000000-0000-0000-0000-000000000003", orderNumber: "LL-1046", customerName: "Priya Nair", total: 96, fulfillmentStatus: "ready", createdAt: new Date(now - 69 * 60_000).toISOString() }),
-          demo({ id: "10000000-0000-0000-0000-000000000004", orderNumber: "LL-1045", customerName: "Jada Knowles", total: 212.75, loyverseSyncStatus: "failed", createdAt: new Date(now - 92 * 60_000).toISOString() }),
-          demo({ id: "10000000-0000-0000-0000-000000000005", orderNumber: "LL-1044", customerName: "Darren Bain", total: 78, fulfillmentStatus: "fulfilled", createdAt: new Date(now - 118 * 60_000).toISOString() }),
+          demo({ id: "10000000-0000-0000-0000-000000000001", orderNumber: "AP-1048", customerName: "Amara Clarke", total: 126 }),
+          demo({ id: "10000000-0000-0000-0000-000000000002", orderNumber: "AP-1047", customerName: "Marcus Rolle", total: 184.5, shippingAmount: 10, deliveryDetails: { address: { line1: "West Bay Street", city: "Nassau", country: "BS" } }, createdAt: new Date(now - 42 * 60_000).toISOString() }),
+          demo({ id: "10000000-0000-0000-0000-000000000003", orderNumber: "AP-1046", customerName: "Priya Nair", total: 96, fulfillmentStatus: "ready", createdAt: new Date(now - 69 * 60_000).toISOString() }),
+          demo({ id: "10000000-0000-0000-0000-000000000004", orderNumber: "AP-1045", customerName: "Jada Knowles", total: 212.75, loyverseSyncStatus: "failed", createdAt: new Date(now - 92 * 60_000).toISOString() }),
+          demo({ id: "10000000-0000-0000-0000-000000000005", orderNumber: "AP-1044", customerName: "Darren Bain", total: 78, fulfillmentStatus: "fulfilled", createdAt: new Date(now - 118 * 60_000).toISOString() }),
         ],
       };
     }

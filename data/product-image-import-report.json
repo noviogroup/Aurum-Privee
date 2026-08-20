@@ -1,6 +1,6 @@
 {
   "dryRun": false,
-  "inputDirectory": "/Users/ShowmanIT/Downloads/Novio Group/lola-lily-store/product-image-intake",
+  "inputDirectory": "product-image-intake",
   "processedAt": "2026-08-19T23:06:34.723Z",
   "acceptedExtensions": [
     ".jpg",

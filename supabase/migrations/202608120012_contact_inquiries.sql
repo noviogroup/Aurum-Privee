@@ -63,7 +63,7 @@ begin
   if p_order_number is not null and length(btrim(p_order_number)) > 64 then raise exception 'Invalid inquiry order'; end if;
   if p_message is null or length(btrim(p_message)) not between 20 and 2000 then raise exception 'Invalid inquiry message'; end if;
 
-  v_reference := 'LLC-' || upper(substring(replace(v_id::text, '-', '') from 1 for 10));
+  v_reference := 'APC-' || upper(substring(replace(v_id::text, '-', '') from 1 for 10));
   insert into public.contact_inquiries (
     id, reference, customer_name, customer_email, customer_phone, topic, order_number, message
   ) values (

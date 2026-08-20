@@ -32,7 +32,7 @@ function localCustomers(): OperationsCustomers {
     loyverseLinked: true, preferredFamilies: index === 0 ? ["Floral"] : [],
     staffNotes: index === 0 ? "Prefers soft florals and gift-ready packaging." : "",
     vip: index === 0, profileUpdatedAt: null,
-    orders: [{ id: `10000000-0000-0000-0000-00000000000${index + 1}`, orderNumber: `LL-${1048 - index}`, status: "paid", total: spend, currency: "BSD", createdAt: new Date(now - (18 + index * 29) * 60_000).toISOString() }],
+    orders: [{ id: `10000000-0000-0000-0000-00000000000${index + 1}`, orderNumber: `AP-${1048 - index}`, status: "paid", total: spend, currency: "BSD", createdAt: new Date(now - (18 + index * 29) * 60_000).toISOString() }],
   }));
   return { customers, configured: false, preview: true, totals: totals(customers) };
 }

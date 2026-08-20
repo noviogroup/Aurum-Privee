@@ -4,7 +4,7 @@ import { orderNeedsAttention, type OperationsOrder } from "../lib/operations-typ
 
 const base: OperationsOrder = {
   id: "10000000-0000-0000-0000-000000000001",
-  orderNumber: "LL-TEST",
+  orderNumber: "AP-TEST",
   paymentStatus: "paid",
   fulfillmentStatus: "unfulfilled",
   confirmationEmailStatus: "sent",

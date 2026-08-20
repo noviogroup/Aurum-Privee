@@ -28,7 +28,7 @@ async function handleRefundedCharge(charge: Stripe.Charge, supabase: NonNullable
     .maybeSingle();
   if (error) return NextResponse.json({ error: "Refund order lookup failed" }, { status: 500 });
   if (!order) {
-    if (charge.metadata?.channel === "lola-lily-web") return NextResponse.json({ error: "Store order is not persisted yet" }, { status: 500 });
+    if (charge.metadata?.channel === "aurum-privee-web") return NextResponse.json({ error: "Store order is not persisted yet" }, { status: 500 });
     return NextResponse.json({ received: true, ignored: "unrelated charge" });
   }
 
@@ -131,7 +131,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true, paymentPending: true });
   }
   if (!supabase) return NextResponse.json({ error: "Supabase is required for paid order persistence" }, { status: 503 });
-  if (session.metadata?.channel !== "lola-lily-web") {
+  if (session.metadata?.channel !== "aurum-privee-web") {
     await setEventState(supabase, event.id, "processed");
     return NextResponse.json({ received: true, ignored: "unrelated checkout" });
   }
@@ -191,7 +191,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Paid inventory requires manual reconciliation" }, { status: 500 });
   }
   const merchandiseTaxAmount = parsedLines.filter((line) => line.kind === "added_tax").reduce((sum, line) => sum + line.amount, 0);
-  const orderNumber = `LL-${session.id.slice(-8).toUpperCase()}`;
+  const orderNumber = `AP-${session.id.slice(-8).toUpperCase()}`;
   const total = (session.amount_total || 0) / 100;
   const customerEmail = session.customer_details?.email || "";
   const customerName = session.customer_details?.name || "Client";

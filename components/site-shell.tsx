@@ -5,7 +5,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { CartProvider } from "@/components/cart-provider";
 import { WishlistProvider } from "@/components/wishlist-provider";
-import { Storefront } from "@phosphor-icons/react";
+import { Truck } from "@phosphor-icons/react";
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -16,7 +16,7 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   return (
     <CartProvider>
       <WishlistProvider>
-        <div className="announcement"><span><Storefront size={13} weight="light" />Complimentary Nassau pickup on every order</span><b>Bahamas · BSD</b></div>
+        <div className="announcement"><span><Truck size={14} weight="light" />Complimentary delivery in Nassau &amp; Harbour Island</span><b>Bahamas · BSD</b></div>
         <Header />
         <main id="main">{children}</main>
         <Footer />

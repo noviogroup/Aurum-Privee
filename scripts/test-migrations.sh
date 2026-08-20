@@ -15,7 +15,7 @@ done
 
 database_directory="$(mktemp -d /tmp/aurum-privee-pg-XXXXXX)"
 socket_directory="$(mktemp -d /tmp/aurum-privee-pg-socket-XXXXXX)"
-port="${LOLA_TEST_POSTGRES_PORT:-55432}"
+port="${AURUM_TEST_POSTGRES_PORT:-55432}"
 
 cleanup() {
   "$PG_CTL" -D "$database_directory" stop -m fast >/dev/null 2>&1 || true
@@ -92,7 +92,7 @@ insert into public.orders (
   id, order_number, stripe_session_id, customer_email, customer_name, currency,
   subtotal, total, status, fulfillment_status, line_items
 ) values (
-  '30000000-0000-0000-0000-000000000001', 'LL-MIGRATION', 'cs_test_fulfillment',
+  '30000000-0000-0000-0000-000000000001', 'AP-MIGRATION', 'cs_test_fulfillment',
   'client@example.com', 'Client', 'BSD', 100, 100, 'paid', 'unfulfilled', '[]'
 );
 
@@ -232,7 +232,7 @@ begin
   select reference, customer_email, notification_status into v_reference, v_email, v_status
     from public.contact_inquiries where customer_email = 'client@example.com';
   select count(*) into v_count from public.contact_inquiries;
-  if v_reference not like 'LLC-%' or v_email <> 'client@example.com' or v_status <> 'pending' or v_count <> 1 then
+  if v_reference not like 'APC-%' or v_email <> 'client@example.com' or v_status <> 'pending' or v_count <> 1 then
     raise exception 'Contact inquiry invariant failed';
   end if;
   if not public.claim_contact_inquiry_notification((select id from public.contact_inquiries limit 1)) then raise exception 'Contact notification was not claimed'; end if;

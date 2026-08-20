@@ -90,7 +90,7 @@ For Resend, provide an API key after the Aurum Privée sending domain has been v
 ## Live account audit — 12 August 2026
 
 - Currency: BSD; country: The Bahamas.
-- Store: legacy name `Iola Lily` in Loyverse, ID `abdd8cc2-2fd5-40d8-8ac3-98b9af876818`, with four POS devices. Rename the business and selected store to `Aurum Privée`, or document an approved legal-name exception.
+- Store: the connected Loyverse business still uses its former operating name, ID `abdd8cc2-2fd5-40d8-8ac3-98b9af876818`, with four POS devices. Rename the business and selected store to `Aurum Privée`, or document an approved legal-name exception.
 - Tax: `Value Added Tax - 10`, 10%, type `ADDED`, automatically applied to new items and currently attached to about 1,990 items.
 - Payment types: Cash, Card, RBC Direct and Gift certificate. Existing Card ID: `54b01027-7497-4b3b-9244-4ba6873ec85f`.
 - Catalog: 1,994 items and 1,999 variants. The fragrance-only, tester-excluded, positive-stock local assortment currently contains 734 fixed-price variants. It includes 659 acceptable Loyverse images mirrored locally and 75 bottle-free Aurum Privée editorial placeholders awaiting approved photography. Dolce & Gabbana Dolce Rose is among those 75 because its Loyverse source is only 80×80 pixels. The missing-image worksheet is `data/missing-product-images.csv`.
@@ -99,8 +99,8 @@ For Resend, provide an API key after the Aurum Privée sending domain has been v
 
 The protected local setup diagnostic currently reports five expected launch blockers:
 
-1. The connected business is still named `Iola Lily`, while the approved storefront brand is `Aurum Privée`; rename it or document an approved legal-name exception.
-2. The selected store is also named `Iola Lily`; confirm or rename it in Loyverse Back Office.
+1. The connected business still uses its former operating name, while the approved storefront brand is `Aurum Privée`; rename it or document an approved legal-name exception.
+2. The selected store also uses the former operating name; confirm or rename it in Loyverse Back Office.
 3. No delivery/service item exists. Create a fixed-price, non-stock `New Providence Delivery` item, attach the approved tax treatment, and configure its variant ID.
 4. `NEXT_PUBLIC_SITE_URL` is localhost rather than a public HTTPS deployment.
 5. Supabase has not been configured and migrated.
@@ -110,32 +110,32 @@ The protected local setup diagnostic currently reports five expected launch bloc
 After the site is deployed and the environment variables are present, set local shell variables without printing their values:
 
 ```bash
-export LOLA_SYNC_SECRET='value-from-host-secret-store'
-export LOLA_SITE_URL='https://shop.lolalily.example'
+export AURUM_SYNC_SECRET='value-from-host-secret-store'
+export AURUM_SITE_URL='https://aurum-privee.netlify.app'
 ```
 
 Check the connection and list the matched store/payment configuration:
 
 ```bash
 curl --fail-with-body \
-  -H "Authorization: Bearer $LOLA_SYNC_SECRET" \
-  "$LOLA_SITE_URL/api/setup/loyverse"
+  -H "Authorization: Bearer $AURUM_SYNC_SECRET" \
+  "$AURUM_SITE_URL/api/setup/loyverse"
 ```
 
 Register or repair both required webhooks:
 
 ```bash
 curl --fail-with-body -X POST \
-  -H "Authorization: Bearer $LOLA_SYNC_SECRET" \
-  "$LOLA_SITE_URL/api/setup/loyverse"
+  -H "Authorization: Bearer $AURUM_SYNC_SECRET" \
+  "$AURUM_SITE_URL/api/setup/loyverse"
 ```
 
 Import the full catalog:
 
 ```bash
 curl --fail-with-body -X POST \
-  -H "Authorization: Bearer $LOLA_SYNC_SECRET" \
-  "$LOLA_SITE_URL/api/sync/loyverse"
+  -H "Authorization: Bearer $AURUM_SYNC_SECRET" \
+  "$AURUM_SITE_URL/api/sync/loyverse"
 ```
 
 The first setup diagnostic returns the merchant ID needed for `LOYVERSE_MERCHANT_ID`; add it to the deployment environment and run the diagnostic again. The response redacts the webhook token. A clean response has `connected: true`, an empty `issues` array, and no failed operational counts.
@@ -163,18 +163,18 @@ List the newest paid orders from a trusted operator terminal:
 
 ```bash
 curl --fail-with-body \
-  -H "Authorization: Bearer $LOLA_SYNC_SECRET" \
-  "$LOLA_SITE_URL/api/orders?fulfillment=unfulfilled&limit=50"
+  -H "Authorization: Bearer $AURUM_SYNC_SECRET" \
+  "$AURUM_SITE_URL/api/orders?fulfillment=unfulfilled&limit=50"
 ```
 
 Mark an order ready for pickup or delivery and send its customer update:
 
 ```bash
 curl --fail-with-body -X POST \
-  -H "Authorization: Bearer $LOLA_SYNC_SECRET" \
+  -H "Authorization: Bearer $AURUM_SYNC_SECRET" \
   -H "Content-Type: application/json" \
   --data '{"orderId":"ORDER_UUID","status":"ready"}' \
-  "$LOLA_SITE_URL/api/orders/fulfillment"
+  "$AURUM_SITE_URL/api/orders/fulfillment"
 ```
 
 Use `fulfilled` after collection/delivery or `cancelled` when fulfillment will not proceed. The transition is durable, and Resend uses an idempotency key per order/status. A failed email can be retried with the identical request; a successfully sent update is not sent again.
@@ -183,10 +183,10 @@ If an order receipt fails after payment, fix the configuration and retry pending
 
 ```bash
 curl --fail-with-body -X POST \
-  -H "Authorization: Bearer $LOLA_SYNC_SECRET" \
+  -H "Authorization: Bearer $AURUM_SYNC_SECRET" \
   -H "Content-Type: application/json" \
   --data '{"limit":25}' \
-  "$LOLA_SITE_URL/api/sync/loyverse/orders"
+  "$AURUM_SITE_URL/api/sync/loyverse/orders"
 ```
 
 The retry endpoint can target one database order with `{"orderId":"..."}`.

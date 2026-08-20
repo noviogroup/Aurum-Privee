@@ -1,5 +1,5 @@
 // Keep the legacy namespace so existing saved fragrances survive the brand rename.
-export const WISHLIST_STORAGE_KEY = "lola-lily-saved-fragrances-v1";
+export const WISHLIST_STORAGE_KEY = "aurum-privee-saved-fragrances-v1";
 export const MAX_SAVED_FRAGRANCES = 20;
 
 export function parseSavedFragranceIds(value: string | null): string[] {
