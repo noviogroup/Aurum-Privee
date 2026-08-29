@@ -152,7 +152,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         {count > 0 && <span>{count}</span>}
       </button>
       {open && <button className="drawer-scrim" aria-label="Close bag" onClick={() => setOpen(false)} />}
-      <aside className={`cart-drawer ${open ? "is-open" : ""}`} aria-hidden={!open} aria-label="Shopping bag">
+      <aside className={`cart-drawer ${open ? "is-open" : ""}`} aria-hidden={!open} inert={!open} aria-label="Shopping bag">
         <div className="drawer-head">
           <div>
             <p className="utility-label">Your selection</p>

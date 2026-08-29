@@ -60,7 +60,7 @@ export function SavedFragrances() {
       ) : products.length > 0 ? (
         <section className="saved-collection section-shell" aria-label={`${products.length} saved fragrances`}>
           <div className="saved-count"><span>{products.length.toString().padStart(2, "0")}</span><p>{products.length === 1 ? "fragrance held for you" : "fragrances held for you"}</p></div>
-          <div className="product-grid">{products.map((product, index) => <ProductCard key={product.id} product={product} priority={index < 3} />)}</div>
+          <div className="product-grid">{products.map((product, index) => <ProductCard key={product.id} product={product} priority={index < 3} headingLevel={2} />)}</div>
         </section>
       ) : (
         <section className="saved-empty section-shell">

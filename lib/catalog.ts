@@ -6,7 +6,7 @@ import { products as sampleProducts } from "@/lib/products";
 import { Product, ScentFamily } from "@/lib/types";
 import { CommerceTax } from "@/lib/tax";
 import { matchesCatalogSearch } from "@/lib/catalog-search";
-import { customerFacingBrand, customerFacingCopy } from "@/lib/brand";
+import { customerFacingBrand, customerFacingCopy, customerFacingProductName } from "@/lib/brand";
 
 type ProductRow = {
   id: string;
@@ -44,9 +44,9 @@ function fromRow(row: ProductRow): Product {
     loyverseTaxes: row.loyverse_taxes || [],
     slug: row.slug,
     brand,
-    name: row.name,
+    name: customerFacingProductName(row.name),
     concentration: row.concentration || "Fine fragrance",
-    size: row.size || "Standard size",
+    size: row.size ? customerFacingProductName(row.size) : "Standard size",
     price: Number(row.price),
     compareAtPrice: row.compare_at_price ? Number(row.compare_at_price) : undefined,
     description,
@@ -66,6 +66,8 @@ async function getLocalLoyverseProducts() {
     return (JSON.parse(contents) as Product[]).map((product) => ({
       ...product,
       brand: customerFacingBrand(product.brand),
+      name: customerFacingProductName(product.name),
+      size: customerFacingProductName(product.size),
       description: customerFacingCopy(product.description),
       imageAlt: customerFacingCopy(product.imageAlt),
     }));

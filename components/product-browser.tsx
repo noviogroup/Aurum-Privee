@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MagnifyingGlass, SlidersHorizontal, X } from "@phosphor-icons/react";
 import { Product, ScentFamily } from "@/lib/types";
 import { ProductCard } from "@/components/product-card";
@@ -19,6 +19,8 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
   const [remoteProducts, setRemoteProducts] = useState(products);
   const [remoteTotal, setRemoteTotal] = useState(catalogTotal ?? products.length);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const skipInitialRemoteRequest = useRef(true);
   const filtered = useMemo(() => (remote ? remoteProducts : products.filter((product) => {
     const familyMatch = family === "All" || (family === "New" ? product.newArrival : product.family === family);
     return familyMatch && matchesCatalogSearch(product, query);
@@ -26,9 +28,14 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
 
   useEffect(() => {
     if (!remote) return;
+    if (skipInitialRemoteRequest.current) {
+      skipInitialRemoteRequest.current = false;
+      return;
+    }
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
       setLoading(true);
+      setError("");
       try {
         const parameters = new URLSearchParams({ family, query, sort, offset: "0", limit: "24" });
         const response = await fetch(`/api/catalog?${parameters}`, { signal: controller.signal });
@@ -37,7 +44,9 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
         setRemoteProducts(result.products);
         setRemoteTotal(result.total);
       } catch (error) {
-        if (!(error instanceof DOMException && error.name === "AbortError")) setRemoteProducts([]);
+        if (!(error instanceof DOMException && error.name === "AbortError")) {
+          setError("We could not refresh the collection. Your current selection is still available.");
+        }
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }
@@ -61,6 +70,7 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
       return;
     }
     setLoading(true);
+    setError("");
     try {
       const parameters = new URLSearchParams({ family, query, sort, offset: remoteProducts.length.toString(), limit: "24" });
       const response = await fetch(`/api/catalog?${parameters}`);
@@ -68,6 +78,8 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
       const result = await response.json();
       setRemoteProducts((current) => [...current, ...result.products]);
       setRemoteTotal(result.total);
+    } catch {
+      setError("More fragrances could not be loaded. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -98,10 +110,11 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
         </div>
         <label className="catalog-sort"><SlidersHorizontal size={16} /><span>Sort</span><select value={sort} onChange={(event) => setSort(event.target.value as CatalogSort)}><option value="featured">Featured</option><option value="price-asc">Price, low to high</option><option value="price-desc">Price, high to low</option><option value="name">Brand &amp; name</option></select></label>
       </div>}
-      {!compact && <div className="catalog-status" aria-live="polite"><p>{loading ? "Searching…" : <><strong>{remote ? remoteTotal : filtered.length}</strong> {remoteTotal === 1 ? "fragrance" : "fragrances"}{query.trim() ? <> matching “{query.trim()}”</> : ""}</>}</p>{(query || family !== "All" || sort !== "featured") && <button type="button" onClick={() => { setQuery(""); setFamily("All"); setSort("featured"); }}>Clear all <X size={14} /></button>}</div>}
+      {!compact && <div className="catalog-status" aria-live="polite"><p><strong>{remote ? remoteTotal : filtered.length}</strong> {remoteTotal === 1 ? "fragrance" : "fragrances"}{query.trim() ? <> matching “{query.trim()}”</> : ""}{loading ? <span> Updating…</span> : ""}</p>{(query || family !== "All" || sort !== "featured") && <button type="button" onClick={() => { setQuery(""); setFamily("All"); setSort("featured"); }}>Clear all <X size={14} /></button>}</div>}
+      {error && <div className="catalog-error" role="status"><span>{error}</span><button type="button" onClick={() => setError("")}>Dismiss</button></div>}
       {filtered.length ? (
         <div className={`product-grid ${compact ? "product-grid-compact" : ""}`}>
-          {(remote ? filtered : filtered.slice(0, visibleCount)).map((product, index) => <ProductCard product={product} key={product.id} priority={index < 2} />)}
+          {(remote ? filtered : filtered.slice(0, visibleCount)).map((product, index) => <ProductCard product={product} key={product.id} priority={index < 2} headingLevel={compact ? 3 : 2} />)}
         </div>
       ) : (
         <div className="catalog-empty"><h2>No fragrances found.</h2><p>Check the spelling, search only the brand, or clear the scent-family filter.</p><button className="button button-secondary" type="button" onClick={() => { setQuery(""); setFamily("All"); }}>Clear search</button></div>

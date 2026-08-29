@@ -7,7 +7,9 @@ import { formatMoney } from "@/lib/config";
 import { AddToBag } from "@/components/add-to-bag";
 import { SaveButton } from "@/components/save-button";
 
-export function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
+export function ProductCard({ product, priority = false, headingLevel = 3 }: { product: Product; priority?: boolean; headingLevel?: 2 | 3 }) {
+  const ProductHeading = headingLevel === 2 ? "h2" : "h3";
+
   return (
     <article className="product-card">
       <Link href={`/shop/${product.slug}`} className="product-image-wrap" aria-label={`View ${product.name}`}>
@@ -17,7 +19,7 @@ export function ProductCard({ product, priority = false }: { product: Product; p
       <div className="product-card-info">
         <div>
           <p className="product-brand">{product.brand}</p>
-          <Link href={`/shop/${product.slug}`}><h3>{product.name}</h3></Link>
+          <Link href={`/shop/${product.slug}`}><ProductHeading>{product.name}</ProductHeading></Link>
           <p>{product.concentration}, {product.size}</p>
         </div>
         <div className="product-price">
