@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MagnifyingGlass, SlidersHorizontal, X } from "@phosphor-icons/react";
 import { Product, ScentFamily } from "@/lib/types";
@@ -92,15 +94,34 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
   return (
     <div>
       {searchable && (
-        <div className="catalog-search-wrap" id="catalog-search">
-          <div className="catalog-search">
-            <MagnifyingGlass size={22} weight="light" />
-            <label htmlFor="catalog-query">What are you looking for?</label>
-            <input id="catalog-query" value={query} onChange={(event) => { setQuery(event.target.value); setVisibleCount(24); }} placeholder="Fragrance, brand, scent note, EDP or size" autoComplete="off" />
-            {query && <button type="button" aria-label="Clear search" onClick={() => setQuery("")}><X size={17} /></button>}
+        <section className="shop-editorial-intro" aria-labelledby="shop-title">
+          <div className="shop-editorial-copy">
+            <h1 id="shop-title">Find the one that stays with you.</h1>
+            <p>Explore designer, niche and Arabian fragrance, selected in Nassau for the way it wears—not simply the name on the bottle.</p>
+            <div className="catalog-search-wrap" id="catalog-search">
+              <div className="catalog-search">
+                <MagnifyingGlass size={22} weight="light" />
+                <label htmlFor="catalog-query">Search the collection</label>
+                <input id="catalog-query" value={query} onChange={(event) => { setQuery(event.target.value); setVisibleCount(24); }} placeholder="Brand, fragrance, note or size" autoComplete="off" />
+                {query && <button type="button" aria-label="Clear search" onClick={() => setQuery("")}><X size={17} /></button>}
+              </div>
+              <p>Try “Dior,” “vanilla,” “oud,” or “EDP.”</p>
+            </div>
           </div>
-          <p>Try a name like “Dunhill Desire,” a note like “vanilla,” or a type like “EDP.”</p>
-        </div>
+          <aside className="shop-editorial-stage" aria-label="Featured fragrances">
+            <span className="shop-stage-location" aria-hidden="true">Nassau · The Bahamas</span>
+            <span className="shop-stage-plinth" aria-hidden="true" />
+            <Link className="shop-stage-product shop-stage-dior" href="/shop/christian-dior-dior-sauvage-3-4-edp-sp-460426" aria-label="Shop Dior Sauvage Eau de Parfum">
+              <Image src="/images/hero-products/dior-sauvage.webp" alt="Dior Sauvage Eau de Parfum bottle and box" fill sizes="(max-width: 767px) 46vw, 24vw" priority />
+            </Link>
+            <Link className="shop-stage-product shop-stage-tom-ford" href="/shop/tom-ford-black-orchid-1-7-edp-sp-7fcf54" aria-label="Shop Tom Ford Black Orchid">
+              <Image src="/images/hero-products/tom-ford-black-orchid.webp" alt="Tom Ford Black Orchid bottle and box" fill sizes="(max-width: 767px) 46vw, 24vw" priority />
+            </Link>
+            <Link className="shop-stage-product shop-stage-afnan" href="/shop/afnan-supremacy-noir-edp-3-4-oz-4d0813" aria-label="Shop Afnan Supremacy Noir">
+              <Image src="/images/hero-products/afnan-supremacy-noir.webp" alt="Afnan Supremacy Noir bottle and box" fill sizes="(max-width: 767px) 42vw, 22vw" priority />
+            </Link>
+          </aside>
+        </section>
       )}
       {!compact && <div className="catalog-tools">
         <div className="filter-row" role="group" aria-label="Filter by scent family">

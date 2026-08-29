@@ -18,11 +18,6 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   const initialPage = await getCatalogPage({ family: initialFilter, query: initialQuery, sort: initialSort, limit: 24 });
   return (
     <div className="shop-page section-shell page-top">
-      <div className="shop-heading">
-        <p className="utility-label">The fragrance edit</p>
-        <h1>Find the one that stays with you.</h1>
-        <p>Browse by feeling, note or instinct. Every fragrance is available for Nassau pickup, with delivery options confirmed at checkout.</p>
-      </div>
       <ProductBrowser products={initialPage.products} catalogTotal={initialPage.total} remote searchable initialFilter={initialFilter} initialQuery={initialQuery} initialSort={initialSort} />
     </div>
   );
