@@ -36,7 +36,7 @@ const pages: Record<string, { title: string; intro: string; sections: Array<{ he
     title: "About Aurum Privée",
     intro: "A Nassau fragrance house built around discovery, discernment and the deeply personal way scent becomes memory.",
     sections: [
-      { heading: "Our point of view", body: "We bring designer, niche and expressive fragrance into one considered collection—selected for quality, character and the pleasure of finding something that feels entirely your own." },
+      { heading: "Our point of view", body: "We bring designer, niche and expressive fragrance into one considered collection, selected for quality, character and the pleasure of finding something that feels entirely your own." },
       { heading: "Exceptional, without boundaries", body: "A fragrance wardrobe should move with the person wearing it. We help clients explore beyond labels and begin with mood, memory, notes and instinct." },
       { heading: "Based in The Bahamas", body: "Orders are prepared in Nassau, with pickup and approved delivery choices confirmed during checkout." },
     ],

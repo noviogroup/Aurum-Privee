@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChatCircleDots, Gift, SealCheck, Truck } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight, ChatCircleDots, Gift, SealCheck, Truck, WhatsappLogo } from "@phosphor-icons/react/dist/ssr";
 import { ProductBrowser } from "@/components/product-browser";
-import { Newsletter } from "@/components/newsletter";
 import { getCatalogProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
@@ -18,27 +17,24 @@ const homepageProductIds = [
 ];
 
 const homepageProductImages: Record<string, string> = {
-  "460426e4-f854-40f4-9217-7fac41fe75bf": "/images/hero-products/dior-sauvage.png",
-  "7fcf5448-ebd6-42d2-9ddf-b67204d63feb": "/images/hero-products/tom-ford-black-orchid.png",
-  "66c09dc0-cc21-4cbd-a9f9-c475a1137486": "/images/hero-products/creed-aventus-for-her.png",
-  "af8923c3-473a-42a8-9e61-18da1341b878": "/images/hero-products/xerjoff-erba-pura.png",
-  "1f76c75f-77aa-47ef-b35a-4150e279f60e": "/images/hero-products/versace-crystal-noir-set.png",
-  "4d08132e-e1b4-42ac-b4e2-44b2f7214f85": "/images/hero-products/afnan-supremacy-noir.png",
+  "460426e4-f854-40f4-9217-7fac41fe75bf": "/images/hero-products/dior-sauvage.webp",
+  "7fcf5448-ebd6-42d2-9ddf-b67204d63feb": "/images/hero-products/tom-ford-black-orchid.webp",
+  "66c09dc0-cc21-4cbd-a9f9-c475a1137486": "/images/hero-products/creed-aventus-for-her.webp",
+  "af8923c3-473a-42a8-9e61-18da1341b878": "/images/hero-products/xerjoff-erba-pura.webp",
+  "1f76c75f-77aa-47ef-b35a-4150e279f60e": "/images/hero-products/versace-crystal-noir-set.webp",
+  "4d08132e-e1b4-42ac-b4e2-44b2f7214f85": "/images/hero-products/afnan-supremacy-noir.webp",
 };
 
 const carriedBrands = [
-  ["DIOR", "Christian Dior", "dior"],
-  ["TOM FORD", "Tom Ford", "tom-ford"],
-  ["GUCCI", "Gucci", "gucci"],
-  ["CREED", "Creed", "creed"],
-  ["XERJOFF", "Xerjoff", "xerjoff"],
-  ["VERSACE", "Versace", "versace"],
-  ["GIORGIO ARMANI", "Giorgio Armani", "armani"],
-  ["AFNAN", "Afnan", "afnan"],
-  ["LATTAFA", "Lattafa", "lattafa"],
-  ["MONTBLANC", "Mont Blanc", "montblanc"],
-  ["BVLGARI", "Bvlgari", "bvlgari"],
-  ["CAROLINA HERRERA", "Carolina Herrera", "carolina-herrera"],
+  ["Dior", "Christian Dior", "/images/brand-logos/dior.svg"],
+  ["Tom Ford", "Tom Ford", "/images/brand-logos/tom-ford.svg"],
+  ["Gucci", "Gucci", "/images/brand-logos/gucci.svg"],
+  ["Creed", "Creed", "/images/brand-logos/creed.svg"],
+  ["Versace", "Versace", "/images/brand-logos/versace.svg"],
+  ["Giorgio Armani", "Giorgio Armani", "/images/brand-logos/giorgio-armani.svg"],
+  ["Montblanc", "Mont Blanc", "/images/brand-logos/montblanc.svg"],
+  ["Bvlgari", "Bvlgari", "/images/brand-logos/bvlgari.svg"],
+  ["Carolina Herrera", "Carolina Herrera", "/images/brand-logos/carolina-herrera.svg"],
 ] as const;
 
 export default async function HomePage() {
@@ -61,17 +57,18 @@ export default async function HomePage() {
           priority
           sizes="100vw"
           className="hero-image"
+          decoding="sync"
         />
         <div className="hero-scrim" />
         <div className="hero-merchandise" aria-label="Featured fragrances available from Aurum Privée">
           <Link className="hero-product hero-product-dior" href="/shop/christian-dior-dior-sauvage-3-4-edp-sp-460426" aria-label="Shop Dior Sauvage Eau de Parfum">
-            <Image src="/images/hero-products/dior-sauvage.png" alt="Dior Sauvage Eau de Parfum bottle and box" fill sizes="28vw" />
+            <Image src="/images/hero-products/dior-sauvage.webp" alt="Dior Sauvage Eau de Parfum bottle and box" fill sizes="28vw" priority />
           </Link>
           <Link className="hero-product hero-product-tom-ford" href="/shop/tom-ford-black-orchid-1-7-edp-sp-7fcf54" aria-label="Shop Tom Ford Black Orchid">
-            <Image src="/images/hero-products/tom-ford-black-orchid.png" alt="Tom Ford Black Orchid bottle and box" fill sizes="27vw" />
+            <Image src="/images/hero-products/tom-ford-black-orchid.webp" alt="Tom Ford Black Orchid bottle and box" fill sizes="27vw" priority />
           </Link>
           <Link className="hero-product hero-product-afnan" href="/shop/afnan-supremacy-noir-edp-3-4-oz-4d0813" aria-label="Shop Afnan Supremacy Noir">
-            <Image src="/images/hero-products/afnan-supremacy-noir.png" alt="Afnan Supremacy Noir bottle and box" fill sizes="25vw" />
+            <Image src="/images/hero-products/afnan-supremacy-noir.webp" alt="Afnan Supremacy Noir bottle and box" fill sizes="25vw" priority />
           </Link>
         </div>
         <div className="hero-content entrance">
@@ -94,54 +91,60 @@ export default async function HomePage() {
       <section className="home-collections section-shell" id="collections">
         <div className="home-section-title home-section-title-centered collection-heading"><h2>Shop by collection</h2><Link href="/shop">View all fragrance <ArrowRight size={16} /></Link></div>
         <div className="collection-cabinet">
-          <Link className="collection-tile collection-tile-real collection-for-her" href="/shop?query=woman"><Image src="/product-images/loyverse/7ee5e1c6-424a-4768-b2a3-cdd513a01351.webp" alt="Abercrombie & Fitch Naturally Fierce for women" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><strong>For her</strong><b>Shop now</b></span></Link>
-          <Link className="collection-tile collection-tile-real collection-for-him" href="/shop?query=men"><Image src="/product-images/loyverse/645c039f-0050-4d2e-9539-e47b79090f01.webp" alt="Dunhill Desire Red for men" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><strong>For him</strong><b>Shop now</b></span></Link>
-          <Link className="collection-tile collection-tile-real collection-unisex" href="/shop?query=unisex"><Image src="/product-images/loyverse/a67eb208-0372-4c16-ab86-232822c70dcf.webp" alt="Xerjoff Erba Pura unisex fragrance" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><strong>Unisex</strong><b>Shop now</b></span></Link>
-          <Link className="collection-tile collection-tile-real collection-arabian" href="/shop?query=oud"><Image src="/product-images/loyverse/b6e45592-7537-4020-9826-fdb294860e5e.webp" alt="Afnan Supremacy Noir Arabian fragrance" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><strong>Arabian collection</strong><b>Shop now</b></span></Link>
-          <Link className="collection-tile collection-tile-real collection-discovery" href="/shop?query=gift%20set"><Image src="/product-images/loyverse/1f0799ca-7ad0-4369-8f46-3e482f4a7dad.webp" alt="Al Haramain Amber Oud discovery gift set" fill sizes="(max-width: 760px) 100vw, 20vw" /><span><strong>Discovery sets</strong><b>Shop now</b></span></Link>
+          <Link className="collection-tile" href="/shop?query=woman"><Image src="/images/collections/for-her-v2.webp" alt="Blush fragrance surrounded by lilies" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><strong>For her</strong><b>Shop now</b></span></Link>
+          <Link className="collection-tile" href="/shop?query=men"><Image src="/images/collections/for-him-v2.webp" alt="Dark navy fragrance in an evening setting" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><strong>For him</strong><b>Shop now</b></span></Link>
+          <Link className="collection-tile" href="/shop?query=unisex"><Image src="/images/collections/unisex-v2.webp" alt="Amber unisex fragrances in warm window light" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><strong>Unisex</strong><b>Shop now</b></span></Link>
+          <Link className="collection-tile" href="/shop?query=oud"><Image src="/images/collections/arabian-v2.webp" alt="Ornate oud fragrances in black and bronze" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><strong>Arabian collection</strong><b>Shop now</b></span></Link>
+          <Link className="collection-tile" href="/shop?query=gift%20set"><Image src="/images/collections/discovery-v2.webp" alt="Fragrance discovery vials on a stone plinth" fill sizes="(max-width: 760px) 100vw, 20vw" /><span><strong>Discovery sets</strong><b>Shop now</b></span></Link>
         </div>
       </section>
 
       <section className="bestsellers home-storefront section-shell">
-        <div className="home-section-title home-section-title-centered"><p className="utility-label">Chosen often</p><h2>Featured fragrances</h2><Link href="/shop">View all <ArrowRight size={16} /></Link></div>
+        <div className="home-section-title home-section-title-centered"><h2>Featured fragrances</h2><Link href="/shop">View all <ArrowRight size={16} /></Link></div>
         <ProductBrowser products={featured} compact />
       </section>
 
       <section className="brand-rail" aria-label="Brands carried by Aurum Privée">
-        {carriedBrands.map(([label, query, style]) => <Link href={`/shop?query=${encodeURIComponent(query)}`} className={`brand-wordmark brand-${style}`} key={query}>{label}</Link>)}
+        {carriedBrands.map(([label, query, image]) => (
+          <Link href={`/shop?query=${encodeURIComponent(query)}`} className="brand-wordmark" aria-label={`Shop ${label}`} key={query}>
+            <Image src={image} alt={label} width={170} height={54} unoptimized />
+          </Link>
+        ))}
       </section>
 
       <section className="scent-finder section-shell" id="scent-finder">
         <div className="scent-title">
-          <h2>Start with how you want to feel.</h2>
-          <p>Scent families make fragrance easier to browse. Choose the mood that feels most like you today.</p>
+          <h2>Find your fragrance by feeling.</h2>
+          <p>Choose a scent family and step straight into a more personal edit.</p>
         </div>
         <div className="scent-choices">
           {[
-            ["Floral", "Petal-soft, luminous, expressive", "Iris / rose / jasmine"],
-            ["Fresh", "Clear, green, bright", "Citrus / tea / mineral notes"],
-            ["Woody", "Quiet, warm, close to skin", "Cedar / vetiver / sandalwood"],
-            ["Amber", "Deep, magnetic, after dark", "Resins / spice / incense"],
-          ].map(([name, mood, notes]) => (
+            ["Floral", "Petal-soft and luminous"],
+            ["Fresh", "Clear, green and bright"],
+            ["Woody", "Warm and close to skin"],
+            ["Amber", "Deep, magnetic and spiced"],
+          ].map(([name, mood]) => (
             <Link href={`/shop?family=${name}`} className="scent-choice" key={name}>
-              <span>{name}</span><strong>{mood}</strong><small>{notes}</small><ArrowRight size={18} />
+              <span>{name}</span><strong>{mood}</strong><ArrowRight size={18} />
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="home-editorial section-shell">
-        <article className="home-editorial-primary"><Image src="/product-images/9b87ea12-e27b-4385-ab2f-5bf662577ddd.webp" alt="Midnight fragrance portrait with plum and amber notes" fill sizes="(max-width: 760px) 100vw, 52vw" /><div><p className="utility-label">Your private edit</p><h2>A fragrance wardrobe, not one signature.</h2><p>Find bottles for quiet mornings, polished workdays and memorable nights.</p><Link href="/shop">Explore every mood <ArrowRight size={16} /></Link></div></article>
-        <article className="home-editorial-note"><p className="utility-label">Gifting</p><h3>Give them something unforgettable.</h3><p>Choose a fragrance or gift set, then ask us about presentation for the occasion.</p><Link href="/shop?query=gift%20set">Shop gifts <ArrowRight size={15} /></Link></article>
-        <article className="home-editorial-note"><p className="utility-label">Need help?</p><h3>Let us narrow the shelf.</h3><p>Tell us what they wear, how they want to feel, or the notes they already love.</p><Link href="/pages/contact">Ask Aurum Privée <ArrowRight size={15} /></Link></article>
-      </section>
-
-      <section className="newsletter section-shell">
-        <div>
-          <h2>A note from Aurum Privée.</h2>
-          <p>New arrivals, thoughtful gift ideas and the occasional invitation.</p>
-        </div>
-        <Newsletter />
+      <section className="home-services section-shell" aria-label="Private fragrance services">
+        <Link className="home-service-card" href="/pages/aurum-room">
+          <Image src="/images/services/aurum-room-v2.webp" alt="A private fragrance consultation room" fill sizes="(max-width: 760px) 100vw, 34vw" />
+          <span><strong>The Aurum Room</strong><small>A private fragrance experience, tailored to you.</small><b>Learn more</b></span>
+        </Link>
+        <Link className="home-service-card" href="/shop?query=gift%20set">
+          <Image src="/images/services/gifting-v2.webp" alt="Ivory gift box tied with a blush silk ribbon" fill sizes="(max-width: 760px) 100vw, 34vw" />
+          <span><strong>Gifting</strong><small>Thoughtful fragrance, beautifully presented.</small><b>Shop gifts</b></span>
+        </Link>
+        <Link className="home-service-card home-service-help" href="/pages/contact">
+          <Image src="/images/services/whatsapp-v2.webp" alt="Hand holding a phone for private fragrance assistance" fill sizes="(max-width: 760px) 100vw, 34vw" />
+          <WhatsappLogo className="service-chat-mark" size={28} weight="fill" aria-hidden="true" />
+          <span><strong>Need help?</strong><small>Tell us what you wear or the feeling you want.</small><b>Contact us</b></span>
+        </Link>
       </section>
     </div>
   );

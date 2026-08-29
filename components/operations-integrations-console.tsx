@@ -98,7 +98,7 @@ export function OperationsIntegrationsConsole({ initialReadiness }: { initialRea
           <section className="operations-queue operations-integration-list">
             <div className="operations-readiness-band">
               <strong>{readiness.ready} of {readiness.total} ready</strong>
-              <span aria-hidden="true"><i style={{ width: `${percentage}%` }} /></span>
+              <span aria-hidden="true"><i style={{ transform: `scaleX(${percentage / 100})` }} /></span>
               <b>{percentage}%</b>
             </div>
             {readiness.services.map((service) => {

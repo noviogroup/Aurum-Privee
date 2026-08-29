@@ -220,7 +220,7 @@ export function OperationsCatalogConsole({ initialCatalog }: { initialCatalog: O
               </div>
               <div className="operations-loyverse-source-head"><span><CheckCircle size={16} weight="fill" />Synced from Loyverse</span></div>
               <dl className="operations-loyverse-source">
-                <div><dt>Price BSD</dt><dd>{money(selected.price)}</dd></div><div><dt>Stock</dt><dd>{selected.stock}</dd></div><div><dt>SKU</dt><dd>{selected.sku || "—"}</dd></div><div><dt>Barcode</dt><dd>{selected.barcode || "—"}</dd></div>
+                <div><dt>Price BSD</dt><dd>{money(selected.price)}</dd></div><div><dt>Stock</dt><dd>{selected.stock}</dd></div><div><dt>SKU</dt><dd>{selected.sku || "Not set"}</dd></div><div><dt>Barcode</dt><dd>{selected.barcode || "Not set"}</dd></div>
               </dl>
               <p className="operations-source-note"><LockKey size={14} weight="light" />Price, stock, SKU and barcode remain controlled by Loyverse.</p>
               {notice && <div className={`operations-notice is-${notice.tone}`} role={notice.tone === "error" ? "alert" : "status"}>{notice.tone === "success" ? <CheckCircle size={18} weight="fill" /> : <WarningCircle size={18} weight="fill" />}{notice.text}</div>}

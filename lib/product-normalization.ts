@@ -4,7 +4,7 @@ import { BRAND_EDIT } from "@/lib/brand";
 export function splitProductName(itemName: string) {
   const parts = itemName.split(/\s+-\s+/).map((part) => part.trim()).filter(Boolean);
   if (parts.length < 2) return { brand: BRAND_EDIT, name: itemName.trim() };
-  return { brand: parts[0], name: parts.slice(1).join(" — ") };
+  return { brand: parts[0], name: parts.slice(1).join(" · ") };
 }
 
 export function familyForCategory(category: string): ScentFamily {

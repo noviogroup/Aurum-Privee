@@ -1,21 +1,23 @@
 import Link from "next/link";
 import { BrandMark } from "@/components/brand-mark";
+import { Newsletter } from "@/components/newsletter";
 
 export function Footer() {
   return (
     <footer className="site-footer">
-      <div className="footer-mark"><BrandMark full /></div>
       <div className="footer-grid">
-        <div>
-          <h3>Visit</h3>
+        <div className="footer-brand">
+          <div className="footer-mark"><BrandMark /></div>
+          <p>Exceptional fragrance.<br />Without boundaries.</p>
           <p>Nassau, The Bahamas</p>
-          <p>Pickup details are confirmed with your order.</p>
         </div>
         <div>
-          <h3>Discover</h3>
-          <Link href="/pages/about">Our story</Link>
-          <Link href="/pages/aurum-room">The Aurum Room</Link>
-          <Link href="/#collections">Collections</Link>
+          <h3>Shop</h3>
+          <Link href="/shop">All fragrances</Link>
+          <Link href="/shop?query=women">For her</Link>
+          <Link href="/shop?query=men">For him</Link>
+          <Link href="/shop?query=unisex">Unisex</Link>
+          <Link href="/shop?query=gift%20set">Gift sets</Link>
         </div>
         <div>
           <h3>Client care</h3>
@@ -26,14 +28,21 @@ export function Footer() {
           <Link href="/pages/terms">Terms</Link>
         </div>
         <div>
-          <h3>Your edit</h3>
+          <h3>About</h3>
+          <Link href="/pages/about">Our story</Link>
+          <Link href="/pages/aurum-room">The Aurum Room</Link>
+          <Link href="/#collections">Collections</Link>
           <Link href="/saved">Saved fragrances</Link>
-          <Link href="/shop">Shop all</Link>
+        </div>
+        <div className="footer-newsletter">
+          <h3>Private list</h3>
+          <p>New arrivals, gifting ideas and the occasional invitation.</p>
+          <Newsletter />
         </div>
       </div>
       <div className="footer-bottom">
         <span>© {new Date().getFullYear()} Aurum Privée</span>
-        <span>Exceptional fragrance. Without boundaries.</span>
+        <span>Designed in The Bahamas</span>
       </div>
     </footer>
   );
