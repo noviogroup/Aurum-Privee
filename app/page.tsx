@@ -49,35 +49,19 @@ export default async function HomePage() {
   ].slice(0, 6);
   return (
     <div className="home-page">
-      <section className="hero">
-        <Image
-          src="/images/hero-merchandising-background-v2.webp"
-          alt="Sunlit travertine fragrance display with blush lilies"
-          fill
-          priority
-          sizes="100vw"
-          className="hero-image"
-          decoding="sync"
-        />
-        <div className="hero-scrim" />
-        <div className="hero-merchandise" aria-label="Featured fragrances available from Aurum Privée">
-          <Link className="hero-product hero-product-dior" href="/shop/christian-dior-dior-sauvage-3-4-edp-sp-460426" aria-label="Shop Dior Sauvage Eau de Parfum">
-            <Image src="/images/hero-products/dior-sauvage.webp" alt="Dior Sauvage Eau de Parfum bottle and box" fill sizes="28vw" priority />
-          </Link>
-          <Link className="hero-product hero-product-tom-ford" href="/shop/tom-ford-black-orchid-1-7-edp-sp-7fcf54" aria-label="Shop Tom Ford Black Orchid">
-            <Image src="/images/hero-products/tom-ford-black-orchid.webp" alt="Tom Ford Black Orchid bottle and box" fill sizes="27vw" priority />
-          </Link>
-          <Link className="hero-product hero-product-afnan" href="/shop/afnan-supremacy-noir-edp-3-4-oz-4d0813" aria-label="Shop Afnan Supremacy Noir">
-            <Image src="/images/hero-products/afnan-supremacy-noir.webp" alt="Afnan Supremacy Noir bottle and box" fill sizes="25vw" priority />
-          </Link>
-        </div>
-        <div className="hero-content entrance">
+      <section className="home-campaign-hero">
+        <div className="home-campaign-copy entrance">
           <p className="utility-label">Exceptional fragrance.</p>
-          <h1>Without<br />boundaries.</h1>
-          <p>A curated selection of the world&apos;s finest fragrances. Designer, niche and luxury from every corner of the globe.</p>
+          <h1>Without<br />{" "}boundaries.</h1>
+          <p>A considered wardrobe of designer, niche and Arabian fragrance—selected in Nassau, worn everywhere.</p>
           <div className="hero-actions">
-            <Link className="button button-primary" href="/shop">Shop now</Link>
+            <Link className="button button-primary" href="/shop">Shop the collection</Link>
+            <Link className="campaign-text-link" href="#scent-finder">Find your scent <ArrowRight size={16} /></Link>
           </div>
+        </div>
+        <div className="home-campaign-visual">
+          <Image src="/images/campaign/signature-consultation.webp" alt="Aurum Privée scent consultation with Miss Dior, Dior Sauvage and Good Girl fragrances" fill priority sizes="(max-width: 767px) 100vw, 64vw" />
+          <div className="home-campaign-caption"><strong>Your signature, considered.</strong><span>Personal fragrance guidance in Nassau</span></div>
         </div>
       </section>
 
@@ -110,6 +94,35 @@ export default async function HomePage() {
             <Image src={image} alt={label} width={170} height={54} unoptimized />
           </Link>
         ))}
+      </section>
+
+      <section className="campaign-journal section-shell" aria-labelledby="campaign-journal-title">
+        <div className="campaign-journal-heading">
+          <h2 id="campaign-journal-title">A fragrance wardrobe,<br />{" "}composed slowly.</h2>
+          <p>Follow instinct across luminous florals, polished amber and the darker pull of oud.</p>
+        </div>
+        <div className="campaign-journal-grid">
+          <Link className="campaign-story campaign-story-baccarat" href="/shop/maison-francis-kurkdjian-baccarat-rouge-540-edp-2-4-540-a5076e">
+            <Image src="/images/campaign/baccarat-gifting.webp" alt="Baccarat Rouge 540 presented with Aurum Privée gift packaging" fill sizes="(max-width: 767px) 100vw, 42vw" />
+            <span><small>Gift-worthy signatures</small><strong>Baccarat Rouge 540</strong><b>Discover the fragrance <ArrowRight size={15} /></b></span>
+          </Link>
+          <div className="campaign-journal-side">
+            <Link className="campaign-story campaign-story-amber-gold" href="/shop/al-haramain-amber-oud-gold-edp-spray-3-4-oz-e36239">
+              <Image src="/images/campaign/amber-oud-gold.webp" alt="Al Haramain Amber Oud Gold Edition in warm daylight" fill sizes="(max-width: 767px) 100vw, 58vw" />
+              <span><small>Golden and enveloping</small><strong>Amber Oud Gold</strong><b>Shop the fragrance <ArrowRight size={15} /></b></span>
+            </Link>
+            <div className="campaign-journal-pair">
+              <Link className="campaign-story campaign-story-oud" href="/shop?query=oud">
+                <Image src="/images/campaign/oud-ritual.webp" alt="Amber oud fragrance beside carved lantern and oud wood" fill sizes="(max-width: 767px) 100vw, 29vw" />
+                <span><small>Smoked woods and resin</small><strong>The oud ritual</strong><b>Explore oud <ArrowRight size={15} /></b></span>
+              </Link>
+              <Link className="campaign-story campaign-story-roja" href="/shop?family=Amber">
+                <Image src="/images/campaign/roja-amber.webp" alt="Amber fragrance presented with oud wood and Aurum Privée ribbon" fill sizes="(max-width: 767px) 100vw, 29vw" />
+                <span><small>Deep, magnetic, spiced</small><strong>The amber edit</strong><b>Explore amber <ArrowRight size={15} /></b></span>
+              </Link>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section className="scent-finder section-shell" id="scent-finder">
