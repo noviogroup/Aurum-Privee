@@ -60,8 +60,8 @@ export default async function HomePage() {
           </div>
         </div>
         <div className="home-campaign-visual">
-          <Image src="/images/campaign/signature-consultation.webp" alt="Aurum Privée scent consultation with Miss Dior, Dior Sauvage and Good Girl fragrances" fill priority sizes="(max-width: 767px) 100vw, 64vw" />
-          <div className="home-campaign-caption"><strong>Your signature, considered.</strong><span>Personal fragrance guidance in Nassau</span></div>
+          <Image src="/images/campaign/hero-popular-fragrances-v2.webp" alt="Dior Sauvage, Carolina Herrera Good Girl Blush, Baccarat Rouge 540 and Tom Ford Black Orchid fragrances" fill priority sizes="(max-width: 767px) 100vw, 64vw" />
+          <div className="home-campaign-caption"><strong>Four icons. One considered edit.</strong><span>Dior · Carolina Herrera · MFK · Tom Ford</span></div>
         </div>
       </section>
 
