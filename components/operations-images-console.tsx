@@ -156,7 +156,7 @@ export function OperationsImagesConsole({ initialCatalog }: { initialCatalog: Op
           <h1>Product images</h1>
           <p>Complete the catalog with approved retail photography.</p>
         </div>
-        {catalog.preview && <div className="operations-preview-banner"><WarningCircle size={17} weight="fill" />Local catalog preview. Connect Supabase Storage to publish images from this screen.</div>}
+        {catalog.preview && <div className="operations-preview-banner"><WarningCircle size={17} weight="fill" />Catalog preview. Publish approved photography through the versioned repository image-intake workflow.</div>}
 
         <div className="operations-frame operations-image-frame">
           <section className="operations-queue operations-image-queue">

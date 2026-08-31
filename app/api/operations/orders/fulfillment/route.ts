@@ -5,6 +5,8 @@ import { hasOperatorSession } from "@/lib/operator-session";
 import { readJsonBody, RequestBodyTooLargeError } from "@/lib/request-security";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { deliverFulfillmentUpdate } from "@/lib/transactional-email";
+import { sendFulfillmentEmail } from "@/lib/email";
+import { getCommerceOrder, updateCommerceOrder } from "@/lib/netlify-commerce";
 
 const schema = z.object({
   orderId: z.string().uuid(),
@@ -14,10 +16,40 @@ const schema = z.object({
 export async function POST(request: Request) {
   if (!await hasOperatorSession()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!isSameOriginRequest(request)) return NextResponse.json({ error: "Invalid request origin" }, { status: 403 });
-  const supabase = getSupabaseAdmin();
-  if (!supabase) return NextResponse.json({ error: "Supabase is not configured" }, { status: 503 });
   try {
     const input = schema.parse(await readJsonBody<unknown>(request, 2_048));
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      const order = await getCommerceOrder(input.orderId);
+      if (!order) return NextResponse.json({ error: "Order was not found" }, { status: 404 });
+      if (order.fulfillmentStatus === input.status && order.fulfillmentEmailStatus === "sent") {
+        return NextResponse.json({ orderId: order.id, orderNumber: order.orderNumber, status: order.fulfillmentStatus, duplicate: true });
+      }
+      let emailSent = false;
+      try {
+        await sendFulfillmentEmail({
+          orderNumber: order.orderNumber,
+          customerName: order.customerName,
+          customerEmail: order.customerEmail,
+          status: input.status,
+          isDelivery: order.shippingAmount > 0,
+        });
+        emailSent = true;
+      } catch {
+        emailSent = false;
+      }
+      await updateCommerceOrder(order.id, {
+        fulfillmentStatus: input.status,
+        fulfillmentEmailStatus: emailSent ? "sent" : "failed",
+      });
+      return NextResponse.json({
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        status: input.status,
+        emailSent,
+        ...(!emailSent ? { error: "The order was updated, but its customer email needs retry." } : {}),
+      }, { status: emailSent ? 200 : 502 });
+    }
     const { data, error } = await supabase.rpc("transition_order_fulfillment", { p_order_id: input.orderId, p_next_status: input.status });
     if (error) throw error;
     const order = Array.isArray(data) ? data[0] : data;

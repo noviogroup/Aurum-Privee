@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import crypto from "node:crypto";
 import Stripe from "stripe";
 import { OrderSyncLine, syncOrderToLoyverse } from "@/lib/loyverse-order-sync";
 import { syncFullRefundToLoyverse } from "@/lib/loyverse-refund-sync";
@@ -7,6 +8,16 @@ import { netFromGross, parseCommerceTaxes, roundMoney } from "@/lib/tax";
 import { isConfiguredSecret } from "@/lib/env";
 import { readRequestText, RequestBodyTooLargeError } from "@/lib/request-security";
 import { deliverOrderConfirmation } from "@/lib/transactional-email";
+import { sendOrderEmails } from "@/lib/email";
+import {
+  claimCommerceEvent,
+  completeCommerceEvent,
+  getCommerceOrderByPaymentIntent,
+  getCommerceOrderBySession,
+  saveCommerceOrder,
+  updateCommerceOrder,
+  type CommerceOrder,
+} from "@/lib/netlify-commerce";
 
 export const runtime = "nodejs";
 
@@ -75,6 +86,195 @@ async function handleRefundedCharge(charge: Stripe.Charge, supabase: NonNullable
   return NextResponse.json({ received: true, fullRefund: true, loyverseRefundSynchronized: false });
 }
 
+async function parsePaidCheckout(stripe: Stripe, session: Stripe.Checkout.Session) {
+  const checkoutLines = await stripe.checkout.sessions.listLineItems(session.id, { expand: ["data.price.product"], limit: 100 });
+  const parsedLines = checkoutLines.data.map((line) => {
+    const stripeProduct = typeof line.price?.product === "object" ? line.price.product as Stripe.Product : null;
+    return {
+      kind: stripeProduct?.metadata.line_kind || "product",
+      name: line.description || "Fragrance",
+      quantity: line.quantity || 1,
+      amount: (line.amount_total || 0) / 100,
+      productId: stripeProduct?.metadata.product_id || "",
+      loyverseVariantId: stripeProduct?.metadata.loyverse_variant_id || "",
+      taxIds: (stripeProduct?.metadata.loyverse_tax_ids || "").split(",").filter(Boolean),
+      taxes: parseCommerceTaxes(stripeProduct?.metadata.loyverse_taxes),
+      unitPrice: line.quantity ? (line.amount_total || 0) / 100 / line.quantity : 0,
+    };
+  });
+  const lines = parsedLines.filter((line) => line.kind === "product").map((line) => ({
+    name: line.name,
+    quantity: line.quantity,
+    amount: line.amount,
+    productId: line.productId,
+    loyverseVariantId: line.loyverseVariantId,
+    taxIds: line.taxIds,
+    taxes: line.taxes,
+    unitPrice: line.unitPrice,
+  }));
+  if (!lines.length || lines.some((line) => !line.productId || !line.loyverseVariantId || line.quantity < 1)) {
+    throw new Error("Paid checkout has invalid product lines");
+  }
+  return { parsedLines, lines };
+}
+
+async function runBlobOrderSideEffects(order: CommerceOrder) {
+  let updated = order;
+  if (order.customerEmail && order.confirmationEmailStatus !== "sent") {
+    try {
+      await sendOrderEmails({
+        orderNumber: order.orderNumber,
+        customerName: order.customerName,
+        customerEmail: order.customerEmail,
+        total: order.total,
+        items: order.lineItems.map((line) => ({ name: line.name, quantity: line.quantity, amount: line.amount })),
+      });
+      updated = { ...updated, confirmationEmailStatus: "sent" };
+    } catch {
+      updated = { ...updated, confirmationEmailStatus: "failed" };
+    }
+  }
+  if (isConfiguredSecret(process.env.LOYVERSE_ACCESS_TOKEN) && order.loyverseSyncStatus !== "succeeded") {
+    try {
+      const result = await syncOrderToLoyverse(null, {
+        orderNumber: order.orderNumber,
+        customerName: order.customerName,
+        customerEmail: order.customerEmail,
+        customerPhone: order.customerPhone,
+        shippingAmount: order.shippingAmount,
+        paidTotal: order.total,
+        createdAt: order.createdAt,
+        deliveryDetails: order.deliveryDetails as CommerceOrder["deliveryDetails"],
+        lines: order.lineItems,
+      });
+      updated = {
+        ...updated,
+        loyverseSyncStatus: "succeeded",
+        loyverseSyncAttempts: order.loyverseSyncAttempts + 1,
+        loyverseReceiptId: result.receipt.receipt_number,
+      };
+    } catch {
+      updated = { ...updated, loyverseSyncStatus: "failed", loyverseSyncAttempts: order.loyverseSyncAttempts + 1 };
+    }
+  }
+  return await saveCommerceOrder(updated);
+}
+
+async function handleDatabaseFreeEvent(event: Stripe.Event, stripe: Stripe) {
+  if (!await claimCommerceEvent(event.id, event.type)) return NextResponse.json({ received: true, duplicate: true });
+  try {
+    if (event.type === "checkout.session.expired") {
+      await completeCommerceEvent(event.id, event.type);
+      return NextResponse.json({ received: true });
+    }
+    if (event.type === "charge.refunded") {
+      const charge = event.data.object;
+      const paymentIntentId = typeof charge.payment_intent === "string" ? charge.payment_intent : charge.payment_intent?.id;
+      if (!paymentIntentId) {
+        await completeCommerceEvent(event.id, event.type);
+        return NextResponse.json({ received: true, ignored: "refund has no payment intent" });
+      }
+      const order = await getCommerceOrderByPaymentIntent(paymentIntentId);
+      if (!order) throw new Error("Refund order was not found in Netlify storage");
+      const fullRefund = charge.amount_refunded >= charge.amount;
+      let refundStatus: CommerceOrder["loyverseRefundSyncStatus"] = fullRefund ? "pending" : "manual_required";
+      let refundReceiptId = order.loyverseRefundReceiptId;
+      if (fullRefund && isConfiguredSecret(process.env.LOYVERSE_ACCESS_TOKEN)) {
+        try {
+          const result = await syncFullRefundToLoyverse(null, {
+            orderNumber: order.orderNumber,
+            saleReceiptNumber: order.loyverseReceiptId,
+            createdAt: order.createdAt,
+          });
+          refundStatus = "succeeded";
+          refundReceiptId = result.refund.receipt_number;
+        } catch {
+          refundStatus = "failed";
+        }
+      }
+      await updateCommerceOrder(order.id, {
+        status: fullRefund ? "refunded" : "partially_refunded",
+        refundedAmount: charge.amount_refunded / 100,
+        loyverseRefundSyncStatus: refundStatus,
+        loyverseRefundSyncAttempts: order.loyverseRefundSyncAttempts + 1,
+        loyverseRefundReceiptId: refundReceiptId,
+      });
+      await completeCommerceEvent(event.id, event.type);
+      return NextResponse.json({ received: true, fullRefund, loyverseRefundSynchronized: refundStatus === "succeeded" });
+    }
+    if (event.type !== "checkout.session.completed" && event.type !== "checkout.session.async_payment_succeeded") {
+      await completeCommerceEvent(event.id, event.type);
+      return NextResponse.json({ received: true });
+    }
+    const session = event.data.object;
+    if (session.payment_status !== "paid") {
+      await completeCommerceEvent(event.id, event.type);
+      return NextResponse.json({ received: true, paymentPending: true });
+    }
+    if (session.metadata?.channel !== "aurum-privee-web") {
+      await completeCommerceEvent(event.id, event.type);
+      return NextResponse.json({ received: true, ignored: "unrelated checkout" });
+    }
+    const existing = await getCommerceOrderBySession(session.id);
+    if (existing) {
+      const retried = await runBlobOrderSideEffects(existing);
+      const sideEffectErrors = Number(retried.confirmationEmailStatus === "failed") + Number(retried.loyverseSyncStatus === "failed");
+      await completeCommerceEvent(event.id, event.type, sideEffectErrors ? "Order side effects require retry" : undefined);
+      return NextResponse.json({ received: true, duplicate: true, sideEffectErrors }, { status: sideEffectErrors ? 500 : 200 });
+    }
+    const { parsedLines, lines } = await parsePaidCheckout(stripe, session);
+    const merchandiseTaxAmount = parsedLines.filter((line) => line.kind === "added_tax").reduce((sum, line) => sum + line.amount, 0);
+    const orderNumber = `AP-${session.id.slice(-8).toUpperCase()}`;
+    const total = (session.amount_total || 0) / 100;
+    const merchandiseTotal = lines.reduce((sum, line) => sum + line.amount, 0);
+    const checkoutLineTotal = parsedLines.reduce((sum, line) => sum + line.amount, 0);
+    const shippingGrossAmount = Math.max(0, roundMoney(total - checkoutLineTotal));
+    const deliveryAddedTaxRate = Number(session.metadata?.delivery_added_tax_rate || 0);
+    if (!Number.isFinite(deliveryAddedTaxRate) || deliveryAddedTaxRate < 0) throw new Error("Paid checkout has invalid delivery tax metadata");
+    const shippingAmount = netFromGross(shippingGrossAmount, deliveryAddedTaxRate);
+    const now = new Date(session.created * 1000).toISOString();
+    const order = await saveCommerceOrder({
+      id: crypto.randomUUID(),
+      orderNumber,
+      stripeSessionId: session.id,
+      stripePaymentIntentId: typeof session.payment_intent === "string" ? session.payment_intent : null,
+      customerEmail: session.customer_details?.email || "",
+      customerName: session.customer_details?.name || "Client",
+      customerPhone: session.customer_details?.phone || null,
+      currency: session.currency || "bsd",
+      subtotal: merchandiseTotal,
+      shippingAmount,
+      taxAmount: roundMoney(merchandiseTaxAmount + shippingGrossAmount - shippingAmount),
+      total,
+      status: "paid",
+      fulfillmentStatus: "unfulfilled",
+      confirmationEmailStatus: session.customer_details?.email ? "pending" : "not_sent",
+      fulfillmentEmailStatus: "not_sent",
+      loyverseSyncStatus: isConfiguredSecret(process.env.LOYVERSE_ACCESS_TOKEN) ? "pending" : "failed",
+      loyverseSyncAttempts: 0,
+      loyverseSyncClaimedAt: null,
+      loyverseReceiptId: null,
+      loyverseRefundSyncStatus: null,
+      loyverseRefundSyncAttempts: 0,
+      loyverseRefundSyncClaimedAt: null,
+      loyverseRefundReceiptId: null,
+      refundedAmount: 0,
+      deliveryDetails: session.collected_information?.shipping_details as unknown as Record<string, unknown> || null,
+      lineItems: lines,
+      createdAt: now,
+      updatedAt: now,
+    });
+    const completed = await runBlobOrderSideEffects(order);
+    const sideEffectErrors = Number(completed.confirmationEmailStatus === "failed") + Number(completed.loyverseSyncStatus === "failed");
+    await completeCommerceEvent(event.id, event.type, sideEffectErrors ? "Order side effects require retry" : undefined);
+    return NextResponse.json({ received: true, sideEffectErrors }, { status: sideEffectErrors ? 500 : 200 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Database-free event processing failed";
+    await completeCommerceEvent(event.id, event.type, message);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
 export async function POST(request: Request) {
   const key = process.env.STRIPE_SECRET_KEY;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -100,6 +300,7 @@ export async function POST(request: Request) {
   }
 
   const supabase = getSupabaseAdmin();
+  if (!supabase) return handleDatabaseFreeEvent(event, stripe);
   if (supabase) {
     const { data: claimed, error: claimError } = await supabase.rpc("claim_stripe_webhook_event", { p_event_id: event.id, p_event_type: event.type });
     if (claimError) return NextResponse.json({ error: "Stripe event claim failed" }, { status: 500 });

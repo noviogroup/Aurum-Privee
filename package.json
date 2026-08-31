@@ -18,6 +18,7 @@
     "images:normalize": "tsx scripts/normalize-catalog-images.ts"
   },
   "dependencies": {
+    "@netlify/blobs": "^10.7.13",
     "@phosphor-icons/react": "^2.1.10",
     "@supabase/supabase-js": "^2.49.4",
     "next": "15.5.23",

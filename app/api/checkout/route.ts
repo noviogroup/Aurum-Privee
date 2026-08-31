@@ -4,11 +4,12 @@ import Stripe from "stripe";
 import { z } from "zod";
 import { getCatalogProductsByIds } from "@/lib/catalog";
 import { siteConfig } from "@/lib/config";
-import { getSupabaseAdmin } from "@/lib/supabase";
 import { calculateAddedTax, grossFromNet } from "@/lib/tax";
 import { isConfiguredSecret } from "@/lib/env";
-import { consumeRateLimit, readJsonBody, RequestBodyTooLargeError } from "@/lib/request-security";
+import { readJsonBody, RequestBodyTooLargeError } from "@/lib/request-security";
 import { checkoutIsEnabled } from "@/lib/checkout-availability";
+import { consumeBlobRateLimit } from "@/lib/netlify-commerce";
+import { listInventory } from "@/lib/loyverse";
 
 const requestSchema = z.object({
   items: z.array(z.object({ productId: z.string().min(1), quantity: z.number().int().min(1).max(10) })).min(1).max(20),
@@ -27,19 +28,33 @@ export async function POST(request: Request) {
     if (!isConfiguredSecret(key)) {
       return NextResponse.json({ error: "Secure checkout is ready for a Stripe key. Add it to the environment to continue." }, { status: 503 });
     }
-    const supabase = getSupabaseAdmin();
-    if (!supabase) return NextResponse.json({ error: "Live inventory reservations are not configured." }, { status: 503 });
-
-    const rateLimit = await consumeRateLimit({ supabase, request, scope: "checkout", limit: 5, windowSeconds: 600 });
+    const storeId = process.env.LOYVERSE_STORE_ID;
+    if (!isConfiguredSecret(process.env.LOYVERSE_ACCESS_TOKEN) || !storeId || !isConfiguredSecret(process.env.LOYVERSE_PAYMENT_TYPE_ID)) {
+      return NextResponse.json({ error: "Online inventory and receipt processing are not configured." }, { status: 503 });
+    }
+    if (![process.env.RESEND_API_KEY, process.env.RESEND_FROM_EMAIL, process.env.STORE_NOTIFICATION_EMAIL].every(isConfiguredSecret)) {
+      return NextResponse.json({ error: "Order confirmations are not configured." }, { status: 503 });
+    }
+    const rateLimit = await consumeBlobRateLimit({ request, scope: "checkout", limit: 5, windowSeconds: 600 });
     if (!rateLimit.configured) return NextResponse.json({ error: "Secure checkout protection is not configured." }, { status: 503 });
     if (!rateLimit.allowed) return NextResponse.json({ error: "Too many checkout attempts. Please wait before trying again." }, { status: 429, headers: { "Retry-After": String(rateLimit.retryAfter) } });
-    const globalLimit = await consumeRateLimit({ supabase, request, scope: "checkout-global", limit: 120, windowSeconds: 60, global: true });
+    const globalLimit = await consumeBlobRateLimit({ request, scope: "checkout-global", limit: 120, windowSeconds: 60, global: true });
     if (!globalLimit.allowed) return NextResponse.json({ error: "Checkout is briefly busy. Please try again shortly." }, { status: 503, headers: { "Retry-After": String(globalLimit.retryAfter) } });
 
     const input = requestSchema.parse(await readJsonBody<unknown>(request, 16_384));
     const products = await getCatalogProductsByIds(input.items.map((item) => item.productId));
     if (products.length !== new Set(input.items.map((item) => item.productId)).size) {
       return NextResponse.json({ error: "One or more fragrances are no longer available." }, { status: 400 });
+    }
+    const trackedProducts = products.filter((product) => product.stock < 999999 && product.loyverseVariantId);
+    if (trackedProducts.length) {
+      const levels = await listInventory(trackedProducts.map((product) => product.loyverseVariantId!));
+      const liveStock = new Map(levels.filter((level) => level.store_id === storeId).map((level) => [level.variant_id, Math.max(0, level.in_stock || 0)]));
+      const unavailable = input.items.find((line) => {
+        const product = trackedProducts.find((candidate) => candidate.id === line.productId);
+        return product?.loyverseVariantId && (liveStock.get(product.loyverseVariantId) || 0) < line.quantity;
+      });
+      if (unavailable) return NextResponse.json({ error: "Those quantities are no longer available. Please review your bag." }, { status: 409 });
     }
 
     let addedTaxAmount = 0;
@@ -95,19 +110,8 @@ export async function POST(request: Request) {
 
     const checkoutReference = crypto.randomUUID();
     const sessionExpiresAt = new Date(Date.now() + 35 * 60 * 1000);
-    const reservationExpiresAt = new Date(sessionExpiresAt.getTime() + 15 * 60 * 1000);
-    const { error: reservationError } = await supabase.rpc("reserve_checkout_inventory", {
-      p_checkout_reference: checkoutReference,
-      p_items: input.items.map((item) => ({ product_id: item.productId, quantity: item.quantity })),
-      p_expires_at: reservationExpiresAt.toISOString(),
-      p_actor_key_hash: rateLimit.keyHash,
-    });
-    if (reservationError) return NextResponse.json({ error: "Those quantities are no longer available. Please review your bag." }, { status: 409 });
-
     const stripe = new Stripe(key, { apiVersion: "2026-02-25.clover" as Stripe.LatestApiVersion });
-    let session: Stripe.Checkout.Session;
-    try {
-      session = await stripe.checkout.sessions.create({
+    const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: lineItems,
       success_url: `${siteConfig.url}/order/success?session_id={CHECKOUT_SESSION_ID}`,
@@ -125,27 +129,13 @@ export async function POST(request: Request) {
       metadata: {
         channel: "aurum-privee-web",
         checkout_reference: checkoutReference,
+        inventory_mode: "loyverse-at-payment",
         delivery_base_amount: deliveryBaseAmount.toFixed(2),
         delivery_added_tax_rate: deliveryAddedTaxRate.toString(),
       },
-      });
-    } catch (error) {
-      await supabase.rpc("release_checkout_inventory", { p_checkout_reference: checkoutReference, p_status: "released" });
-      throw error;
-    }
+    });
 
-    if (!session.url) {
-      await supabase.rpc("release_checkout_inventory", { p_checkout_reference: checkoutReference, p_status: "released" });
-      throw new Error("Stripe did not return a checkout URL.");
-    }
-    const { error: linkError } = await supabase.from("checkout_reservations").update({ stripe_session_id: session.id }).eq("checkout_reference", checkoutReference);
-    if (linkError) {
-      await Promise.allSettled([
-        stripe.checkout.sessions.expire(session.id),
-        supabase.rpc("release_checkout_inventory", { p_checkout_reference: checkoutReference, p_status: "released" }),
-      ]);
-      throw new Error("Checkout inventory could not be linked securely. Please try again.");
-    }
+    if (!session.url) throw new Error("Stripe did not return a checkout URL.");
     return NextResponse.json({ url: session.url });
   } catch (error) {
     if (error instanceof RequestBodyTooLargeError) return NextResponse.json({ error: "The checkout request is too large." }, { status: 413 });

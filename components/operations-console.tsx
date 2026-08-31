@@ -163,7 +163,7 @@ export function OperationsConsole({ initialOrders, preview = false, initialOrder
           <h1>Orders</h1>
           <p>{new Intl.DateTimeFormat("en-BS", { weekday: "long", month: "long", day: "numeric" }).format(new Date())}</p>
         </div>
-        {preview && <div className="operations-preview-banner"><WarningCircle size={17} weight="fill" />Local preview data. Connect Supabase to view and update real orders.</div>}
+        {preview && <div className="operations-preview-banner"><WarningCircle size={17} weight="fill" />Local preview data. Deployed orders are stored privately in Netlify Blobs.</div>}
 
         <div className="operations-frame">
           <section className="operations-queue">

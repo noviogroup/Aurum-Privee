@@ -4,10 +4,8 @@ import { isConfiguredSecret, isStrongSecret } from "@/lib/env";
 import {
   getLoyverseMerchant,
   getLoyverseVariant,
-  getLoyverseWebhookUrl,
   listLoyversePaymentTypes,
   listLoyverseStores,
-  listLoyverseWebhooks,
   resolveVariantForStore,
 } from "@/lib/loyverse";
 import { getOperationsImageCatalog } from "@/lib/operations-images";
@@ -40,22 +38,15 @@ function configuredEmail(env: Environment) {
     && isConfiguredSecret(env.STORE_NOTIFICATION_EMAIL);
 }
 
-function configuredDatabase(env: Environment) {
-  return isConfiguredSecret(env.NEXT_PUBLIC_SUPABASE_URL) && isConfiguredSecret(env.SUPABASE_SERVICE_ROLE_KEY);
-}
-
 function configuredLoyverse(env: Environment) {
   return isConfiguredSecret(env.LOYVERSE_ACCESS_TOKEN)
     && isConfiguredSecret(env.LOYVERSE_MERCHANT_ID)
     && isConfiguredSecret(env.LOYVERSE_STORE_ID)
-    && isConfiguredSecret(env.LOYVERSE_PAYMENT_TYPE_ID)
-    && isStrongSecret(env.LOYVERSE_WEBHOOK_TOKEN);
+    && isConfiguredSecret(env.LOYVERSE_PAYMENT_TYPE_ID);
 }
 
 function configuredSecurity(env: Environment) {
-  return isStrongSecret(env.SYNC_SECRET)
-    && isStrongSecret(env.RATE_LIMIT_SECRET)
-    && isStrongSecret(env.HEALTH_MONITOR_SECRET)
+  return isStrongSecret(env.RATE_LIMIT_SECRET)
     && isStrongSecret(env.OPERATIONS_SESSION_SECRET)
     && isStrongSecret(env.OPERATIONS_PASSWORD, 12);
 }
@@ -68,7 +59,6 @@ export function buildConfigurationReadiness(env: Environment, catalog: CatalogTo
   const host = publicHost(env.NEXT_PUBLIC_SITE_URL);
   const securityReady = configuredSecurity(env);
   const loyverseConfigured = configuredLoyverse(env);
-  const databaseConfigured = configuredDatabase(env);
   const paymentConfigured = configuredPayment(env);
   const checkoutEnabled = checkoutIsEnabled(env.NEXT_PUBLIC_CHECKOUT_ENABLED);
   const emailConfigured = configuredEmail(env);
@@ -90,27 +80,26 @@ export function buildConfigurationReadiness(env: Environment, catalog: CatalogTo
         { label: "Currency", value: env.NEXT_PUBLIC_STORE_CURRENCY || "BSD" },
         { label: "Catalog", value: `${catalog.all} products` },
         { label: "Images", value: `${catalog.loyverse + catalog.curated} sourced / ${catalog.missing} missing` },
-        { label: "Webhooks", value: "Run live checks" },
+        { label: "Inventory", value: "Checked live before checkout" },
       ],
       requirements: [
         ...(!credentialsRotated ? ["Rotate the access token"] : []),
         ...(!deliveryConfigured ? [deliveryItemRequirement()] : []),
-        "Register inventory and item webhooks on the public domain",
       ],
     }),
     service({
       id: "database",
-      name: "Database & storage",
-      summary: "Orders, reservations, catalog and product media",
-      state: databaseConfigured ? "attention" : "missing",
-      status: databaseConfigured ? "Configured" : "Needs setup",
-      connection: databaseConfigured ? "Credentials present" : "Supabase not connected",
+      name: "Commerce storage",
+      summary: "Orders, webhook state, inquiries and subscriber consent",
+      state: "ready",
+      status: "Ready",
+      connection: "Netlify Blobs · zero configuration",
       facts: [
-        { label: "Database", value: databaseConfigured ? "Configured" : "Not connected" },
-        { label: "Migrations", value: "14 required" },
-        { label: "Image bucket", value: databaseConfigured ? "Run live checks" : "Not connected" },
+        { label: "Store", value: "Site-scoped Netlify Blobs" },
+        { label: "Consistency", value: "Strong reads for commerce state" },
+        { label: "Credentials", value: "None required" },
       ],
-      requirements: databaseConfigured ? ["Verify all migrations and the product-images bucket"] : ["Create the Supabase project", "Apply all fourteen migrations", "Provide server-side service-role access"],
+      requirements: [],
     }),
     service({
       id: "payments",
@@ -167,8 +156,8 @@ export function buildConfigurationReadiness(env: Environment, catalog: CatalogTo
       facts: [
         { label: "Staff console", value: isStrongSecret(env.OPERATIONS_PASSWORD, 12) ? "Protected" : "Needs password" },
         { label: "Sessions", value: isStrongSecret(env.OPERATIONS_SESSION_SECRET) ? "Signed, HttpOnly" : "Needs signing key" },
-        { label: "API protection", value: isStrongSecret(env.RATE_LIMIT_SECRET) && isStrongSecret(env.SYNC_SECRET) ? "Configured" : "Needs secrets" },
-        { label: "Health monitor", value: isStrongSecret(env.HEALTH_MONITOR_SECRET) ? "Private readiness enabled" : "Needs secret" },
+        { label: "API protection", value: isStrongSecret(env.RATE_LIMIT_SECRET) ? "Configured" : "Needs rate-limit secret" },
+        { label: "Storage", value: "Private Netlify site scope" },
       ],
       requirements: securityReady ? [] : ["Configure independent high-entropy security secrets"],
     }),
@@ -196,16 +185,12 @@ export async function getOperationsReadiness({ live = false }: { live?: boolean 
       if (!configuredLoyverse(process.env)) return;
       try {
         const deliveryId = isConfiguredSecret(process.env.LOYVERSE_DELIVERY_VARIANT_ID) ? process.env.LOYVERSE_DELIVERY_VARIANT_ID : null;
-        const [merchant, stores, paymentTypes, webhooks, delivery] = await Promise.all([
-          getLoyverseMerchant(), listLoyverseStores(), listLoyversePaymentTypes(), listLoyverseWebhooks(),
+        const [merchant, stores, paymentTypes, delivery] = await Promise.all([
+          getLoyverseMerchant(), listLoyverseStores(), listLoyversePaymentTypes(),
           deliveryId ? getLoyverseVariant(deliveryId).catch(() => null) : Promise.resolve(null),
         ]);
         const store = stores.find((item) => item.id === process.env.LOYVERSE_STORE_ID);
         const payment = paymentTypes.find((item) => item.id === process.env.LOYVERSE_PAYMENT_TYPE_ID && (!store || item.stores.includes(store.id)));
-        let expectedUrl: string | null = null;
-        try { expectedUrl = getLoyverseWebhookUrl(); } catch { expectedUrl = null; }
-        const webhookTypes = new Set(webhooks.filter((item) => expectedUrl && item.url === expectedUrl && item.status === "ENABLED").map((item) => item.type));
-        const hooksReady = webhookTypes.has("items.update") && webhookTypes.has("inventory_levels.update");
         const deliveryReady = Boolean(delivery && store && resolveVariantForStore(delivery, store.id).available);
         const rotated = process.env.LOYVERSE_CREDENTIALS_ROTATED === "true";
         const expectedBusiness = expectedLoyverseBusinessName(process.env);
@@ -218,7 +203,6 @@ export async function getOperationsReadiness({ live = false }: { live?: boolean 
           ...(store && !storeNameReady ? [`Rename the Loyverse store from ‘${store.name}’ to ‘${expectedBusiness}’ or approve the existing operating name`] : []),
           ...(!payment ? ["Select an online payment type enabled for the store"] : []),
           ...(!deliveryReady ? [deliveryItemRequirement()] : []),
-          ...(!hooksReady ? ["Register inventory and item webhooks on the public domain"] : []),
         ];
         updateService(readiness, "loyverse", {
           state: requirements.length ? "attention" : "ready",
@@ -230,7 +214,7 @@ export async function getOperationsReadiness({ live = false }: { live?: boolean 
             { label: "Currency", value: merchant.currency.code },
             { label: "Catalog", value: `${catalog.totals.all} products` },
             { label: "Images", value: `${catalog.totals.loyverse + catalog.totals.curated} sourced / ${catalog.totals.missing} missing` },
-            { label: "Webhooks", value: `${Number(webhookTypes.has("items.update")) + Number(webhookTypes.has("inventory_levels.update"))} of 2 enabled` },
+            { label: "Inventory", value: "Checked live before checkout" },
           ],
           requirements,
         });

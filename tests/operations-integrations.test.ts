@@ -48,12 +48,13 @@ test("readiness never exposes configured secret values", () => {
   assert.equal(result.services.find((item) => item.id === "payments")?.requirements.some((item) => item.includes("NEXT_PUBLIC_CHECKOUT_ENABLED=true")), true);
 });
 
-test("local unconfigured environment reports actionable launch gaps", () => {
+test("local unconfigured environment reports launch gaps while storage needs no setup", () => {
   const result = buildConfigurationReadiness({ NEXT_PUBLIC_SITE_URL: "http://localhost:3000" }, catalog);
-  assert.equal(result.ready, 0);
+  assert.equal(result.ready, 1);
   assert.equal(result.live, false);
   assert.equal(result.services.find((item) => item.id === "loyverse")?.status, "Needs setup");
-  assert.equal(result.services.find((item) => item.id === "database")?.requirements.includes("Apply all fourteen migrations"), true);
+  assert.equal(result.services.find((item) => item.id === "database")?.connection, "Netlify Blobs · zero configuration");
+  assert.deepEqual(result.services.find((item) => item.id === "database")?.requirements, []);
   assert.equal(result.services.find((item) => item.id === "domain")?.status, "Local only");
   assert.equal(result.services.find((item) => item.id === "security")?.state, "attention");
 });

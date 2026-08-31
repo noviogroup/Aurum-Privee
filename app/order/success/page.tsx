@@ -5,6 +5,7 @@ import { formatMoney, siteConfig } from "@/lib/config";
 import { isConfiguredSecret } from "@/lib/env";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { OrderSuccessCartClear } from "@/components/order-success-cart-clear";
+import { getCommerceOrderBySession } from "@/lib/netlify-commerce";
 
 export const dynamic = "force-dynamic";
 
@@ -14,15 +15,31 @@ async function getVerifiedOrder(sessionId: string) {
   if (!/^cs_[A-Za-z0-9_]+$/.test(sessionId) || sessionId.length > 255) return null;
   const stripeKey = process.env.STRIPE_SECRET_KEY;
   const supabase = getSupabaseAdmin();
-  if (!isConfiguredSecret(stripeKey) || !supabase) return null;
+  if (!isConfiguredSecret(stripeKey)) return null;
   const stripe = new Stripe(stripeKey, { apiVersion: "2026-02-25.clover" as Stripe.LatestApiVersion });
   const session = await stripe.checkout.sessions.retrieve(sessionId);
   if (session.metadata?.channel !== "aurum-privee-web" || session.payment_status !== "paid") return null;
-  const { data } = await supabase.from("orders")
-    .select("order_number,total,currency,customer_email,line_items,shipping_amount,fulfillment_status,confirmation_email_status")
-    .eq("stripe_session_id", session.id)
-    .maybeSingle();
-  return data ? { session, order: data } : { session, order: null };
+  if (supabase) {
+    const { data } = await supabase.from("orders")
+      .select("order_number,total,currency,customer_email,line_items,shipping_amount,fulfillment_status,confirmation_email_status")
+      .eq("stripe_session_id", session.id)
+      .maybeSingle();
+    return data ? { session, order: data } : { session, order: null };
+  }
+  const stored = await getCommerceOrderBySession(session.id);
+  return {
+    session,
+    order: stored ? {
+      order_number: stored.orderNumber,
+      total: stored.total,
+      currency: stored.currency,
+      customer_email: stored.customerEmail,
+      line_items: stored.lineItems,
+      shipping_amount: stored.shippingAmount,
+      fulfillment_status: stored.fulfillmentStatus,
+      confirmation_email_status: stored.confirmationEmailStatus,
+    } : null,
+  };
 }
 
 export default async function OrderSuccessPage({ searchParams }: { searchParams: Promise<{ session_id?: string }> }) {

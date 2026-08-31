@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Image must be 10 MB or smaller." }, { status: 413 });
   }
   const supabase = getSupabaseAdmin();
-  if (!supabase) return NextResponse.json({ error: "Connect Supabase before publishing product images." }, { status: 503 });
+  if (!supabase) return NextResponse.json({ error: "Publish product images through the repository image-intake workflow." }, { status: 503 });
   try {
     const rateLimit = await consumeRateLimit({ supabase, request, scope: "operations-image-upload", limit: 30, windowSeconds: 3600 });
     if (!rateLimit.allowed) return NextResponse.json({ error: "Too many image uploads. Try again later." }, { status: 429, headers: { "Retry-After": String(rateLimit.retryAfter) } });

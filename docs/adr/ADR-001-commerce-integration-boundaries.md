@@ -1,6 +1,6 @@
 # ADR-001: Commerce and provider integration boundaries
 
-- Status: Accepted
+- Status: Superseded by ADR-002
 - Date: 2026-08-12
 
 ## Context

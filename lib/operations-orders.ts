@@ -1,5 +1,7 @@
 import { getSupabaseAdmin } from "@/lib/supabase";
 import type { OperationsLineItem, OperationsOrder } from "@/lib/operations-types";
+import { listCommerceOrders, type CommerceOrder } from "@/lib/netlify-commerce";
+import { getCatalogProductsByIds } from "@/lib/catalog";
 
 type OrderRow = {
   id: string;
@@ -73,6 +75,41 @@ function normalizeOrder(row: OrderRow, images: Map<string, string>): OperationsO
   };
 }
 
+function normalizeBlobOrder(order: CommerceOrder, images: Map<string, string>): OperationsOrder {
+  return {
+    id: order.id,
+    orderNumber: order.orderNumber,
+    paymentStatus: order.status,
+    fulfillmentStatus: order.fulfillmentStatus,
+    confirmationEmailStatus: order.confirmationEmailStatus,
+    fulfillmentEmailStatus: order.fulfillmentEmailStatus,
+    loyverseSyncStatus: order.loyverseSyncStatus,
+    loyverseSyncAttempts: order.loyverseSyncAttempts,
+    loyverseSyncClaimedAt: order.loyverseSyncClaimedAt,
+    loyverseRefundSyncStatus: order.loyverseRefundSyncStatus,
+    loyverseRefundSyncAttempts: order.loyverseRefundSyncAttempts,
+    loyverseRefundSyncClaimedAt: order.loyverseRefundSyncClaimedAt,
+    customerName: order.customerName,
+    customerEmail: order.customerEmail,
+    customerPhone: order.customerPhone,
+    subtotal: order.subtotal,
+    shippingAmount: order.shippingAmount,
+    taxAmount: order.taxAmount,
+    total: order.total,
+    currency: order.currency.toUpperCase(),
+    deliveryDetails: order.deliveryDetails,
+    lineItems: order.lineItems.map((item) => ({
+      name: item.name,
+      quantity: item.quantity,
+      amount: item.amount,
+      productId: item.productId,
+      image: item.productId ? images.get(item.productId) : undefined,
+    })),
+    createdAt: order.createdAt,
+    updatedAt: order.updatedAt,
+  };
+}
+
 export async function getOperationsOrders(limit = 250) {
   const supabase = getSupabaseAdmin();
   if (!supabase) {
@@ -118,7 +155,15 @@ export async function getOperationsOrders(limit = 250) {
         ],
       };
     }
-    return { configured: false as const, preview: false as const, orders: [] as OperationsOrder[] };
+    try {
+      const orders = await listCommerceOrders(limit);
+      const productIds = [...new Set(orders.flatMap((order) => order.lineItems.map((line) => line.productId).filter((id): id is string => Boolean(id))))];
+      const products = productIds.length ? await getCatalogProductsByIds(productIds) : [];
+      const images = new Map(products.map((product) => [product.id, product.image]));
+      return { configured: true as const, preview: false as const, storage: "netlify-blobs" as const, orders: orders.map((order) => normalizeBlobOrder(order, images)) };
+    } catch {
+      return { configured: false as const, preview: false as const, orders: [] as OperationsOrder[] };
+    }
   }
   const { data, error } = await supabase.from("orders")
     .select("id,order_number,status,fulfillment_status,confirmation_email_status,fulfillment_email_status,loyverse_sync_status,loyverse_sync_attempts,loyverse_sync_claimed_at,loyverse_refund_sync_status,loyverse_refund_sync_attempts,loyverse_refund_sync_claimed_at,customer_name,customer_email,customer_phone,subtotal,shipping_amount,tax_amount,total,currency,delivery_details,line_items,created_at,updated_at")

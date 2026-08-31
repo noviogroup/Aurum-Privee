@@ -9,6 +9,7 @@ import {
 } from "@/lib/operator-auth";
 import { consumeRateLimit, readJsonBody, RequestBodyTooLargeError } from "@/lib/request-security";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { consumeBlobRateLimit } from "@/lib/netlify-commerce";
 
 const schema = z.object({ password: z.string().min(1).max(256) });
 const localAttempts = new Map<string, { count: number; resetsAt: number }>();
@@ -24,7 +25,17 @@ async function loginAllowed(request: Request) {
   }
   const hostname = new URL(request.url).hostname;
   const isLoopback = hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
-  if (process.env.NODE_ENV === "production" && !isLoopback) return false;
+  if (process.env.NODE_ENV === "production" && !isLoopback) {
+    try {
+      const [client, global] = await Promise.all([
+        consumeBlobRateLimit({ request, scope: "operations-login", limit: 8, windowSeconds: 900 }),
+        consumeBlobRateLimit({ request, scope: "operations-login-global", limit: 60, windowSeconds: 900, global: true }),
+      ]);
+      return client.allowed && global.allowed;
+    } catch {
+      return false;
+    }
+  }
   const key = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
   const now = Date.now();
   const current = localAttempts.get(key);
