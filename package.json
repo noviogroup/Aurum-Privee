@@ -14,7 +14,8 @@
     "sync:loyverse:local": "tsx --env-file=.env.local scripts/sync-loyverse-local.ts",
     "images:check": "tsx scripts/import-product-images.ts --dry-run",
     "images:import": "tsx scripts/import-product-images.ts",
-    "images:mirror-loyverse": "tsx scripts/mirror-loyverse-images.ts"
+    "images:mirror-loyverse": "tsx scripts/mirror-loyverse-images.ts",
+    "images:normalize": "tsx scripts/normalize-catalog-images.ts"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",

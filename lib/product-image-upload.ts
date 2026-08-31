@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import sharp from "sharp";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import type { ProductImageUploadResult } from "@/lib/operations-image-types";
+import { normalizeProductPackshot } from "@/lib/product-packshot";
 
 export const productImageBucket = "product-images";
 export const maximumProductImageBytes = 10_000_000;
@@ -23,11 +24,7 @@ export async function normalizeProductImage(input: { bytes: Buffer; contentType:
     if (!metadata.width || !metadata.height) throw new ProductImageValidationError("Image dimensions could not be read.");
     if (metadata.width < 800 || metadata.height < 800) throw new ProductImageValidationError(`Image must be at least 800×800 pixels. This file is ${metadata.width}×${metadata.height}.`);
     if (metadata.width > 20_000 || metadata.height > 20_000) throw new ProductImageValidationError("Image dimensions are too large.");
-    const output = await sharp(input.bytes, { limitInputPixels: 100_000_000 })
-      .rotate()
-      .resize(1600, 1600, { fit: "contain", background: { r: 247, g: 247, b: 249, alpha: 1 }, withoutEnlargement: true })
-      .webp({ quality: 90, effort: 5 })
-      .toBuffer();
+    const output = (await normalizeProductPackshot(input.bytes)).output;
     return { output, width: metadata.width, height: metadata.height, sha256: createHash("sha256").update(input.bytes).digest("hex") };
   } catch (error) {
     if (error instanceof ProductImageValidationError) throw error;

@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
   listAllLoyverseItems,
@@ -11,7 +11,6 @@ import { slugifyProduct } from "../lib/loyverse-sync";
 import { concentrationForName, familyForCategory, isOnlineCategory, sizeForProduct, splitProductName } from "../lib/product-normalization";
 import type { Product } from "../lib/types";
 import { getMirroredLoyverseImage, isRejectedLoyverseImage } from "../lib/loyverse-images";
-import { curatedImageForVariant, emptyCuratedProductImageManifest, parseCuratedProductImageManifest } from "../lib/curated-product-images";
 import { customerFacingBrand, customerFacingCopy } from "../lib/brand";
 
 const fallbackImage = "/images/product-awaiting-photography.webp";
@@ -24,9 +23,6 @@ async function main() {
   const storeId = process.env.LOYVERSE_STORE_ID;
   if (!storeId) throw new Error("LOYVERSE_STORE_ID is required");
 
-  const curatedManifest = await readFile(path.join(process.cwd(), "data", "curated-product-images.json"), "utf8")
-    .then((contents) => parseCuratedProductImageManifest(JSON.parse(contents)))
-    .catch(() => emptyCuratedProductImageManifest());
   const [items, categories, taxes] = await Promise.all([
     listAllLoyverseItems(),
     listLoyverseCategories(),
@@ -55,7 +51,7 @@ async function main() {
     const stock = item.track_stock ? Math.max(0, stockMap.get(variant.variant_id) || 0) : 999999;
     const { brand, name } = splitProductName(item.item_name);
     const optionValues = [variant.option1_value, variant.option2_value, variant.option3_value].filter(Boolean);
-    const image = curatedImageForVariant(curatedManifest, variant.variant_id) || getMirroredLoyverseImage(item.id, item.image_url) || (isRejectedLoyverseImage(item.id, item.image_url) ? fallbackImage : item.image_url) || fallbackImage;
+    const image = getMirroredLoyverseImage(item.id, item.image_url) || (isRejectedLoyverseImage(item.id, item.image_url) ? fallbackImage : item.image_url) || fallbackImage;
     return {
       id: variant.variant_id,
       loyverseItemId: item.id,

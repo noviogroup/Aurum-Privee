@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 import type { Product } from "@/lib/types";
 import type { OperationsImageCatalog, OperationsImageProduct } from "@/lib/operations-image-types";
 import { customerFacingBrand } from "@/lib/brand";
+import { isMirroredLoyverseAsset } from "@/lib/loyverse-images";
 
 const placeholderImage = "/images/product-awaiting-photography.webp";
 
@@ -56,7 +57,7 @@ async function localImageCatalog(): Promise<OperationsImageCatalog> {
     loyverseImageUrl: null,
     stock: product.stock,
     missing: missingRows.has(product.id),
-    curated: !missingRows.has(product.id) && !product.image.includes("/product-images/loyverse/"),
+    curated: !missingRows.has(product.id) && !isMirroredLoyverseAsset(product.image),
     updatedAt: new Date().toISOString(),
   }));
   return { products: rows, configured: false, preview: true, totals: totals(rows) };
@@ -76,7 +77,7 @@ export async function getOperationsImageCatalog(): Promise<OperationsImageCatalo
     if (error) throw new Error("Product images could not be loaded");
     for (const row of data || []) {
       const missing = isMissingImage(row.image_url);
-      const curated = !missing && Boolean(row.image_url && row.image_url !== row.loyverse_image_url && !row.image_url.startsWith("/product-images/loyverse/"));
+      const curated = !missing && Boolean(row.image_url && row.image_url !== row.loyverse_image_url && !isMirroredLoyverseAsset(row.image_url));
       rows.push({
         id: row.id,
         name: row.name,

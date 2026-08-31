@@ -3,15 +3,27 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import type { Product } from "../lib/types";
+import { normalizeProductPackshot, packshotKindForName } from "../lib/product-packshot";
 
 type ManifestImage = {
   sourceUrl: string;
   localPath: string;
+  normalizedPath?: string;
   sha256: string;
   width: number;
   height: number;
   bytes: number;
   mirroredAt: string;
+  normalization?: {
+    version: 2;
+    kind: "standard" | "set";
+    sourceFillRatio: number;
+    trimPasses: number;
+    contentWidth: number;
+    contentHeight: number;
+    reviewReasons: string[];
+    normalizedAt: string;
+  };
 };
 
 type Manifest = {
@@ -49,6 +61,7 @@ async function main() {
   const snapshotPath = path.join(process.cwd(), "data", "loyverse-products.json");
   const manifestPath = path.join(process.cwd(), "data", "loyverse-image-manifest.json");
   const outputDirectory = path.join(process.cwd(), "public", "product-images", "loyverse");
+  const normalizedDirectory = path.join(process.cwd(), "public", "product-images", "catalog-v2");
   const products = JSON.parse(await readFile(snapshotPath, "utf8")) as Product[];
   const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as Manifest;
   const rejected = manifest.rejected ||= {};
@@ -64,6 +77,7 @@ async function main() {
     .filter((product) => product.loyverseItemId && product.image.startsWith(`${sourceOrigin}/image/`))
     .map((product) => [product.loyverseItemId!, { itemId: product.loyverseItemId!, sourceUrl: product.image }])).values()];
   await mkdir(outputDirectory, { recursive: true });
+  await mkdir(normalizedDirectory, { recursive: true });
 
   let completed = 0;
   let mirrored = 0;
@@ -91,14 +105,29 @@ async function main() {
           .webp({ quality: 88, effort: 5 })
           .toBuffer();
         await writeFile(targetPath, output);
+        const productName = products.find((product) => product.loyverseItemId === candidate.itemId);
+        const kind = packshotKindForName(productName ? `${productName.brand} ${productName.name}` : "");
+        const normalized = await normalizeProductPackshot(output, { kind });
+        await writeFile(path.join(normalizedDirectory, `${candidate.itemId}.webp`), normalized.output);
         manifest.images[candidate.itemId] = {
           sourceUrl: candidate.sourceUrl,
           localPath: `/product-images/loyverse/${candidate.itemId}.webp`,
+          normalizedPath: `/product-images/catalog-v2/${candidate.itemId}.webp`,
           sha256: createHash("sha256").update(source).digest("hex"),
           width: metadata.width,
           height: metadata.height,
           bytes: output.byteLength,
           mirroredAt: new Date().toISOString(),
+          normalization: {
+            version: 2,
+            kind,
+            sourceFillRatio: normalized.sourceFillRatio,
+            trimPasses: normalized.trimPasses,
+            contentWidth: normalized.contentWidth,
+            contentHeight: normalized.contentHeight,
+            reviewReasons: normalized.reviewReasons,
+            normalizedAt: new Date().toISOString(),
+          },
         };
         delete rejected[candidate.itemId];
         mirrored += 1;

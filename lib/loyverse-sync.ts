@@ -8,7 +8,7 @@ import {
   resolveVariantForStore,
 } from "@/lib/loyverse";
 import { concentrationForName, familyForCategory, isOnlineCategory, sizeForProduct, splitProductName } from "@/lib/product-normalization";
-import { getMirroredLoyverseImage, isRejectedLoyverseImage } from "@/lib/loyverse-images";
+import { getMirroredLoyverseImage, isMirroredLoyverseAsset, isRejectedLoyverseImage } from "@/lib/loyverse-images";
 import { customerFacingBrand, customerFacingCopy } from "@/lib/brand";
 
 const untrackedStock = 999999;
@@ -101,9 +101,10 @@ export async function syncLoyverseCatalog(input: {
       const sourceImage = item.image_url || null;
       const mirroredImage = getMirroredLoyverseImage(item.id, sourceImage);
       const rejectedSourceImage = isRejectedLoyverseImage(item.id, sourceImage);
-      const existingImageWasLoyverseSource = Boolean(existing?.loyverse_image_url && (existing.image_url === existing.loyverse_image_url || existing.image_url === mirroredImage));
-      const existingImageIsCurated = Boolean(existing?.image_url && existing.image_url !== placeholderImage && !existingImageWasLoyverseSource);
-      const imageUrl = existingImageIsCurated ? existing?.image_url : mirroredImage || (rejectedSourceImage ? null : sourceImage) || existing?.image_url || placeholderImage;
+      const existingImageWasLoyverseSource = Boolean(existing?.loyverse_image_url && (existing.image_url === existing.loyverse_image_url || isMirroredLoyverseAsset(existing.image_url)));
+      const existingImageIsLegacyLifestyle = Boolean(existing?.image_url?.startsWith("/product-images/") && !isMirroredLoyverseAsset(existing.image_url));
+      const existingImageIsCurated = Boolean(existing?.image_url && existing.image_url !== placeholderImage && !existingImageWasLoyverseSource && !existingImageIsLegacyLifestyle);
+      const imageUrl = existingImageIsCurated ? existing?.image_url : mirroredImage || (rejectedSourceImage ? null : sourceImage) || (existingImageIsLegacyLifestyle ? null : existing?.image_url) || placeholderImage;
       if (existing) updated += 1;
       else inserted += 1;
 
