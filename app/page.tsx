@@ -90,7 +90,7 @@ export default async function HomePage() {
 
       <section className="brand-rail" aria-label="Brands carried by Aurum Privée">
         {carriedBrands.map(([label, query, image]) => (
-          <Link href={`/shop?query=${encodeURIComponent(query)}`} className="brand-wordmark" aria-label={`Shop ${label}`} key={query}>
+          <Link href={`/shop?query=${encodeURIComponent(query)}`} className={label === "Montblanc" ? "brand-wordmark brand-wordmark-compact" : "brand-wordmark"} aria-label={`Shop ${label}`} key={query}>
             <Image src={image} alt={label} width={170} height={54} unoptimized />
           </Link>
         ))}
