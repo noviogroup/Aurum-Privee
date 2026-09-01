@@ -621,46 +621,33 @@ h3 { font-size: 1.65rem; }
   min-width: 0;
   min-height: 560px;
   overflow: hidden;
-  background: linear-gradient(145deg, #302d27 0%, #171612 62%, #0f0f0d 100%);
+  background: #c9a97b;
   isolation: isolate;
 }
-.shop-editorial-stage::before {
+.shop-editorial-stage::after {
   content: "";
   position: absolute;
-  inset: 5% 5% 16%;
-  z-index: -1;
-  background: radial-gradient(ellipse at 48% 48%, rgba(236, 217, 182, .22), rgba(236, 217, 182, 0) 64%);
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 251, 243, .24);
 }
+.shop-stage-image { object-fit: cover; object-position: center 54%; filter: saturate(.94) contrast(1.01); }
 .shop-stage-location {
   position: absolute;
-  z-index: 5;
+  z-index: 2;
   top: 24px;
   right: 20px;
-  color: rgba(255, 250, 241, .68);
+  padding: 9px 7px;
+  background: rgba(250, 245, 235, .76);
+  color: rgba(38, 31, 24, .72);
+  backdrop-filter: blur(8px);
   font-size: 8px;
   font-weight: 700;
   letter-spacing: .16em;
   text-transform: uppercase;
   writing-mode: vertical-rl;
 }
-.shop-stage-plinth {
-  position: absolute;
-  z-index: 0;
-  left: 7%;
-  right: 9%;
-  bottom: 4%;
-  height: 22%;
-  border-radius: 50%;
-  background: #d1c0a1;
-  box-shadow: 0 22px 44px rgba(0, 0, 0, .38), inset 0 12px 18px rgba(255, 255, 255, .24);
-  transform: perspective(380px) rotateX(58deg);
-}
-.shop-stage-product { position: absolute; z-index: 2; display: block; }
-.shop-stage-product img { object-fit: contain; filter: drop-shadow(0 24px 18px rgba(0, 0, 0, .4)); transition: transform .7s cubic-bezier(.16, 1, .3, 1); }
-.shop-stage-product:hover img { transform: translateY(-8px); }
-.shop-stage-dior { left: -2%; bottom: 11%; width: 47%; height: 72%; }
-.shop-stage-tom-ford { z-index: 3; left: 29%; bottom: 8%; width: 46%; height: 83%; }
-.shop-stage-afnan { right: -1%; bottom: 12%; width: 43%; height: 69%; }
 .catalog-search-wrap { max-width: 570px; width: 100%; margin: 46px 0 0; }
 .catalog-search {
   width: 100%;
@@ -713,11 +700,9 @@ h3 { font-size: 1.65rem; }
 
 @media (prefers-reduced-motion: no-preference) {
   .shop-editorial-stage { animation: shop-stage-enter .8s cubic-bezier(.16, 1, .3, 1) both; }
-  .shop-stage-product { animation: shop-product-enter .9s cubic-bezier(.16, 1, .3, 1) both; }
-  .shop-stage-tom-ford { animation-delay: .08s; }
-  .shop-stage-afnan { animation-delay: .16s; }
+  .shop-stage-image { animation: shop-image-enter 1s cubic-bezier(.16, 1, .3, 1) both; }
   @keyframes shop-stage-enter { from { clip-path: inset(0 9% 0 0); } to { clip-path: inset(0); } }
-  @keyframes shop-product-enter { from { opacity: .82; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes shop-image-enter { from { opacity: .84; transform: scale(1.025); } to { opacity: 1; transform: scale(1); } }
 }
 
 .product-page.page-top { padding-top: clamp(40px, 4.5vw, 68px); }
@@ -928,6 +913,12 @@ h3 { font-size: 1.65rem; }
   .shop-editorial-stage { min-height: 500px; }
 }
 
+@media (max-width: 900px) {
+  .shop-editorial-intro { grid-template-columns: 1fr; min-height: 0; }
+  .shop-editorial-stage { order: -1; min-height: 0; aspect-ratio: 3 / 2; }
+  .shop-stage-image { object-position: center 56%; }
+}
+
 @media (max-width: 767px) {
   :root { --header-height: 62px; }
   .announcement { justify-content: center; padding-inline: 12px; font-size: 9px; letter-spacing: .08em; }
@@ -1033,13 +1024,10 @@ h3 { font-size: 1.65rem; }
   .newsletter { width: 100%; padding: 72px 16px; grid-template-columns: 1fr; gap: 34px; }
   .shop-page.page-top { padding-top: 24px; }
   .shop-editorial-intro { grid-template-columns: 1fr; min-height: 0; margin-bottom: 20px; }
-  .shop-editorial-stage { order: -1; min-height: 340px; }
+  .shop-editorial-stage { order: -1; min-height: 0; aspect-ratio: 1 / 1; }
   .shop-editorial-copy { padding: 38px 24px 42px; }
   .shop-editorial-copy h1 { margin-bottom: 20px; font-size: clamp(3.35rem, 14vw, 4.6rem); }
   .shop-editorial-copy > p { font-size: 13px; }
-  .shop-stage-dior { left: 0; width: 45%; height: 70%; }
-  .shop-stage-tom-ford { left: 29%; width: 45%; height: 82%; }
-  .shop-stage-afnan { right: 0; width: 42%; height: 68%; }
   .shop-stage-location { top: 16px; right: 13px; }
   .catalog-search-wrap { margin: 32px 0 0; }
   .catalog-search-wrap > p { margin-left: 0; }

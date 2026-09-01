@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MagnifyingGlass, SlidersHorizontal, X } from "@phosphor-icons/react";
 import { Product, ScentFamily } from "@/lib/types";
@@ -109,17 +108,15 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
             </div>
           </div>
           <aside className="shop-editorial-stage" aria-label="Featured fragrances">
+            <Image
+              className="shop-stage-image"
+              src="/images/campaign/shop-editorial-popular-v4.webp"
+              alt="Dior Sauvage, Tom Ford Black Orchid, Baccarat Rouge 540 and Carolina Herrera Good Girl arranged on sunlit travertine"
+              fill
+              sizes="(max-width: 900px) calc(100vw - 32px), 54vw"
+              priority
+            />
             <span className="shop-stage-location" aria-hidden="true">Nassau · The Bahamas</span>
-            <span className="shop-stage-plinth" aria-hidden="true" />
-            <Link className="shop-stage-product shop-stage-dior" href="/shop/christian-dior-dior-sauvage-3-4-edp-sp-460426" aria-label="Shop Dior Sauvage Eau de Parfum">
-              <Image src="/images/hero-products/dior-sauvage.webp" alt="Dior Sauvage Eau de Parfum bottle and box" fill sizes="(max-width: 767px) 46vw, 24vw" priority />
-            </Link>
-            <Link className="shop-stage-product shop-stage-tom-ford" href="/shop/tom-ford-black-orchid-1-7-edp-sp-7fcf54" aria-label="Shop Tom Ford Black Orchid">
-              <Image src="/images/hero-products/tom-ford-black-orchid.webp" alt="Tom Ford Black Orchid bottle and box" fill sizes="(max-width: 767px) 46vw, 24vw" priority />
-            </Link>
-            <Link className="shop-stage-product shop-stage-afnan" href="/shop/afnan-supremacy-noir-edp-3-4-oz-4d0813" aria-label="Shop Afnan Supremacy Noir">
-              <Image src="/images/hero-products/afnan-supremacy-noir.webp" alt="Afnan Supremacy Noir bottle and box" fill sizes="(max-width: 767px) 42vw, 22vw" priority />
-            </Link>
           </aside>
         </section>
       )}
