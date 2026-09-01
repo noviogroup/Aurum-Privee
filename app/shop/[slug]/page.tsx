@@ -48,7 +48,7 @@ export default async function ProductPage({ params }: Props) {
       <Link href="/shop" className="back-link"><ArrowLeft size={16} /> Back to fragrance</Link>
       <div className="product-detail">
         <div className="product-gallery">
-          <Image src={product.image} alt={product.imageAlt} fill priority sizes="(max-width: 800px) 100vw, 58vw" />
+          <Image src={product.image} alt={product.imageAlt} fill priority sizes="(max-width: 900px) calc(100vw - 48px), 660px" />
         </div>
         <div className="product-summary">
           <p className="product-brand">{product.brand}</p>
