@@ -13,6 +13,12 @@ import { listInventory } from "@/lib/loyverse";
 
 const requestSchema = z.object({
   items: z.array(z.object({ productId: z.string().min(1), quantity: z.number().int().min(1).max(10) })).min(1).max(20),
+  customer: z.object({
+    name: z.string().trim().min(2).max(100),
+    email: z.string().trim().email().max(320).transform((value) => value.toLowerCase()),
+    phone: z.string().trim().max(40).optional(),
+  }).strict(),
+  fulfillment: z.enum(["pickup", "delivery"]),
 }).superRefine(({ items }, context) => {
   if (new Set(items.map((item) => item.productId)).size !== items.length) {
     context.addIssue({ code: z.ZodIssueCode.custom, message: "Duplicate products are not allowed" });
@@ -115,16 +121,16 @@ export async function POST(request: Request) {
       mode: "payment",
       line_items: lineItems,
       success_url: `${siteConfig.url}/order/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${siteConfig.url}/shop`,
+      cancel_url: `${siteConfig.url}/checkout`,
       customer_creation: "always",
+      customer_email: input.customer.email,
       billing_address_collection: "auto",
-      phone_number_collection: { enabled: true },
+      phone_number_collection: { enabled: false },
       payment_intent_data: { metadata: { channel: "aurum-privee-web", checkout_reference: checkoutReference } },
-      shipping_address_collection: { allowed_countries: ["BS"] },
-      shipping_options: [
-        { shipping_rate_data: { type: "fixed_amount", fixed_amount: { amount: 0, currency: siteConfig.currency.toLowerCase() }, display_name: siteConfig.pickupLabel } },
-        { shipping_rate_data: { type: "fixed_amount", fixed_amount: { amount: Math.round(deliveryGrossAmount * 100), currency: siteConfig.currency.toLowerCase() }, display_name: "New Providence delivery", delivery_estimate: { minimum: { unit: "business_day", value: 1 }, maximum: { unit: "business_day", value: 3 } } } },
-      ],
+      shipping_address_collection: input.fulfillment === "delivery" ? { allowed_countries: ["BS"] } : undefined,
+      shipping_options: input.fulfillment === "delivery"
+        ? [{ shipping_rate_data: { type: "fixed_amount", fixed_amount: { amount: Math.round(deliveryGrossAmount * 100), currency: siteConfig.currency.toLowerCase() }, display_name: "New Providence delivery", delivery_estimate: { minimum: { unit: "business_day", value: 1 }, maximum: { unit: "business_day", value: 3 } } } }]
+        : [{ shipping_rate_data: { type: "fixed_amount", fixed_amount: { amount: 0, currency: siteConfig.currency.toLowerCase() }, display_name: siteConfig.pickupLabel } }],
       expires_at: Math.floor(sessionExpiresAt.getTime() / 1000),
       metadata: {
         channel: "aurum-privee-web",
@@ -132,6 +138,9 @@ export async function POST(request: Request) {
         inventory_mode: "loyverse-at-payment",
         delivery_base_amount: deliveryBaseAmount.toFixed(2),
         delivery_added_tax_rate: deliveryAddedTaxRate.toString(),
+        fulfillment: input.fulfillment,
+        customer_name: input.customer.name,
+        customer_phone: input.customer.phone || "",
       },
     });
 

@@ -7,6 +7,7 @@ import { Product, ScentFamily } from "@/lib/types";
 import { CommerceTax } from "@/lib/tax";
 import { matchesCatalogSearch } from "@/lib/catalog-search";
 import { customerFacingBrand, customerFacingCopy, customerFacingProductName } from "@/lib/brand";
+import { applyProductEnrichment } from "@/lib/product-enrichment";
 
 type ProductRow = {
   id: string;
@@ -36,7 +37,7 @@ function fromRow(row: ProductRow): Product {
   const brand = customerFacingBrand(row.brand);
   const description = customerFacingCopy(row.description || "Selected by Aurum Privée.");
   const imageAlt = customerFacingCopy(row.image_alt || `${row.name} fragrance`);
-  return {
+  return applyProductEnrichment({
     id: row.id,
     loyverseItemId: row.loyverse_item_id || undefined,
     loyverseVariantId: row.loyverse_variant_id || undefined,
@@ -57,13 +58,13 @@ function fromRow(row: ProductRow): Product {
     featured: row.featured,
     newArrival: row.new_arrival,
     stock: Number(row.available_stock ?? row.stock),
-  };
+  });
 }
 
 async function getLocalLoyverseProducts() {
   try {
     const contents = await readFile(path.join(process.cwd(), "data", "loyverse-products.json"), "utf8");
-    return (JSON.parse(contents) as Product[]).map((product) => ({
+    return (JSON.parse(contents) as Product[]).map((product) => applyProductEnrichment({
       ...product,
       brand: customerFacingBrand(product.brand),
       name: customerFacingProductName(product.name),

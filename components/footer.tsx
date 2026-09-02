@@ -26,6 +26,7 @@ export function Footer() {
           <Link href="/pages/authenticity">Authenticity</Link>
           <Link href="/pages/privacy">Privacy</Link>
           <Link href="/pages/terms">Terms</Link>
+          <Link href="/account">My account</Link>
         </div>
         <div>
           <h3>About</h3>

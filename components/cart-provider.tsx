@@ -5,11 +5,11 @@ import { Minus, Plus, ShoppingBag, X } from "@phosphor-icons/react";
 import { CartItem, Product } from "@/lib/types";
 import { formatMoney } from "@/lib/config";
 import { calculateAddedTax } from "@/lib/tax";
-import { checkoutIsEnabled } from "@/lib/checkout-availability";
 
 type CartContextValue = {
   items: CartItem[];
   count: number;
+  hydrated: boolean;
   addItem: (product: Product) => void;
   openCart: () => void;
   clearCart: () => void;
@@ -35,11 +35,8 @@ function readSavedCart(value: string | null): CartItem[] {
 }
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const checkoutEnabled = checkoutIsEnabled(process.env.NEXT_PUBLIC_CHECKOUT_ENABLED);
   const [items, setItems] = useState<CartItem[]>([]);
   const [open, setOpen] = useState(false);
-  const [checkingOut, setCheckingOut] = useState(false);
-  const [error, setError] = useState("");
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
@@ -111,26 +108,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   };
 
-  const checkout = async () => {
-    if (!checkoutEnabled) {
-      setError("Online checkout is not open yet. Your selection will stay saved in this browser.");
-      return;
-    }
-    setCheckingOut(true);
-    setError("");
-    try {
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: items.map((item) => ({ productId: item.product.id, quantity: item.quantity })) }),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Checkout could not be started.");
-      window.location.assign(data.url);
-    } catch (checkoutError) {
-      setError(checkoutError instanceof Error ? checkoutError.message : "Checkout could not be started.");
-      setCheckingOut(false);
-    }
+  const reviewCheckout = () => {
+    setOpen(false);
+    window.location.assign("/checkout");
   };
 
   const count = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -142,7 +122,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setOpen(false);
     window.localStorage.removeItem(storageKey);
   }, []);
-  const value = useMemo(() => ({ items, count, addItem, openCart: () => setOpen(true), clearCart }), [items, count, addItem, clearCart]);
+  const value = useMemo(() => ({ items, count, hydrated, addItem, openCart: () => setOpen(true), clearCart }), [items, count, hydrated, addItem, clearCart]);
 
   return (
     <CartContext.Provider value={value}>
@@ -193,10 +173,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             <div className="cart-total"><span>Subtotal</span><strong>{formatMoney(subtotal)}</strong></div>
             {taxTotal > 0 && <div className="cart-total"><span>VAT</span><strong>{formatMoney(taxTotal)}</strong></div>}
             {taxTotal > 0 && <div className="cart-total"><span>Total before delivery</span><strong>{formatMoney(total)}</strong></div>}
-            <p>{checkoutEnabled ? "Delivery and pickup choices are confirmed securely at checkout." : "Online checkout will open after payment and delivery acceptance testing."}</p>
-            {error && <p className="form-error" role="alert">{error}</p>}
-            <button className="button button-primary button-full" onClick={checkout} disabled={checkingOut || !checkoutEnabled}>
-              {checkingOut ? "Opening secure checkout" : checkoutEnabled ? "Checkout" : "Checkout opening soon"}
+            <p>Delivery or pickup, contact details and payment are confirmed at checkout.</p>
+            <button className="button button-primary button-full" onClick={reviewCheckout}>
+              Checkout
             </button>
           </div>
         )}

@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 
-const obviousPlaceholder = /(?:replace(?:_|-)?me|replace_with|change(?:_|-)?me|yourdomain\.com|^(?:secret|password|test|testing|development|dev|changeme)$)/i;
+const obviousPlaceholder = /(?:replace(?:_|-)?(?:me|with)|change(?:_|-)?me|yourdomain\.com|^(?:secret|password|test|testing|development|dev|changeme)$)/i;
 
 export function isConfiguredSecret(value: string | undefined | null): value is string {
   if (!value) return false;

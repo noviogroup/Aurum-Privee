@@ -13,6 +13,11 @@ import type { IntegrationId, OperationsIntegration, OperationsReadiness } from "
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { deliveryItemRequirement, expectedLoyverseBusinessName, loyverseBusinessNameMatches } from "@/lib/loyverse-readiness";
 import { checkoutIsEnabled } from "@/lib/checkout-availability";
+import {
+  isRestrictedResendKeyError,
+  resendDomainIsConfirmed,
+  resendSenderDomain,
+} from "@/lib/resend-config";
 
 type Environment = NodeJS.ProcessEnv | Record<string, string | undefined>;
 type CatalogTotals = { all: number; loyverse: number; missing: number; curated: number };
@@ -170,11 +175,6 @@ function updateService(readiness: OperationsReadiness, id: IntegrationId, patch:
   readiness.services = readiness.services.map((item) => item.id === id ? { ...item, ...patch } : item);
 }
 
-function fromAddressDomain(value: string | undefined) {
-  const match = value?.match(/@([^>\s]+)>?$/);
-  return match?.[1]?.toLowerCase() || null;
-}
-
 export async function getOperationsReadiness({ live = false }: { live?: boolean } = {}): Promise<OperationsReadiness> {
   const catalog = await getOperationsImageCatalog();
   const readiness = buildConfigurationReadiness(process.env, catalog.totals);
@@ -287,8 +287,24 @@ export async function getOperationsReadiness({ live = false }: { live?: boolean 
       try {
         const resend = new Resend(process.env.RESEND_API_KEY);
         const response = await resend.domains.list();
+        const domain = resendSenderDomain(process.env.RESEND_FROM_EMAIL);
+        if (response.error && isRestrictedResendKeyError(response.error)) {
+          const confirmed = resendDomainIsConfirmed(process.env);
+          updateService(readiness, "email", {
+            state: confirmed ? "ready" : "attention",
+            status: confirmed ? "Ready" : "Confirm domain",
+            connection: "Domain-restricted sending key accepted",
+            facts: [
+              { label: "Provider", value: "Resend" },
+              { label: "Sending domain", value: domain || "Could not determine" },
+              { label: "Domain status", value: confirmed ? "Verified in dashboard" : "Awaiting operator confirmation" },
+              { label: "Messages", value: "Orders, fulfillment, newsletter" },
+            ],
+            requirements: confirmed ? [] : ["Confirm the sending domain is verified, then set RESEND_DOMAIN_VERIFIED=true"],
+          });
+          return;
+        }
         if (response.error) throw new Error("Email verification failed");
-        const domain = fromAddressDomain(process.env.RESEND_FROM_EMAIL);
         const entry = response.data?.data?.find((item) => item.name.toLowerCase() === domain);
         const verified = entry?.status === "verified";
         updateService(readiness, "email", {

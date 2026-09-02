@@ -10,11 +10,10 @@ export const siteConfig = {
 };
 
 export function formatMoney(amount: number) {
-  const hasFractionalCents = Math.abs(Math.round(amount * 100) % 100) > 0;
   return new Intl.NumberFormat(siteConfig.locale, {
     style: "currency",
     currency: siteConfig.currency,
-    minimumFractionDigits: hasFractionalCents ? 2 : 0,
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);
 }

@@ -22,14 +22,16 @@ import { formatMoney } from "../lib/config";
 import { escapeHtml } from "../lib/email";
 import { readRequestText, requestFingerprint, RequestBodyTooLargeError } from "../lib/request-security";
 
-test("formats fractional currency values to two cents", () => {
+test("formats every currency value to two cents", () => {
   assert.match(formatMoney(6.5), /6\.50/);
-  assert.doesNotMatch(formatMoney(65), /65\.00/);
+  assert.match(formatMoney(65), /65\.00/);
+  assert.match(formatMoney(1), /1\.00/);
 });
 
 test("rejects unset and placeholder secrets", () => {
   assert.equal(isConfiguredSecret(undefined), false);
   assert.equal(isConfiguredSecret("replace_with_a_random_secret"), false);
+  assert.equal(isConfiguredSecret("replace-with-monitored-inbox@example.com"), false);
   assert.equal(isConfiguredSecret("CHANGE-ME"), false);
   assert.equal(isConfiguredSecret("https://yourdomain.com/callback"), false);
   assert.equal(isConfiguredSecret("a-real-random-secret-value"), true);

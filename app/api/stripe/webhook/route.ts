@@ -239,8 +239,8 @@ async function handleDatabaseFreeEvent(event: Stripe.Event, stripe: Stripe) {
       stripeSessionId: session.id,
       stripePaymentIntentId: typeof session.payment_intent === "string" ? session.payment_intent : null,
       customerEmail: session.customer_details?.email || "",
-      customerName: session.customer_details?.name || "Client",
-      customerPhone: session.customer_details?.phone || null,
+      customerName: session.customer_details?.name || session.metadata?.customer_name || "Client",
+      customerPhone: session.customer_details?.phone || session.metadata?.customer_phone || null,
       currency: session.currency || "bsd",
       subtotal: merchandiseTotal,
       shippingAmount,
@@ -395,7 +395,7 @@ export async function POST(request: Request) {
   const orderNumber = `AP-${session.id.slice(-8).toUpperCase()}`;
   const total = (session.amount_total || 0) / 100;
   const customerEmail = session.customer_details?.email || "";
-  const customerName = session.customer_details?.name || "Client";
+  const customerName = session.customer_details?.name || session.metadata?.customer_name || "Client";
   const merchandiseTotal = lines.reduce((sum, line) => sum + line.amount, 0);
   const checkoutLineTotal = parsedLines.reduce((sum, line) => sum + line.amount, 0);
   const shippingGrossAmount = Math.max(0, roundMoney(total - checkoutLineTotal));
@@ -412,7 +412,7 @@ export async function POST(request: Request) {
       stripe_payment_intent_id: typeof session.payment_intent === "string" ? session.payment_intent : null,
       customer_email: customerEmail,
       customer_name: customerName,
-      customer_phone: session.customer_details?.phone,
+      customer_phone: session.customer_details?.phone || session.metadata?.customer_phone || null,
       currency: session.currency,
       subtotal: merchandiseTotal,
       shipping_amount: shippingAmount,
@@ -448,7 +448,7 @@ export async function POST(request: Request) {
       orderNumber,
       customerName,
       customerEmail,
-      customerPhone: session.customer_details?.phone,
+      customerPhone: session.customer_details?.phone || session.metadata?.customer_phone || null,
       shippingAmount,
       paidTotal: total,
       createdAt: new Date(session.created * 1000).toISOString(),

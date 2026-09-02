@@ -16,6 +16,7 @@ export type Product = {
   description: string;
   family: ScentFamily;
   notes: { top: string[]; heart: string[]; base: string[] };
+  detailsSource?: { label: string; url: string };
   image: string;
   imageAlt: string;
   featured?: boolean;

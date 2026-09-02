@@ -37,7 +37,11 @@ export default async function ProductPage({ params }: Props) {
   const product = await getCatalogProductBySlug(slug);
   if (!product) notFound();
   const products = await getCatalogProducts();
-  const related = products.filter((item) => item.family === product.family && item.id !== product.id).slice(0, 2);
+  const related = products
+    .filter((item) => item.family === product.family && item.id !== product.id)
+    .sort((left, right) => Number(right.brand === product.brand) - Number(left.brand === product.brand))
+    .slice(0, 4);
+  const hasNotes = [...product.notes.top, ...product.notes.heart, ...product.notes.base].length > 0;
 
   return (
     <div className="product-page page-top">
@@ -53,7 +57,11 @@ export default async function ProductPage({ params }: Props) {
         <div className="product-summary">
           <p className="product-brand">{product.brand}</p>
           <h1>{product.name}</h1>
-          <p className="product-format">{product.concentration}, {product.size}</p>
+          <p className="product-format">
+            <span>{product.family}</span>
+            <span>{product.concentration}</span>
+            <span>{product.size}</span>
+          </p>
           <strong className="detail-price">{formatMoney(product.price)}</strong>
           <p className="detail-description">{product.description}</p>
           <div className="product-purchase-actions">
@@ -64,11 +72,22 @@ export default async function ProductPage({ params }: Props) {
           <div className="delivery-note"><Package size={21} weight="light" /><p><strong>Pickup or delivery</strong><br />Choose your preference during secure checkout.</p></div>
         </div>
       </div>
-      {[...product.notes.top, ...product.notes.heart, ...product.notes.base].length > 0 && (
-        <section className="note-pyramid section-shell">
-          <div><span>First impression</span><h2>{product.notes.top.join(", ")}</h2></div>
-          <div><span>At the heart</span><h2>{product.notes.heart.join(", ")}</h2></div>
-          <div><span>What remains</span><h2>{product.notes.base.join(", ")}</h2></div>
+      {hasNotes && (
+        <section className="scent-profile section-shell" aria-labelledby="scent-profile-title">
+          <header className="scent-profile-intro">
+            <h2 id="scent-profile-title">Fragrance notes</h2>
+            <p>See how this composition develops from its opening notes through its lasting base.</p>
+          </header>
+          <div className="scent-profile-notes">
+            <article><span>Top notes</span><h3>{product.notes.top.join(", ")}</h3></article>
+            <article><span>Middle notes</span><h3>{product.notes.heart.join(", ")}</h3></article>
+            <article><span>Base notes</span><h3>{product.notes.base.join(", ")}</h3></article>
+          </div>
+          {product.detailsSource && (
+            <a className="scent-profile-source" href={product.detailsSource.url} target="_blank" rel="noreferrer">
+              Composition verified by {product.detailsSource.label}
+            </a>
+          )}
         </section>
       )}
       {related.length > 0 && (
