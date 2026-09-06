@@ -4,8 +4,8 @@ The storefront email code is complete. Resend will deliver order confirmations, 
 
 ## Production identities
 
-- Sending domain: `mail.aurumprivee.com`
-- From address: `Aurum Privée <orders@mail.aurumprivee.com>`
+- Sending domain: `aurumprivee.com`
+- From address: `Aurum Privée <orders@aurumprivee.com>`
 - Public origin: `https://aurumprivee.com`
 - Merchant recipient: a real inbox monitored by the store owner (still to be confirmed)
 
@@ -13,16 +13,16 @@ The nameservers for `aurumprivee.com` currently point to Wix, so the Resend DNS 
 
 ## 1. Verify the sending domain
 
-1. In Resend, add `mail.aurumprivee.com` under Domains.
+1. In Resend, add `aurumprivee.com` under Domains.
 2. Copy every SPF, DKIM and MX record shown by Resend into Wix DNS exactly as provided. Do not invent or reuse values from another domain.
 3. Start verification in Resend and wait until the status is **Verified**.
 4. Add the optional DMARC record after SPF and DKIM verify.
 
-Using a subdomain keeps transactional-email reputation separate from the public website and any future staff mailbox provider.
+The production Resend account currently verifies the root domain, so the From address must use that exact domain.
 
 ## 2. Create the production key
 
-Create a key named `Aurum Privee Netlify Production` with **Sending access**, restricted to `mail.aurumprivee.com`. Copy it immediately; Resend only displays a new key once.
+Create a key named `Aurum Privee Netlify Production` with **Sending access**, restricted to `aurumprivee.com`. Copy it immediately; Resend only displays a new key once.
 
 Never commit this key, paste it into a browser-visible `NEXT_PUBLIC_*` variable, or place it in `netlify.toml`.
 
@@ -32,7 +32,7 @@ Set these values in the ignored `.env.local` file:
 
 ```dotenv
 RESEND_API_KEY=re_your_private_key
-RESEND_FROM_EMAIL="Aurum Privée <orders@mail.aurumprivee.com>"
+RESEND_FROM_EMAIL="Aurum Privée <orders@aurumprivee.com>"
 RESEND_DOMAIN_VERIFIED=true
 STORE_NOTIFICATION_EMAIL=the-real-monitored-inbox@example.com
 NEXT_PUBLIC_SITE_URL=http://localhost:3040
@@ -53,7 +53,7 @@ In Netlify, open **Aurum Privée → Project configuration → Environment varia
 | Variable | Value | Secret |
 | --- | --- | --- |
 | `RESEND_API_KEY` | production Sending-access key | Yes |
-| `RESEND_FROM_EMAIL` | `Aurum Privée <orders@mail.aurumprivee.com>` | No |
+| `RESEND_FROM_EMAIL` | `Aurum Privée <orders@aurumprivee.com>` | No |
 | `RESEND_DOMAIN_VERIFIED` | `true` | No |
 | `STORE_NOTIFICATION_EMAIL` | confirmed monitored inbox | No |
 | `NEXT_PUBLIC_SITE_URL` | `https://aurumprivee.com` | No |
@@ -62,7 +62,7 @@ Saving variables does not require a manual deploy now. The values will be used b
 
 ## 5. Route account emails through Resend
 
-The website's Resend key covers storefront transactional messages, but Supabase sends account magic links and recovery messages. In Resend, open Integrations, connect the Aurum Privée Supabase project, select `mail.aurumprivee.com`, and configure the sender as `Aurum Privée` / `accounts@mail.aurumprivee.com`.
+The website's Resend key covers storefront transactional messages, but Supabase sends account magic links and recovery messages. In Resend, open Integrations, connect the Aurum Privée Supabase project, select `aurumprivee.com`, and configure the sender as `Aurum Privée` / `accounts@aurumprivee.com`.
 
 If configured manually in Supabase Auth SMTP settings, use:
 
