@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Manrope } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/lib/config";
 import { SiteShell } from "@/components/site-shell";
+import { getCommerceProvider } from "@/lib/wix-config";
 
 const display = Cormorant_Garamond({
   subsets: ["latin"],
@@ -36,10 +37,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <body className={`${display.variable} ${body.variable}`}>
         <a className="skip-link" href="#main">Skip to content</a>
-        <SiteShell>{children}</SiteShell>
+        <SiteShell commerceProvider={getCommerceProvider(process.env.COMMERCE_PROVIDER)}>{children}</SiteShell>
       </body>
     </html>
   );

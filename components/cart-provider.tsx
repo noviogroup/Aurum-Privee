@@ -5,6 +5,7 @@ import { Minus, Plus, ShoppingBag, X } from "@phosphor-icons/react";
 import { CartItem, Product } from "@/lib/types";
 import { formatMoney } from "@/lib/config";
 import { calculateAddedTax } from "@/lib/tax";
+import type { CommerceProvider } from "@/lib/wix-config";
 
 type CartContextValue = {
   items: CartItem[];
@@ -34,7 +35,7 @@ function readSavedCart(value: string | null): CartItem[] {
   }).slice(0, 20);
 }
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
+export function CartProvider({ children, commerceProvider }: { children: React.ReactNode; commerceProvider: CommerceProvider }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [open, setOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -116,7 +117,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const count = items.reduce((sum, item) => sum + item.quantity, 0);
   const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const taxTotal = items.reduce((sum, item) => sum + calculateAddedTax(item.product.price * item.quantity, item.product.loyverseTaxes), 0);
-  const total = subtotal + taxTotal;
+  const total = subtotal + (commerceProvider === "legacy" ? taxTotal : 0);
   const clearCart = useCallback(() => {
     setItems([]);
     setOpen(false);
@@ -171,9 +172,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         {items.length > 0 && (
           <div className="drawer-foot">
             <div className="cart-total"><span>Subtotal</span><strong>{formatMoney(subtotal)}</strong></div>
-            {taxTotal > 0 && <div className="cart-total"><span>VAT</span><strong>{formatMoney(taxTotal)}</strong></div>}
-            {taxTotal > 0 && <div className="cart-total"><span>Total before delivery</span><strong>{formatMoney(total)}</strong></div>}
-            <p>Delivery or pickup, contact details and payment are confirmed at checkout.</p>
+            {commerceProvider === "legacy" && taxTotal > 0 && <div className="cart-total"><span>VAT</span><strong>{formatMoney(taxTotal)}</strong></div>}
+            {commerceProvider === "legacy" && taxTotal > 0 && <div className="cart-total"><span>Total before delivery</span><strong>{formatMoney(total)}</strong></div>}
+            {commerceProvider === "wix" && <div className="cart-total"><span>Taxes &amp; fulfillment</span><strong>Calculated next</strong></div>}
+            <p>{commerceProvider === "wix" ? "Location, delivery or collection, and payment are confirmed securely in Wix checkout." : "Delivery or pickup, contact details and payment are confirmed at checkout."}</p>
             <button className="button button-primary button-full" onClick={reviewCheckout}>
               Checkout
             </button>

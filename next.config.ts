@@ -13,6 +13,12 @@ const supabaseImagePattern = (() => {
 
 const nextConfig: NextConfig = {
   outputFileTracingRoot: process.cwd(),
+  async redirects() {
+    return [
+      { source: "/pages/about", destination: "/about", permanent: true },
+      { source: "/pages/contact", destination: "/contact", permanent: true },
+    ];
+  },
   images: {
     // Netlify's runtime image proxy rejects the catalog's valid source assets
     // with HTTP 400. The catalog files are already normalized and compressed
@@ -22,6 +28,7 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
       { protocol: "https", hostname: "api.loyverse.com", pathname: "/image/**" },
+      { protocol: "https", hostname: "static.wixstatic.com", pathname: "/media/**" },
       ...(supabaseImagePattern ? [supabaseImagePattern] : []),
     ],
   },

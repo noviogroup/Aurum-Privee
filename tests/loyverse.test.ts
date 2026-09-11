@@ -16,7 +16,7 @@ import { normalizeLoyverseStock, slugifyProduct } from "../lib/loyverse-sync";
 import { prepareLoyverseReceipt } from "../lib/loyverse-order-sync";
 import { findExistingFullRefund } from "../lib/loyverse-refund-sync";
 import { calculateAddedTax, grossFromNet, netFromGross } from "../lib/tax";
-import { familyForCategory, isOnlineCategory, splitProductName } from "../lib/product-normalization";
+import { audienceForProduct, familyForCategory, isOnlineCategory, splitProductName } from "../lib/product-normalization";
 import { hasBearerSecret, isConfiguredSecret, isStrongSecret } from "../lib/env";
 import { formatMoney } from "../lib/config";
 import { escapeHtml } from "../lib/email";
@@ -186,6 +186,9 @@ test("normalizes fragrance brands and gendered categories", () => {
   assert.equal(familyForCategory("Women's Fragrance Collection"), "Floral");
   assert.equal(familyForCategory("Men’s Fragrance Collection"), "Woody");
   assert.equal(familyForCategory("Unisex Fragrance"), "Fresh");
+  assert.equal(audienceForProduct("Women's Fragrance Collection", "Example"), "Women");
+  assert.equal(audienceForProduct("Men’s Fragrance Collection", "Example"), "Men");
+  assert.equal(audienceForProduct("Unisex Fragrance", "Example"), "Unisex");
 });
 
 test("publishes fragrance categories while excluding testers", () => {

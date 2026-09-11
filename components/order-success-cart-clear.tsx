@@ -3,10 +3,10 @@
 import { useEffect } from "react";
 import { useCart } from "@/components/cart-provider";
 
-export function OrderSuccessCartClear({ paid }: { paid: boolean }) {
+export function OrderSuccessCartClear({ completed }: { completed: boolean }) {
   const { clearCart } = useCart();
   useEffect(() => {
-    if (paid) clearCart();
-  }, [paid, clearCart]);
+    if (completed) clearCart();
+  }, [completed, clearCart]);
   return null;
 }

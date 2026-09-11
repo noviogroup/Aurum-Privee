@@ -42,8 +42,39 @@ async function getVerifiedOrder(sessionId: string) {
   };
 }
 
-export default async function OrderSuccessPage({ searchParams }: { searchParams: Promise<{ session_id?: string }> }) {
-  const { session_id: sessionId } = await searchParams;
+export default async function OrderSuccessPage({ searchParams }: { searchParams: Promise<{ session_id?: string; provider?: string; orderId?: string }> }) {
+  const { session_id: sessionId, provider, orderId } = await searchParams;
+  const isWixOrder = provider === "wix";
+  const validWixOrderId = Boolean(orderId && /^[0-9a-f-]{20,64}$/i.test(orderId));
+
+  if (isWixOrder) {
+    return (
+      <div className="status-page order-receipt-page section-shell page-top">
+        <OrderSuccessCartClear completed={validWixOrderId} />
+        {validWixOrderId ? <CheckCircle size={48} weight="thin" /> : <ClockCountdown size={48} weight="thin" />}
+        <p className="utility-label">{validWixOrderId ? "Order received" : "Order confirmation"}</p>
+        <h1>{validWixOrderId ? "Your fragrance is reserved." : "We are confirming your order."}</h1>
+        <p>
+          {validWixOrderId
+            ? "Your order is now in the Aurum Privée order system. A member of our team will confirm collection or delivery details by email."
+            : "If you completed checkout, please check your email before placing another order. Contact client care if your confirmation does not arrive."}
+        </p>
+        {validWixOrderId && (
+          <div className="order-receipt-card">
+            <div className="order-receipt-method">
+              <Storefront size={24} weight="light" />
+              <div>
+                <strong>Payment and fulfillment confirmation</strong>
+                <span>Payment will be collected using the manual method selected at checkout. Please wait for collection or delivery confirmation before travelling.</span>
+              </div>
+            </div>
+          </div>
+        )}
+        <div className="order-next-actions"><Link href="/shop" className="button button-primary">Keep browsing</Link><Link href="/contact" className="text-link">Questions about this order</Link></div>
+      </div>
+    );
+  }
+
   let verified: Awaited<ReturnType<typeof getVerifiedOrder>> = null;
   try {
     if (sessionId) verified = await getVerifiedOrder(sessionId);
@@ -72,7 +103,7 @@ export default async function OrderSuccessPage({ searchParams }: { searchParams:
   const confirmationSent = order?.confirmation_email_status === "sent";
   return (
     <div className="status-page order-receipt-page section-shell page-top">
-      <OrderSuccessCartClear paid />
+      <OrderSuccessCartClear completed />
       <CheckCircle size={48} weight="thin" />
       <p className="utility-label">Payment confirmed · {orderNumber}</p>
       <h1>Your fragrance is reserved.</h1>
@@ -85,7 +116,7 @@ export default async function OrderSuccessPage({ searchParams }: { searchParams:
         {lines.length > 0 && <div className="order-receipt-lines">{lines.map((line, index) => <div key={`${line.name}-${index}`}><span>{line.name || "Fragrance"} × {line.quantity || 1}</span><strong>{formatMoney(Number(line.amount || 0))}</strong></div>)}</div>}
         <div className="order-receipt-total"><span>Total paid</span><strong>{formatMoney(Number(order?.total ?? (session.amount_total || 0) / 100))}</strong></div>
       </div>
-      <div className="order-next-actions"><Link href="/shop" className="button button-primary">Keep browsing</Link><Link href="/pages/contact" className="text-link">Questions about this order</Link></div>
+      <div className="order-next-actions"><Link href="/shop" className="button button-primary">Keep browsing</Link><Link href="/contact" className="text-link">Questions about this order</Link></div>
     </div>
   );
 }

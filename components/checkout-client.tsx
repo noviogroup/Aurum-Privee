@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { ArrowRight, LockKey, Package, Storefront, Truck, UserCircle } from "@phosphor-icons/react";
+import { ArrowRight, GlobeHemisphereWest, LockKey, Package, Storefront, Truck, UserCircle } from "@phosphor-icons/react";
 import { useCart } from "@/components/cart-provider";
 import { formatMoney } from "@/lib/config";
 import { calculateAddedTax } from "@/lib/tax";
@@ -15,9 +15,10 @@ type CheckoutClientProps = {
   paymentReady: boolean;
   pickupLabel: string;
   deliveryFee: number;
+  commerceProvider: "legacy" | "wix";
 };
 
-export function CheckoutClient({ initialEmail, paymentReady, pickupLabel, deliveryFee }: CheckoutClientProps) {
+export function CheckoutClient({ initialEmail, paymentReady, pickupLabel, deliveryFee, commerceProvider }: CheckoutClientProps) {
   const { items, hydrated } = useCart();
   const [name, setName] = useState("");
   const [email, setEmail] = useState(initialEmail);
@@ -28,8 +29,8 @@ export function CheckoutClient({ initialEmail, paymentReady, pickupLabel, delive
 
   const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const tax = items.reduce((sum, item) => sum + calculateAddedTax(item.product.price * item.quantity, item.product.loyverseTaxes), 0);
-  const shipping = fulfillment === "delivery" ? deliveryFee : 0;
-  const total = subtotal + tax + shipping;
+  const shipping = commerceProvider === "wix" ? 0 : fulfillment === "delivery" ? deliveryFee : 0;
+  const total = subtotal + (commerceProvider === "legacy" ? tax : 0) + shipping;
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -45,7 +46,7 @@ export function CheckoutClient({ initialEmail, paymentReady, pickupLabel, delive
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           items: items.map((item) => ({ productId: item.product.id, quantity: item.quantity })),
-          customer: { name, email, phone },
+          customer: commerceProvider === "legacy" ? { name, email, phone } : undefined,
           fulfillment,
         }),
       });
@@ -78,23 +79,28 @@ export function CheckoutClient({ initialEmail, paymentReady, pickupLabel, delive
       <header className="checkout-heading">
         <div>
           <h1>Checkout</h1>
-          <p>Complete your details, choose pickup or delivery, then continue to secure payment.</p>
+          <p>{commerceProvider === "wix" ? "Review your selection, then continue to Aurum Privée’s secure checkout." : "Complete your details, choose pickup or delivery, then continue to secure payment."}</p>
         </div>
         <Link href="/account" className="checkout-account-link"><UserCircle size={20} />{initialEmail ? "Account connected" : "Sign in for faster checkout"}</Link>
       </header>
 
       <div className="checkout-layout">
         <form className="checkout-form" onSubmit={submit}>
-          <section className="checkout-section" aria-labelledby="checkout-contact-title">
+          {commerceProvider === "legacy" ? <section className="checkout-section" aria-labelledby="checkout-contact-title">
             <div className="checkout-section-heading"><span>01</span><div><h2 id="checkout-contact-title">Contact details</h2><p>Your receipt and order updates will be sent here.</p></div></div>
             <div className="checkout-fields">
               <label><span>Full name</span><input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" required minLength={2} maxLength={100} /></label>
               <label><span>Email</span><input value={email} onChange={(event) => setEmail(event.target.value)} type="email" autoComplete="email" required maxLength={320} /></label>
               <label className="checkout-field-wide"><span>Phone</span><input value={phone} onChange={(event) => setPhone(event.target.value)} type="tel" autoComplete="tel" maxLength={40} placeholder="Optional" /></label>
             </div>
-          </section>
+          </section> : (
+            <section className="checkout-section" aria-labelledby="checkout-contact-title">
+              <div className="checkout-section-heading"><span>01</span><div><h2 id="checkout-contact-title">Secure Wix checkout</h2><p>Contact, delivery and payment details are collected on the next page and managed in the Aurum Privée Wix dashboard.</p></div></div>
+              <div className="checkout-security"><LockKey size={20} /><span>Your order details are transferred directly to Wix commerce.</span></div>
+            </section>
+          )}
 
-          <section className="checkout-section" aria-labelledby="checkout-fulfillment-title">
+          {commerceProvider === "legacy" ? <section className="checkout-section" aria-labelledby="checkout-fulfillment-title">
             <div className="checkout-section-heading"><span>02</span><div><h2 id="checkout-fulfillment-title">Pickup or delivery</h2><p>Select how you would like to receive your order.</p></div></div>
             <div className="fulfillment-options">
               <label className={fulfillment === "pickup" ? "is-selected" : ""}>
@@ -110,14 +116,24 @@ export function CheckoutClient({ initialEmail, paymentReady, pickupLabel, delive
                 <b>{formatMoney(deliveryFee)}</b>
               </label>
             </div>
-          </section>
+          </section> : (
+            <section className="checkout-section" aria-labelledby="checkout-fulfillment-title">
+              <div className="checkout-section-heading"><span>02</span><div><h2 id="checkout-fulfillment-title">Choose your market</h2><p>Available delivery and collection methods are calculated from your location in secure checkout.</p></div></div>
+              <div className="checkout-security"><GlobeHemisphereWest size={20} /><span>Nassau · Harbour Island · Ghana</span></div>
+            </section>
+          )}
 
           <section className="checkout-section checkout-payment" aria-labelledby="checkout-payment-title">
-            <div className="checkout-section-heading"><span>03</span><div><h2 id="checkout-payment-title">Secure payment</h2><p>Payment details are entered on the hosted payment page and never touch this website.</p></div></div>
+            <div className="checkout-section-heading"><span>03</span><div><h2 id="checkout-payment-title">{commerceProvider === "wix" ? "Payment and fulfillment" : "Secure payment"}</h2><p>{commerceProvider === "wix" ? "Choose an available manual payment method and confirm delivery or collection in Wix checkout." : "Payment details are entered on the hosted payment page and never touch this website."}</p></div></div>
             <div className="checkout-security"><LockKey size={20} /><span>Encrypted payment handoff</span></div>
+            {!paymentReady && (
+              <p className="checkout-gate-notice" role="status">
+                Checkout is currently closed while the catalog, locations and order confirmations complete acceptance testing.
+              </p>
+            )}
             {error && <p className="form-error" role="alert">{error}</p>}
-            <button className="button button-primary button-full" type="submit" disabled={submitting}>
-              {submitting ? "Opening secure payment" : "Continue to secure payment"}<ArrowRight size={17} />
+            <button className="button button-primary button-full" type="submit" disabled={submitting || !paymentReady}>
+              {submitting ? "Opening secure checkout" : paymentReady ? "Continue to secure checkout" : "Checkout opening after testing"}<ArrowRight size={17} />
             </button>
           </section>
         </form>
@@ -135,9 +151,9 @@ export function CheckoutClient({ initialEmail, paymentReady, pickupLabel, delive
           </div>
           <dl className="checkout-totals">
             <div><dt>Subtotal</dt><dd>{formatMoney(subtotal)}</dd></div>
-            {tax > 0 && <div><dt>VAT</dt><dd>{formatMoney(tax)}</dd></div>}
-            <div><dt>{fulfillment === "delivery" ? "Delivery" : "Pickup"}</dt><dd>{shipping > 0 ? formatMoney(shipping) : "Complimentary"}</dd></div>
-            <div className="checkout-total"><dt>Total</dt><dd>{formatMoney(total)}</dd></div>
+            {commerceProvider === "legacy" && tax > 0 && <div><dt>VAT</dt><dd>{formatMoney(tax)}</dd></div>}
+            <div><dt>{commerceProvider === "wix" ? "Taxes & fulfillment" : fulfillment === "delivery" ? "Delivery" : "Pickup"}</dt><dd>{commerceProvider === "wix" ? "Calculated next" : shipping > 0 ? formatMoney(shipping) : "Complimentary"}</dd></div>
+            <div className="checkout-total"><dt>{commerceProvider === "wix" ? "Items total" : "Total"}</dt><dd>{formatMoney(total)}</dd></div>
           </dl>
         </aside>
       </div>

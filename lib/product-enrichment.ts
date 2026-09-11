@@ -2,9 +2,26 @@ import type { Product } from "@/lib/types";
 
 type ProductEnrichment = Pick<Product, "description" | "family" | "notes"> & {
   detailsSource?: Product["detailsSource"];
+  image?: Product["image"];
+  imageAlt?: Product["imageAlt"];
 };
 
 const productEnrichment: Record<string, ProductEnrichment> = {
+  "christian-dior-dior-sauvage-3-4-edp-sp-460426": {
+    description: "Sauvage Eau de Parfum pairs the bright, spicy character of Calabrian bergamot with woody patchouli and a warm, subtly smoky vanilla absolute accord.",
+    family: "Fresh",
+    notes: {
+      top: ["Calabrian Bergamot", "Woody Patchouli", "Vanilla Absolute"],
+      heart: [],
+      base: [],
+    },
+    detailsSource: {
+      label: "Dior",
+      url: "https://www.dior.com/en_us/beauty/products/sauvage-eau-de-parfum-F078524009.html",
+    },
+    image: "/images/hero-products/dior-sauvage.webp",
+    imageAlt: "Dior Sauvage Eau de Parfum bottle and presentation box",
+  },
   "afnan-supremecy-incense-3-4-oz-edp-sp-9e897b": {
     description: "Supremacy Incense is an Eau de Parfum by Afnan. Afnan lists bergamot, oregano and pepper as the top notes; amber, labdanum and opoponax as the middle notes; and leather, sandalwood, patchouli and oud as the base notes.",
     family: "Woody",

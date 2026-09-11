@@ -1,6 +1,18 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { customerFacingProductName } from "../lib/brand";
+import { customerFacingBrand, customerFacingConcentration, customerFacingCopy, customerFacingProductName } from "../lib/brand";
+
+test("uses one customer-facing label for known brand aliases", () => {
+  assert.equal(customerFacingBrand("Christian Dior"), "Dior");
+  assert.equal(customerFacingBrand("Afnan Perfumes"), "Afnan");
+  assert.equal(customerFacingBrand("Mont Blanc"), "Montblanc");
+});
+
+test("expands retail shorthand and removes imported HTML from customer copy", () => {
+  assert.equal(customerFacingConcentration("EDP"), "Eau de Parfum");
+  assert.equal(customerFacingConcentration("EDT"), "Eau de Toilette");
+  assert.equal(customerFacingCopy("<p>Warm &amp; polished.</p>"), "Warm & polished.");
+});
 
 test("polishes obvious customer-facing fragrance name formatting", () => {
   assert.equal(customerFacingProductName("Supremecy Incense 3.40z EDP SP"), "Supremacy Incense 3.4 oz EDP SP");
@@ -10,4 +22,9 @@ test("polishes obvious customer-facing fragrance name formatting", () => {
 
 test("preserves legitimate product wording", () => {
   assert.equal(customerFacingProductName("Dior Sauvage 3.4 EDP SP"), "Dior Sauvage 3.4 EDP SP");
+});
+
+test("creates concise customer-facing names when brand and format are displayed separately", () => {
+  assert.equal(customerFacingProductName("Dior Sauvage 3.4 EDP SP", "Christian Dior"), "Sauvage");
+  assert.equal(customerFacingProductName("Supremecy Incense 3.4 oz EDP SP", "Afnan"), "Supremacy Incense");
 });

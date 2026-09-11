@@ -5,6 +5,7 @@ import { siteConfig } from "@/lib/config";
 import { isConfiguredSecret } from "@/lib/env";
 import { grossFromNet } from "@/lib/tax";
 import { createSupabaseServerClient } from "@/lib/supabase-auth-server";
+import { evaluateWixReadiness, getCommerceProvider } from "@/lib/wix-config";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,9 @@ export const metadata: Metadata = {
 };
 
 function paymentIsReady() {
+  if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix") {
+    return evaluateWixReadiness(process.env).checkoutReady;
+  }
   return checkoutIsEnabled(process.env.NEXT_PUBLIC_CHECKOUT_ENABLED)
     && [
       process.env.STRIPE_SECRET_KEY,
@@ -35,6 +39,7 @@ async function signedInEmail() {
 }
 
 export default async function CheckoutPage() {
+  const commerceProvider = getCommerceProvider(process.env.COMMERCE_PROVIDER);
   const deliveryBase = Number(process.env.NEXT_PUBLIC_DELIVERY_FEE || 10);
   const deliveryTaxRate = Number(process.env.LOYVERSE_DELIVERY_ADDED_TAX_RATE || 0);
   const deliveryFee = grossFromNet(
@@ -46,6 +51,7 @@ export default async function CheckoutPage() {
     <CheckoutClient
       initialEmail={await signedInEmail()}
       paymentReady={paymentIsReady()}
+      commerceProvider={commerceProvider}
       pickupLabel={siteConfig.pickupLabel}
       deliveryFee={deliveryFee}
     />

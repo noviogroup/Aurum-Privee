@@ -1,4 +1,4 @@
-import type { ScentFamily } from "@/lib/types";
+import type { ProductAudience, ScentFamily } from "@/lib/types";
 import { BRAND_EDIT } from "@/lib/brand";
 
 export function splitProductName(itemName: string) {
@@ -14,6 +14,15 @@ export function familyForCategory(category: string): ScentFamily {
   if (/\bmen(?:'s|’s)?\b/.test(normalized) || normalized.includes("boy")) return "Woody";
   if (normalized.includes("unisex")) return "Fresh";
   return "Floral";
+}
+
+export function audienceForProduct(category: string | null | undefined, name: string, description = ""): ProductAudience {
+  const categoryText = (category || "").toLowerCase();
+  const productText = `${name} ${description}`.toLowerCase();
+  const source = categoryText || productText;
+  if (/\b(?:women|woman|ladies|lady|girls?|femme|her)(?:'s|’s)?\b/.test(source)) return "Women";
+  if (/\b(?:men|man|boys?|homme|him)(?:'s|’s)?\b/.test(source)) return "Men";
+  return "Unisex";
 }
 
 export function concentrationForName(name: string) {

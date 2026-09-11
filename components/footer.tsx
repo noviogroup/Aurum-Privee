@@ -14,15 +14,15 @@ export function Footer() {
         <div>
           <h3>Shop</h3>
           <Link href="/shop">All fragrances</Link>
-          <Link href="/shop?query=women">For her</Link>
-          <Link href="/shop?query=men">For him</Link>
-          <Link href="/shop?query=unisex">Unisex</Link>
+          <Link href="/shop?audience=Women">For her</Link>
+          <Link href="/shop?audience=Men">For him</Link>
+          <Link href="/shop?audience=Unisex">Unisex</Link>
           <Link href="/shop?query=gift%20set">Gift sets</Link>
         </div>
         <div>
           <h3>Client care</h3>
           <Link href="/pages/shipping-returns">Shipping & returns</Link>
-          <Link href="/pages/contact">Contact</Link>
+          <Link href="/contact">Contact</Link>
           <Link href="/pages/authenticity">Authenticity</Link>
           <Link href="/pages/privacy">Privacy</Link>
           <Link href="/pages/terms">Terms</Link>
@@ -30,7 +30,7 @@ export function Footer() {
         </div>
         <div>
           <h3>About</h3>
-          <Link href="/pages/about">Our story</Link>
+          <Link href="/about">Our story</Link>
           <Link href="/pages/aurum-room">The Aurum Room</Link>
           <Link href="/#collections">Collections</Link>
           <Link href="/saved">Saved fragrances</Link>

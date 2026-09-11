@@ -2,6 +2,12 @@
 
 An original premium fragrance storefront built with Next.js and deployed on Netlify. Loyverse is the retail source of truth, the storefront ships a generated catalog snapshot, and Netlify Blobs provides durable commerce storage without a separate database project.
 
+## Wix Headless commerce cutover
+
+The client-admin and Bahamas-payment architecture is documented in [`docs/adr/ADR-003-wix-headless-commerce.md`](./docs/adr/ADR-003-wix-headless-commerce.md). The original controlled pilot sequence remains in [`docs/WIX-HEADLESS-PILOT.md`](./docs/WIX-HEADLESS-PILOT.md), the current live-dashboard state is recorded in [`docs/WIX-SETUP-STATUS.md`](./docs/WIX-SETUP-STATUS.md), and the client-facing handover is in [`docs/CLIENT-HANDOVER.md`](./docs/CLIENT-HANDOVER.md).
+
+The complete 733-SKU Wix import and hosted-checkout adapter are prepared. The existing commerce path remains the fail-safe default until the Wix catalog is imported, the generated SKU map is complete, fulfillment rules are approved, and both checkout launch controls are explicitly enabled.
+
 ## What is implemented
 
 - Responsive homepage, catalog, scent-family filtering and product detail pages
@@ -32,7 +38,7 @@ The site reads `data/loyverse-products.json`; the small hand-authored demo catal
 
 Run `npm run sync:loyverse:local` with the Loyverse token and store ID in `.env.local`. This writes an in-stock fragrance snapshot to `data/loyverse-products.json` and an acquisition worksheet for missing photography to `data/missing-product-images.csv`. Commit and deploy an approved snapshot after reviewing catalog and image changes.
 
-The catalog contains 734 available fixed-price fragrance variants. The 659 acceptable Loyverse product images are mirrored into standardized local WebP assets so storefront rendering does not depend on Loyverse's image endpoint. One additional Loyverse image was rejected because it is only 80×80 pixels, leaving 75 products on an original bottle-free Aurum Privée art panel that cannot be mistaken for the actual merchandise. Add approved photography through the repository intake workflow; later local catalog refreshes preserve those curated files.
+The current catalog contains 733 available fixed-price fragrance variants. The 659 acceptable Loyverse product images are mirrored into standardized local WebP assets so storefront rendering does not depend on Loyverse's image endpoint. One additional Loyverse image was rejected because it is only 80×80 pixels, leaving the remaining products on an original bottle-free Aurum Privée art panel that cannot be mistaken for the actual merchandise. Add approved photography through the repository intake workflow; later local catalog refreshes preserve those curated files.
 
 Run `npm run images:mirror-loyverse` after a source catalog refresh to download new or changed Loyverse imagery. The command is resumable, validates dimensions, pins each source URL and SHA-256 hash in `data/loyverse-image-manifest.json`, and records rejected sources instead of upscaling unusable files.
 

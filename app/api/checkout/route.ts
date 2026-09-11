@@ -10,6 +10,7 @@ import { readJsonBody, RequestBodyTooLargeError } from "@/lib/request-security";
 import { checkoutIsEnabled } from "@/lib/checkout-availability";
 import { consumeBlobRateLimit } from "@/lib/netlify-commerce";
 import { listInventory } from "@/lib/loyverse";
+import { evaluateWixReadiness, getCommerceProvider } from "@/lib/wix-config";
 
 const requestSchema = z.object({
   items: z.array(z.object({ productId: z.string().min(1), quantity: z.number().int().min(1).max(10) })).min(1).max(20),
@@ -17,7 +18,7 @@ const requestSchema = z.object({
     name: z.string().trim().min(2).max(100),
     email: z.string().trim().email().max(320).transform((value) => value.toLowerCase()),
     phone: z.string().trim().max(40).optional(),
-  }).strict(),
+  }).strict().optional(),
   fulfillment: z.enum(["pickup", "delivery"]),
 }).superRefine(({ items }, context) => {
   if (new Set(items.map((item) => item.productId)).size !== items.length) {
@@ -30,17 +31,6 @@ export async function POST(request: Request) {
     if (!checkoutIsEnabled(process.env.NEXT_PUBLIC_CHECKOUT_ENABLED)) {
       return NextResponse.json({ error: "Online checkout is not open yet." }, { status: 503 });
     }
-    const key = process.env.STRIPE_SECRET_KEY;
-    if (!isConfiguredSecret(key)) {
-      return NextResponse.json({ error: "Secure checkout is ready for a Stripe key. Add it to the environment to continue." }, { status: 503 });
-    }
-    const storeId = process.env.LOYVERSE_STORE_ID;
-    if (!isConfiguredSecret(process.env.LOYVERSE_ACCESS_TOKEN) || !storeId || !isConfiguredSecret(process.env.LOYVERSE_PAYMENT_TYPE_ID)) {
-      return NextResponse.json({ error: "Online inventory and receipt processing are not configured." }, { status: 503 });
-    }
-    if (![process.env.RESEND_API_KEY, process.env.RESEND_FROM_EMAIL, process.env.STORE_NOTIFICATION_EMAIL].every(isConfiguredSecret)) {
-      return NextResponse.json({ error: "Order confirmations are not configured." }, { status: 503 });
-    }
     const rateLimit = await consumeBlobRateLimit({ request, scope: "checkout", limit: 5, windowSeconds: 600 });
     if (!rateLimit.configured) return NextResponse.json({ error: "Secure checkout protection is not configured." }, { status: 503 });
     if (!rateLimit.allowed) return NextResponse.json({ error: "Too many checkout attempts. Please wait before trying again." }, { status: 429, headers: { "Retry-After": String(rateLimit.retryAfter) } });
@@ -51,6 +41,36 @@ export async function POST(request: Request) {
     const products = await getCatalogProductsByIds(input.items.map((item) => item.productId));
     if (products.length !== new Set(input.items.map((item) => item.productId)).size) {
       return NextResponse.json({ error: "One or more fragrances are no longer available." }, { status: 400 });
+    }
+
+    if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix") {
+      if (!evaluateWixReadiness(process.env).checkoutReady) {
+        return NextResponse.json({ error: "Wix checkout is not ready yet." }, { status: 503 });
+      }
+      const { createWixCheckoutRedirect } = await import("@/lib/wix-checkout");
+      const url = await createWixCheckoutRedirect(
+        input.items.map((line) => ({
+          product: products.find((product) => product.id === line.productId)!,
+          quantity: line.quantity,
+        })),
+        process.env.WIX_STOREFRONT_ORIGIN || siteConfig.url,
+      );
+      return NextResponse.json({ url });
+    }
+
+    if (!input.customer) {
+      return NextResponse.json({ error: "Contact details are required." }, { status: 400 });
+    }
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!isConfiguredSecret(key)) {
+      return NextResponse.json({ error: "Secure checkout is ready for a Stripe key. Add it to the environment to continue." }, { status: 503 });
+    }
+    const storeId = process.env.LOYVERSE_STORE_ID;
+    if (!isConfiguredSecret(process.env.LOYVERSE_ACCESS_TOKEN) || !storeId || !isConfiguredSecret(process.env.LOYVERSE_PAYMENT_TYPE_ID)) {
+      return NextResponse.json({ error: "Online inventory and receipt processing are not configured." }, { status: 503 });
+    }
+    if (![process.env.RESEND_API_KEY, process.env.RESEND_FROM_EMAIL, process.env.STORE_NOTIFICATION_EMAIL].every(isConfiguredSecret)) {
+      return NextResponse.json({ error: "Order confirmations are not configured." }, { status: 503 });
     }
     const trackedProducts = products.filter((product) => product.stock < 999999 && product.loyverseVariantId);
     if (trackedProducts.length) {
@@ -148,6 +168,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ url: session.url });
   } catch (error) {
     if (error instanceof RequestBodyTooLargeError) return NextResponse.json({ error: "The checkout request is too large." }, { status: 413 });
+    if (error instanceof Error && error.name === "WixCatalogMappingError") {
+      console.error("Wix checkout mapping is incomplete", error);
+      return NextResponse.json({ error: "That fragrance is still being connected to secure checkout." }, { status: 503 });
+    }
     if (error instanceof z.ZodError || error instanceof SyntaxError || error instanceof TypeError) {
       return NextResponse.json({ error: "The shopping bag contains invalid quantities." }, { status: 400 });
     }

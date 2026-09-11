@@ -3,11 +3,15 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { products as sampleProducts } from "@/lib/products";
-import { Product, ScentFamily } from "@/lib/types";
+import { Product, ProductAudience, ScentFamily } from "@/lib/types";
 import { CommerceTax } from "@/lib/tax";
 import { matchesCatalogSearch } from "@/lib/catalog-search";
-import { customerFacingBrand, customerFacingCopy, customerFacingProductName } from "@/lib/brand";
+import { customerFacingBrand, customerFacingConcentration, customerFacingCopy, customerFacingProductName, customerFacingSize } from "@/lib/brand";
 import { applyProductEnrichment } from "@/lib/product-enrichment";
+import { audienceForProduct } from "@/lib/product-normalization";
+import { getCommerceProvider } from "@/lib/wix-config";
+import { applyWixCatalog } from "@/lib/wix-catalog";
+import { getProductVariantFamily } from "@/lib/product-variants";
 
 type ProductRow = {
   id: string;
@@ -29,6 +33,7 @@ type ProductRow = {
   image_alt: string | null;
   featured: boolean;
   new_arrival: boolean;
+  loyverse_category_name?: string | null;
   stock: number;
   available_stock?: number;
 };
@@ -36,6 +41,7 @@ type ProductRow = {
 function fromRow(row: ProductRow): Product {
   const brand = customerFacingBrand(row.brand);
   const description = customerFacingCopy(row.description || "Selected by Aurum Privée.");
+  const name = customerFacingProductName(row.name, brand);
   const imageAlt = customerFacingCopy(row.image_alt || `${row.name} fragrance`);
   return applyProductEnrichment({
     id: row.id,
@@ -45,12 +51,13 @@ function fromRow(row: ProductRow): Product {
     loyverseTaxes: row.loyverse_taxes || [],
     slug: row.slug,
     brand,
-    name: customerFacingProductName(row.name),
-    concentration: row.concentration || "Fine fragrance",
-    size: row.size ? customerFacingProductName(row.size) : "Standard size",
+    name,
+    concentration: customerFacingConcentration(row.concentration),
+    size: customerFacingSize(row.size, row.name),
     price: Number(row.price),
     compareAtPrice: row.compare_at_price ? Number(row.compare_at_price) : undefined,
     description,
+    audience: audienceForProduct(row.loyverse_category_name, row.name, description),
     family: (row.scent_family || "Floral") as ScentFamily,
     notes: row.notes || { top: [], heart: [], base: [] },
     image: row.image_url || "/images/product-awaiting-photography.webp",
@@ -67,8 +74,10 @@ async function getLocalLoyverseProducts() {
     return (JSON.parse(contents) as Product[]).map((product) => applyProductEnrichment({
       ...product,
       brand: customerFacingBrand(product.brand),
-      name: customerFacingProductName(product.name),
-      size: customerFacingProductName(product.size),
+      name: customerFacingProductName(product.name, customerFacingBrand(product.brand)),
+      concentration: customerFacingConcentration(product.concentration),
+      size: customerFacingSize(product.size, product.name),
+      audience: product.audience || audienceForProduct(null, product.name, product.description),
       description: customerFacingCopy(product.description),
       imageAlt: customerFacingCopy(product.imageAlt),
     }));
@@ -77,8 +86,25 @@ async function getLocalLoyverseProducts() {
   }
 }
 
+function collapseVariantFamilies(products: Product[]) {
+  const seen = new Set<string>();
+  return products.filter((product) => {
+    const family = getProductVariantFamily(product.id);
+    if (!family) return true;
+    if (seen.has(family.key)) return false;
+    seen.add(family.key);
+    return true;
+  });
+}
+
+async function getWixManagedProducts() {
+  const localProducts = await getLocalLoyverseProducts() || sampleProducts;
+  return applyWixCatalog(localProducts);
+}
+
 export async function getCatalogProducts() {
   noStore();
+  if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix") return getWixManagedProducts();
   const supabase = getSupabaseAdmin();
   if (!supabase) return await getLocalLoyverseProducts() || sampleProducts;
   const { data, error } = await supabase.from("catalog_products_available").select("*").order("sort_order");
@@ -88,6 +114,9 @@ export async function getCatalogProducts() {
 }
 
 export async function getCatalogProductBySlug(slug: string) {
+  if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix") {
+    return (await getWixManagedProducts()).find((product) => product.slug === slug);
+  }
   const supabase = getSupabaseAdmin();
   if (!supabase) return (await getLocalLoyverseProducts() || sampleProducts).find((product) => product.slug === slug);
   const { data, error } = await supabase.from("catalog_products_available").select("*").eq("slug", slug).maybeSingle();
@@ -97,6 +126,9 @@ export async function getCatalogProductBySlug(slug: string) {
 
 export async function getCatalogProductsByIds(ids: string[]) {
   const uniqueIds = [...new Set(ids)].slice(0, 20);
+  if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix") {
+    return (await getWixManagedProducts()).filter((product) => uniqueIds.includes(product.id));
+  }
   const supabase = getSupabaseAdmin();
   if (!supabase) return (await getLocalLoyverseProducts() || sampleProducts).filter((product) => uniqueIds.includes(product.id));
   const { data, error } = await supabase.from("catalog_products_available").select("*").in("id", uniqueIds);
@@ -104,15 +136,26 @@ export async function getCatalogProductsByIds(ids: string[]) {
   return ((data || []) as ProductRow[]).map(fromRow);
 }
 
-export async function getCatalogPage(input: { family?: string; query?: string; sort?: string; offset?: number; limit?: number }) {
+export async function getCatalogPage(input: { family?: string; audience?: ProductAudience | "All"; query?: string; sort?: string; offset?: number; limit?: number }) {
   noStore();
   const supabase = getSupabaseAdmin();
   const family = input.family || "All";
+  const audience = input.audience || "All";
   const query = (input.query || "").trim().toLowerCase();
   const tokens = query.split(/\s+/).map((token) => token.replace(/[%_,()]/g, "")).filter(Boolean).slice(0, 8);
   const sort = input.sort || "featured";
   const offset = Math.max(0, input.offset || 0);
   const limit = Math.min(48, Math.max(1, input.limit || 24));
+  if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix" || audience !== "All") {
+    const products = await getCatalogProducts();
+    const filtered = collapseVariantFamilies(products.filter((product) => {
+      const familyMatch = family === "All" || (family === "New" ? product.newArrival : product.family === family);
+      const audienceMatch = audience === "All" || product.audience === audience;
+      return audienceMatch && familyMatch && matchesCatalogSearch(product, query);
+    }));
+    const sorted = [...filtered].sort((left, right) => sort === "price-asc" ? left.price - right.price : sort === "price-desc" ? right.price - left.price : sort === "name" ? `${left.brand} ${left.name}`.localeCompare(`${right.brand} ${right.name}`) : 0);
+    return { products: sorted.slice(offset, offset + limit), total: sorted.length };
+  }
   if (supabase) {
     let databaseQuery = supabase.from("catalog_products_available").select("*", { count: "exact" });
     if (family === "New") databaseQuery = databaseQuery.eq("new_arrival", true);
@@ -135,10 +178,10 @@ export async function getCatalogPage(input: { family?: string; query?: string; s
     return { products: ((data || []) as ProductRow[]).map(fromRow), total: count || 0 };
   }
   const products = await getLocalLoyverseProducts() || sampleProducts;
-  const filtered = products.filter((product) => {
+  const filtered = collapseVariantFamilies(products.filter((product) => {
     const familyMatch = family === "All" || (family === "New" ? product.newArrival : product.family === family);
     return familyMatch && matchesCatalogSearch(product, query);
-  });
+  }));
   const sorted = [...filtered].sort((left, right) => sort === "price-asc" ? left.price - right.price : sort === "price-desc" ? right.price - left.price : sort === "name" ? `${left.brand} ${left.name}`.localeCompare(`${right.brand} ${right.name}`) : 0);
   return { products: sorted.slice(offset, offset + limit), total: sorted.length };
 }

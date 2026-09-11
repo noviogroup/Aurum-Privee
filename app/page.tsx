@@ -75,9 +75,9 @@ export default async function HomePage() {
       <section className="home-collections section-shell" id="collections">
         <div className="home-section-title home-section-title-centered collection-heading"><h2>Shop by collection</h2><Link href="/shop">View all fragrance <ArrowRight size={16} /></Link></div>
         <div className="collection-cabinet">
-          <Link className="collection-tile" href="/shop?query=woman"><Image src="/images/collections/for-her-brands-v3.webp" alt="Carolina Herrera Good Girl Blush and Yves Saint Laurent Libre fragrances" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Carolina Herrera · YSL</small><strong>For her</strong><b>Shop now</b></span></Link>
-          <Link className="collection-tile" href="/shop?query=men"><Image src="/images/collections/for-him-brands-v3.webp" alt="Dior Sauvage and Montblanc Explorer Platinum fragrances" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Dior · Montblanc</small><strong>For him</strong><b>Shop now</b></span></Link>
-          <Link className="collection-tile" href="/shop?query=unisex"><Image src="/images/collections/unisex-brands-v3.webp" alt="Maison Francis Kurkdjian Baccarat Rouge 540 and Xerjoff Erba Pura fragrances" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><small>MFK · Xerjoff</small><strong>Unisex</strong><b>Shop now</b></span></Link>
+          <Link className="collection-tile" href="/shop?audience=Women"><Image src="/images/collections/for-her-brands-v3.webp" alt="Carolina Herrera Good Girl Blush and Yves Saint Laurent Libre fragrances" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Carolina Herrera · YSL</small><strong>For her</strong><b>Shop now</b></span></Link>
+          <Link className="collection-tile" href="/shop?audience=Men"><Image src="/images/collections/for-him-brands-v3.webp" alt="Dior Sauvage and Montblanc Explorer Platinum fragrances" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Dior · Montblanc</small><strong>For him</strong><b>Shop now</b></span></Link>
+          <Link className="collection-tile" href="/shop?audience=Unisex"><Image src="/images/collections/unisex-brands-v3.webp" alt="Maison Francis Kurkdjian Baccarat Rouge 540 and Xerjoff Erba Pura fragrances" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><small>MFK · Xerjoff</small><strong>Unisex</strong><b>Shop now</b></span></Link>
           <Link className="collection-tile" href="/shop?query=oud"><Image src="/images/collections/arabian-brands-v3.webp" alt="Al Haramain Amber Oud Gold and Afnan Supremacy Noir fragrances" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Al Haramain · Afnan</small><strong>Arabian collection</strong><b>Shop now</b></span></Link>
           <Link className="collection-tile" href="/shop?query=gift%20set"><Image src="/images/collections/discovery-brands-v3.webp" alt="Carolina Herrera Good Girl and Versace Crystal Noir gift sets" fill sizes="(max-width: 760px) 100vw, 20vw" /><span><small>Carolina Herrera · Versace</small><strong>Discovery sets</strong><b>Shop now</b></span></Link>
         </div>
@@ -153,7 +153,7 @@ export default async function HomePage() {
           <Image src="/images/services/gifting-v2.webp" alt="Ivory gift box tied with a blush silk ribbon" fill sizes="(max-width: 760px) 100vw, 34vw" />
           <span><strong>Gifting</strong><small>Thoughtful fragrance, beautifully presented.</small><b>Shop gifts</b></span>
         </Link>
-        <Link className="home-service-card home-service-help" href="/pages/contact">
+        <Link className="home-service-card home-service-help" href="/contact">
           <Image src="/images/services/whatsapp-v2.webp" alt="Hand holding a phone for private fragrance assistance" fill sizes="(max-width: 760px) 100vw, 34vw" />
           <WhatsappLogo className="service-chat-mark" size={28} weight="fill" aria-hidden="true" />
           <span><strong>Need help?</strong><small>Tell us what you wear or the feeling you want.</small><b>Contact us</b></span>

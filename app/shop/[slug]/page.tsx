@@ -5,9 +5,11 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Check, Package } from "@phosphor-icons/react/dist/ssr";
 import { AddToBag } from "@/components/add-to-bag";
 import { ProductCard } from "@/components/product-card";
+import { ProductVariantOptions } from "@/components/product-variant-options";
 import { SaveButton } from "@/components/save-button";
 import { formatMoney } from "@/lib/config";
 import { getCatalogProductBySlug, getCatalogProducts } from "@/lib/catalog";
+import { getProductVariantFamily, getProductVariants } from "@/lib/product-variants";
 import { productStructuredData, serializeStructuredData } from "@/lib/product-structured-data";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -18,13 +20,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const product = await getCatalogProductBySlug(slug);
   if (!product) return {};
+  const family = getProductVariantFamily(product.id);
+  const brand = product.wixProductId ? product.brand : family?.brand || product.brand;
+  const name = product.wixProductId ? product.name : family?.name || product.name;
   return {
-    title: product.name,
+    title: name,
     description: product.description,
     alternates: { canonical: `/shop/${product.slug}` },
     openGraph: {
       type: "website",
-      title: `${product.name} by ${product.brand}`,
+      title: `${name} by ${brand}`,
       description: product.description,
       url: `/shop/${product.slug}`,
       images: [{ url: product.image, alt: product.imageAlt }],
@@ -37,11 +42,18 @@ export default async function ProductPage({ params }: Props) {
   const product = await getCatalogProductBySlug(slug);
   if (!product) notFound();
   const products = await getCatalogProducts();
+  const variantFamily = getProductVariantFamily(product.id);
+  const variants = getProductVariants(product.id, products);
   const related = products
-    .filter((item) => item.family === product.family && item.id !== product.id)
+    .filter((item) => item.family === product.family && item.id !== product.id && !variantFamily?.productIds.includes(item.id))
     .sort((left, right) => Number(right.brand === product.brand) - Number(left.brand === product.brand))
     .slice(0, 4);
   const hasNotes = [...product.notes.top, ...product.notes.heart, ...product.notes.base].length > 0;
+  const noteSections = [
+    { label: product.notes.heart.length || product.notes.base.length ? "Top notes" : "Key notes", notes: product.notes.top },
+    { label: "Middle notes", notes: product.notes.heart },
+    { label: "Base notes", notes: product.notes.base },
+  ].filter((section) => section.notes.length > 0);
 
   return (
     <div className="product-page page-top">
@@ -55,13 +67,14 @@ export default async function ProductPage({ params }: Props) {
           <Image src={product.image} alt={product.imageAlt} fill priority sizes="(max-width: 900px) calc(100vw - 48px), 660px" />
         </div>
         <div className="product-summary">
-          <p className="product-brand">{product.brand}</p>
-          <h1>{product.name}</h1>
+          <p className="product-brand">{product.wixProductId ? product.brand : variantFamily?.brand || product.brand}</p>
+          <h1>{product.wixProductId ? product.name : variantFamily?.name || product.name}</h1>
           <p className="product-format">
             <span>{product.family}</span>
             <span>{product.concentration}</span>
             <span>{product.size}</span>
           </p>
+          <ProductVariantOptions current={product} variants={variants} />
           <strong className="detail-price">{formatMoney(product.price)}</strong>
           <p className="detail-description">{product.description}</p>
           <div className="product-purchase-actions">
@@ -78,10 +91,8 @@ export default async function ProductPage({ params }: Props) {
             <h2 id="scent-profile-title">Fragrance notes</h2>
             <p>See how this composition develops from its opening notes through its lasting base.</p>
           </header>
-          <div className="scent-profile-notes">
-            <article><span>Top notes</span><h3>{product.notes.top.join(", ")}</h3></article>
-            <article><span>Middle notes</span><h3>{product.notes.heart.join(", ")}</h3></article>
-            <article><span>Base notes</span><h3>{product.notes.base.join(", ")}</h3></article>
+          <div className={`scent-profile-notes scent-profile-notes-${noteSections.length}`}>
+            {noteSections.map((section) => <article key={section.label}><span>{section.label}</span><h3>{section.notes.join(", ")}</h3></article>)}
           </div>
           {product.detailsSource && (
             <a className="scent-profile-source" href={product.detailsSource.url} target="_blank" rel="noreferrer">
