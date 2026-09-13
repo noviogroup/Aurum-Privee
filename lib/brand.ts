@@ -6,11 +6,15 @@ const canonicalBrands: Record<string, string> = {
   "christian dior": "Dior",
   "parfums christian dior": "Dior",
   "afnan perfumes": "Afnan",
+  "antorio banderas": "Antonio Banderas",
+  "arianna grande": "Ariana Grande",
+  "dolce & gabanna": "Dolce & Gabbana",
+  "jean paul glautier": "Jean Paul Gaultier",
   "mont blanc": "Montblanc",
 };
 
 export function customerFacingBrand(value: string | null | undefined) {
-  const brand = value?.trim() || "";
+  const brand = value?.replace(/\s+/g, " ").trim() || "";
   return canonicalBrands[brand.toLowerCase()] || brand || BRAND_EDIT;
 }
 
@@ -45,12 +49,16 @@ export function customerFacingProductName(value: string, brand?: string) {
     .trim();
 
   const brandWords = (brand || "").split(/\s+/).filter(Boolean);
-  const prefixes = [brand, brandWords.length > 1 ? brandWords.at(-1) : undefined]
+  const aliases = Object.entries(canonicalBrands)
+    .filter(([, canonical]) => canonical.toLowerCase() === brand?.toLowerCase())
+    .map(([alias]) => alias);
+  const prefixes = [brand, ...aliases, brandWords.length > 1 ? brandWords.at(-1) : undefined]
     .filter((prefix): prefix is string => Boolean(prefix))
     .sort((left, right) => right.length - left.length);
   for (const prefix of prefixes) {
-    if (name.toLowerCase().startsWith(`${prefix.toLowerCase()} `)) {
-      name = name.slice(prefix.length).trim();
+    const remainder = name.slice(prefix.length);
+    if (name.toLowerCase().startsWith(prefix.toLowerCase()) && /^(?:\s*[-/]\s*|\s+)/.test(remainder)) {
+      name = remainder.replace(/^(?:\s*[-/]\s*|\s+)/, "").trim();
       break;
     }
   }

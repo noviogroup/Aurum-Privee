@@ -8,6 +8,7 @@ Prepared for client review on 13 September 2026.
 - A responsive luxury-fragrance experience covering the homepage, searchable catalogue, product pages, saved fragrances, account area, bag, checkout shell, client-care form and operations area.
 - Clean public routes for `/about` and `/contact`, with permanent redirects from the former `/pages/about` and `/pages/contact` addresses.
 - A structured catalogue of 733 sellable fragrance SKUs. Twenty product families have been reviewed for presentation as one product with selectable editions instead of unrelated duplicate pages.
+- An explainable relationship model for every SKU. Each product page shows four distinct in-stock alternatives ranked from verified notes, scent family, audience, brand line, concentration and price, with a visible reason for each connection.
 - Consistent BSD price presentation, customer-facing brand names, concentration labels, sizes and stock-aware catalogue behaviour.
 - Transactional email infrastructure through Resend for the existing order and client-care workflows. Credentials are stored as protected hosting variables, not in source control.
 - A connected Wix Headless client for the existing Wix account. Wix is being established as the business-management layer while the custom Aurum Privée design remains on Netlify.
@@ -31,6 +32,16 @@ The custom page design, navigation, editorial layouts and frontend code are not 
 The Wix catalogue contains 707 controlled customer-facing product pages and 733 sellable SKUs. Twenty reviewed fragrance families consolidate valid size or concentration choices on one product page. Similar names are not automatically merged: for example, Dior Sauvage and Dior Eau Sauvage remain distinct products.
 
 The source SKU is preserved on every imported variant so that Wix records can be mapped back to the existing inventory data. All 733 SKUs are mapped to their live Wix product and variant IDs. Product URLs, fragrance-family classification, verified notes and the reviewed grouping rules remain protected in the custom storefront, while routine commerce fields come from Wix. The legacy Wix account currently also contains nine placeholder products, for 716 total Wix products. They have not been deleted because removal requires explicit owner approval.
+
+### Variants versus related products
+
+Variants and recommendations are intentionally different:
+
+- A variant is another size or concentration of the same fragrance. Only 20 manually reviewed families are allowed to merge, covering 46 SKUs. On those pages, the customer sees **Choose your edition** and can select the exact size and concentration.
+- A related product is a separate fragrance that may be a useful alternative. Every controlled SKU has four ranked connections. The current product and all of its sibling editions are excluded, and another variant family can appear only once.
+- Similar wording never creates a variant. Dior Sauvage has six selectable editions; Dior Eau Sauvage and Eau Sauvage Extreme remain independent fragrances and can appear as related Dior alternatives.
+
+The complete client-readable register is in `docs/PRODUCT-RELATIONSHIPS.md`; the machine-readable source is `data/product-relationships.json`. Run `npm run catalog:relationships` after changing catalogue data, verified notes or the reviewed variant list. The command fails if any controlled SKU loses its Wix mapping or its four connections.
 
 ## Payments and fulfillment
 
@@ -71,6 +82,7 @@ The custom storefront controls technical SEO: page titles and descriptions, cano
 
 - [Complete] Import the controlled Wix catalogue and build the 733-SKU live mapping.
 - [Complete] Verify the reviewed variant model in Wix, including the six-edition Dior Sauvage family.
+- [Complete] Generate and verify four explainable related-product connections for every controlled SKU.
 - Configure and verify the three fulfillment markets with real business details.
 - Complete one cash-pickup order from a phone and a desktop browser.
 - Confirm that the order appears in Wix with the correct SKU, quantity, customer, total and pickup location.

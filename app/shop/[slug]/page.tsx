@@ -9,6 +9,7 @@ import { ProductVariantOptions } from "@/components/product-variant-options";
 import { SaveButton } from "@/components/save-button";
 import { formatMoney } from "@/lib/config";
 import { getCatalogProductBySlug, getCatalogProducts } from "@/lib/catalog";
+import { rankRelatedProducts } from "@/lib/product-relationships";
 import { getProductVariantFamily, getProductVariants } from "@/lib/product-variants";
 import { productStructuredData, serializeStructuredData } from "@/lib/product-structured-data";
 
@@ -44,10 +45,7 @@ export default async function ProductPage({ params }: Props) {
   const products = await getCatalogProducts();
   const variantFamily = getProductVariantFamily(product.id);
   const variants = getProductVariants(product.id, products);
-  const related = products
-    .filter((item) => item.family === product.family && item.id !== product.id && !variantFamily?.productIds.includes(item.id))
-    .sort((left, right) => Number(right.brand === product.brand) - Number(left.brand === product.brand))
-    .slice(0, 4);
+  const related = rankRelatedProducts(product, products);
   const hasNotes = [...product.notes.top, ...product.notes.heart, ...product.notes.base].length > 0;
   const noteSections = [
     { label: product.notes.heart.length || product.notes.base.length ? "Top notes" : "Key notes", notes: product.notes.top },
@@ -102,9 +100,22 @@ export default async function ProductPage({ params }: Props) {
         </section>
       )}
       {related.length > 0 && (
-        <section className="related section-shell">
-          <h2>You may also like</h2>
-          <div className="related-grid">{related.map((item) => <ProductCard product={item} key={item.id} />)}</div>
+        <section className="related section-shell" aria-labelledby="related-title">
+          <header className="related-heading">
+            <div>
+              <p className="utility-label">Curated connections</p>
+              <h2 id="related-title">You may also like</h2>
+            </div>
+            <p>Thoughtfully connected through fragrance profile, audience, house, format and price.</p>
+          </header>
+          <div className="related-grid">
+            {related.map((relationship) => (
+              <div className="related-card" key={relationship.product.id}>
+                <p className="related-match"><span>Why it connects</span>{relationship.primaryReason}</p>
+                <ProductCard product={relationship.product} />
+              </div>
+            ))}
+          </div>
         </section>
       )}
     </div>

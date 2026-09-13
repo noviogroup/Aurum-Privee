@@ -52,3 +52,13 @@ test("Wix-hidden, out-of-stock, and unmapped products are not offered", () => {
   assert.deepEqual(mergeWixCatalogProducts([product], new Map()), []);
   assert.deepEqual(mergeWixCatalogProducts([product], new Map([["sku-1", override({ inStock: false })]])), []);
 });
+
+test("a generic Wix brand does not erase a normalized catalogue house", () => {
+  const normalized = { ...product, brand: "Dior", name: "Sauvage" };
+  const [managed] = mergeWixCatalogProducts([normalized], new Map([["sku-1", override({
+    brand: "Aurum Privée Edit",
+    name: "Christian Dior- Sauvage EDP 6.8 oz",
+  })]]));
+  assert.equal(managed.brand, "Dior");
+  assert.equal(managed.name, "Sauvage");
+});

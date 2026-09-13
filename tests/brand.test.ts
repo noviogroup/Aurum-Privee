@@ -6,6 +6,8 @@ test("uses one customer-facing label for known brand aliases", () => {
   assert.equal(customerFacingBrand("Christian Dior"), "Dior");
   assert.equal(customerFacingBrand("Afnan Perfumes"), "Afnan");
   assert.equal(customerFacingBrand("Mont Blanc"), "Montblanc");
+  assert.equal(customerFacingBrand("Al  Haramain"), "Al Haramain");
+  assert.equal(customerFacingBrand("Jean Paul Glautier"), "Jean Paul Gaultier");
 });
 
 test("expands retail shorthand and removes imported HTML from customer copy", () => {
@@ -26,5 +28,6 @@ test("preserves legitimate product wording", () => {
 
 test("creates concise customer-facing names when brand and format are displayed separately", () => {
   assert.equal(customerFacingProductName("Dior Sauvage 3.4 EDP SP", "Christian Dior"), "Sauvage");
+  assert.equal(customerFacingProductName("Christian Dior- Sauvage EDP 6.8 oz", "Dior"), "Sauvage");
   assert.equal(customerFacingProductName("Supremecy Incense 3.4 oz EDP SP", "Afnan"), "Supremacy Incense");
 });

@@ -29,6 +29,7 @@ This document records the live Wix configuration for the existing Aurum Privée 
 - Complete live mapping for all 733 approved SKUs
 - Wix product list verified at 716 total products: 707 controlled records plus nine inherited placeholders
 - Reviewed Dior Sauvage family spot-checked in Wix with six variants, separate from Dior Eau Sauvage
+- Complete product-relationship register for all 733 SKUs, with 2,932 deterministic recommendation links and sibling-variant exclusions
 - Matching non-secret Wix configuration stored in Netlify's production context and applied by the current production release.
 - Production catalogue provider set to `wix`; checkout remains disabled until fulfillment acceptance is complete.
 

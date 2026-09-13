@@ -1,5 +1,5 @@
 import { media } from "@wix/sdk";
-import { customerFacingBrand, customerFacingCopy, customerFacingProductName } from "@/lib/brand";
+import { BRAND_EDIT, customerFacingBrand, customerFacingCopy, customerFacingProductName } from "@/lib/brand";
 import type { Product } from "@/lib/types";
 import { wixCatalogReferenceForSku } from "@/lib/wix-catalog-map";
 import { createWixVisitorClient } from "@/lib/wix-visitor";
@@ -100,7 +100,8 @@ export function mergeWixCatalogProducts(products: Product[], overrides: Readonly
     const sku = product.loyverseVariantId || product.id;
     const override = overrides.get(sku);
     if (!override || !override.inStock) return [];
-    const brand = customerFacingBrand(override.brand || product.brand);
+    const wixBrand = customerFacingBrand(override.brand || product.brand);
+    const brand = wixBrand === BRAND_EDIT && product.brand !== BRAND_EDIT ? product.brand : wixBrand;
     const name = customerFacingProductName(override.name, brand);
     return [{
       ...product,

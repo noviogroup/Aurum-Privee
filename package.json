@@ -14,6 +14,7 @@
     "preflight:wix": "tsx --env-file-if-exists=.env.local scripts/wix-preflight.ts",
     "catalog:wix:csv": "tsx --env-file-if-exists=.env.local scripts/generate-wix-import.ts",
     "catalog:wix:map": "tsx --env-file-if-exists=.env.local scripts/build-wix-catalog-map.ts",
+    "catalog:relationships": "tsx scripts/generate-product-relationships.ts",
     "preflight:production": "tsx --env-file-if-exists=.env.local scripts/production-preflight.ts",
     "sync:loyverse:local": "tsx --env-file=.env.local scripts/sync-loyverse-local.ts",
     "images:check": "tsx scripts/import-product-images.ts --dry-run",

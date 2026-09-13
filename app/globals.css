@@ -740,8 +740,14 @@ h3 { font-size: 1.65rem; }
 .scent-profile-notes h3 { max-width: 18ch; margin: 0; font-size: clamp(1.35rem, 2vw, 2rem); line-height: 1.16; }
 .scent-profile-source { display: inline-block; margin-top: 18px; border-bottom: 1px solid currentColor; color: var(--muted); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
 .related { padding-bottom: 130px; }
-.related > h2 { margin-bottom: 30px; font-size: clamp(2rem, 2.5vw, 2.65rem); }
+.related-heading { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 420px); align-items: end; gap: 32px; margin-bottom: 30px; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
+.related-heading .utility-label { margin: 0 0 9px; color: var(--accent-hover); }
+.related-heading h2 { margin: 0; font-size: clamp(2rem, 2.5vw, 2.65rem); }
+.related-heading > p { max-width: 48ch; justify-self: end; margin: 0; color: var(--muted); font-size: 12px; line-height: 1.55; }
 .related-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px 16px; }
+.related-card { min-width: 0; }
+.related-match { min-height: 48px; margin: 0; padding: 10px 0 11px; border-top: 2px solid var(--accent); color: var(--ink); font-size: 11px; line-height: 1.35; }
+.related-match span { display: block; margin-bottom: 3px; color: var(--muted); font-size: 8px; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; }
 .related .product-image-wrap { aspect-ratio: 1 / 1; }
 .related .product-image-wrap img { padding: 18px; }
 .related .product-card-info { grid-template-columns: 1fr; gap: 12px; padding-top: 14px; }
@@ -1098,6 +1104,8 @@ h3 { font-size: 1.65rem; }
   .product-gallery { min-height: 0; aspect-ratio: 1 / 1; }
   .back-link { margin-left: 24px; }
   .related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .related-heading { grid-template-columns: 1fr; align-items: start; gap: 14px; }
+  .related-heading > p { justify-self: start; }
   .about-hero { grid-template-columns: minmax(330px, .85fr) minmax(0, 1.15fr); }
   .about-hero-copy { padding-inline: 34px; }
   .about-editorial { grid-template-columns: .9fr 1.1fr; }
@@ -1250,8 +1258,11 @@ h3 { font-size: 1.65rem; }
   .scent-profile-notes span { margin-bottom: 12px; }
   .scent-profile-notes h3 { max-width: 24ch; font-size: 1.45rem; }
   .related { padding-bottom: 90px; }
-  .related > h2 { margin-bottom: 24px; font-size: 1.95rem; }
+  .related-heading { margin-bottom: 24px; padding-bottom: 20px; }
+  .related-heading h2 { font-size: 1.95rem; }
+  .related-heading > p { font-size: 11px; }
   .related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 10px; }
+  .related-match { min-height: 55px; font-size: 10px; }
   .related .product-image-wrap img { padding: 10px; }
   .related .product-card-info h3 { font-size: 1rem; }
   .related .product-card-info p:not(.product-brand) { font-size: 10px; }

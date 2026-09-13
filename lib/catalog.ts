@@ -9,6 +9,7 @@ import { matchesCatalogSearch } from "@/lib/catalog-search";
 import { customerFacingBrand, customerFacingConcentration, customerFacingCopy, customerFacingProductName, customerFacingSize } from "@/lib/brand";
 import { applyProductEnrichment } from "@/lib/product-enrichment";
 import { audienceForProduct } from "@/lib/product-normalization";
+import { normalizeLocalCatalogProducts } from "@/lib/local-catalog-product";
 import { getCommerceProvider } from "@/lib/wix-config";
 import { applyWixCatalog } from "@/lib/wix-catalog";
 import { getProductVariantFamily } from "@/lib/product-variants";
@@ -71,16 +72,7 @@ function fromRow(row: ProductRow): Product {
 async function getLocalLoyverseProducts() {
   try {
     const contents = await readFile(path.join(process.cwd(), "data", "loyverse-products.json"), "utf8");
-    return (JSON.parse(contents) as Product[]).map((product) => applyProductEnrichment({
-      ...product,
-      brand: customerFacingBrand(product.brand),
-      name: customerFacingProductName(product.name, customerFacingBrand(product.brand)),
-      concentration: customerFacingConcentration(product.concentration),
-      size: customerFacingSize(product.size, product.name),
-      audience: product.audience || audienceForProduct(null, product.name, product.description),
-      description: customerFacingCopy(product.description),
-      imageAlt: customerFacingCopy(product.imageAlt),
-    }));
+    return normalizeLocalCatalogProducts(JSON.parse(contents) as Product[]);
   } catch {
     return null;
   }
