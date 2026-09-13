@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/**/*.test.ts",
+    "test": "tsx --test tests/*.test.ts",
     "test:migrations": "bash scripts/test-migrations.sh",
     "preflight:email": "tsx --env-file-if-exists=.env.local scripts/resend-preflight.ts",
     "preflight:wix": "tsx --env-file-if-exists=.env.local scripts/wix-preflight.ts",
@@ -53,6 +53,6 @@
     "sharp": "0.35.4"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": ">=22.0.0"
   }
 }

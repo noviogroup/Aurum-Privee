@@ -1,6 +1,6 @@
 # Wix headless setup status
 
-Last verified: 11 September 2026
+Last verified: 12 September 2026
 
 This document records the live Wix configuration for the existing Aurum Privée site and the remaining gates for the headless-commerce cutover. It contains no credentials.
 
@@ -22,6 +22,7 @@ This document records the live Wix configuration for the existing Aurum Privée 
   - `http://localhost:3040/auth/wix/callback`
 - Local Wix SDK dependencies and separate visitor/admin client factories
 - Hosted-checkout adapter using the Wix cart → checkout → redirect sequence
+- Manual cash payment connected and active, with instructions requiring customers to wait for pickup confirmation before travelling
 - Wix-aware order confirmation and fail-closed 733-SKU mapping check
 - Wix catalogue overlay for client-managed names, brands, descriptions, prices, visibility, stock status and media
 - Matching non-secret Wix configuration stored in Netlify's production context; it will take effect on the next approved deploy.
@@ -42,13 +43,14 @@ Wix Business Info has no address, email or phone. Its default location is not ma
 
 Obtain the complete pickup address and confirm which Loyverse store is authoritative before creating or mapping the Wix inventory location.
 
-### Shipping and delivery
+### Shipping, delivery and pickup
 
 The inherited Wix shipping profile is not launch-safe:
 
 - Domestic region is still Ghana with free shipping.
 - International region is the rest of the world with free shipping.
-- No confirmed Nassau pickup or New Providence delivery policy exists.
+- No Nassau or Harbour Island pickup location is configured.
+- No confirmed New Providence delivery policy exists.
 
 Do not enable Wix checkout until the owner confirms the delivery area, delivery fee, pickup address, opening hours, cutoff time and tax treatment. Remove or replace the inherited regions during acceptance setup.
 

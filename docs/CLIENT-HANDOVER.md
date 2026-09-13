@@ -1,6 +1,6 @@
 # Aurum Privée storefront handover
 
-Prepared for client review on 11 September 2026.
+Prepared for client review on 12 September 2026.
 
 ## What has been built
 
@@ -34,7 +34,7 @@ The source SKU is preserved on every imported variant so that Wix records can be
 
 ## Payments and fulfillment
 
-Cash collection is configured in Wix with the instruction that the customer must wait for pickup confirmation before travelling. Bank transfer can be added as soon as the business supplies its approved receiving-account instructions.
+Cash collection is connected and active in Wix. Its checkout instruction tells the customer to wait for an email or call confirming the selected pickup location before travelling. Bank transfer can be added as soon as the business supplies its approved receiving-account instructions.
 
 The intended service areas are:
 
@@ -43,6 +43,14 @@ The intended service areas are:
 - Ghana, with the city and service details still to be confirmed.
 
 The storefront must not advertise a street address, opening hours, delivery rate or cutoff time until the business confirms that information.
+
+## Wix readiness verified 12 September 2026
+
+- Wix still contains the nine inherited placeholder products; the controlled Aurum Privée catalogue has not yet been imported.
+- The prepared import contains 707 customer-facing products and 733 sellable SKUs, including the 20 reviewed variant families.
+- Manual cash payment is connected, active and carries the approved collection-confirmation instruction.
+- Fulfillment is not launch-safe: Wix still exposes the inherited `Domestic Ghana` free-shipping region and `Rest of the world` free-shipping region, with no configured Nassau or Harbour Island pickup location.
+- The production storefront remains on the legacy commerce provider with both checkout launch controls disabled. This is intentional until catalogue import, fulfillment setup and acceptance testing are complete.
 
 ## Information still required from the client
 
