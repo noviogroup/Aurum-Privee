@@ -1,6 +1,6 @@
 # Aurum Privée storefront handover
 
-Prepared for client review on 12 September 2026.
+Prepared for client review on 13 September 2026.
 
 ## What has been built
 
@@ -28,9 +28,9 @@ The custom page design, navigation, editorial layouts and frontend code are not 
 
 ## Catalogue model
 
-The prepared Wix import contains 707 customer-facing product pages and 733 sellable SKUs. Twenty reviewed fragrance families consolidate valid size or concentration choices on one product page. Similar names are not automatically merged: for example, Dior Sauvage and Dior Eau Sauvage remain distinct products.
+The Wix catalogue contains 707 controlled customer-facing product pages and 733 sellable SKUs. Twenty reviewed fragrance families consolidate valid size or concentration choices on one product page. Similar names are not automatically merged: for example, Dior Sauvage and Dior Eau Sauvage remain distinct products.
 
-The source SKU is preserved on every imported variant so that Wix records can be mapped back to the existing inventory data. Product URLs, fragrance-family classification, verified notes and the reviewed grouping rules remain protected in the custom storefront, while routine commerce fields come from Wix. The legacy Wix account currently also contains nine placeholder products. They have not been deleted because removal requires owner approval.
+The source SKU is preserved on every imported variant so that Wix records can be mapped back to the existing inventory data. All 733 SKUs are mapped to their live Wix product and variant IDs. Product URLs, fragrance-family classification, verified notes and the reviewed grouping rules remain protected in the custom storefront, while routine commerce fields come from Wix. The legacy Wix account currently also contains nine placeholder products, for 716 total Wix products. They have not been deleted because removal requires explicit owner approval.
 
 ## Payments and fulfillment
 
@@ -44,13 +44,14 @@ The intended service areas are:
 
 The storefront must not advertise a street address, opening hours, delivery rate or cutoff time until the business confirms that information.
 
-## Wix readiness verified 12 September 2026
+## Wix readiness verified 13 September 2026
 
-- Wix still contains the nine inherited placeholder products; the controlled Aurum Privée catalogue has not yet been imported.
-- The prepared import contains 707 customer-facing products and 733 sellable SKUs, including the 20 reviewed variant families.
+- The controlled import completed cleanly: Wix reported 707 products updated with no failures or partial-import warnings on the final pass.
+- Wix now contains 716 products: 707 controlled Aurum Privée products plus nine inherited placeholders that remain isolated from the custom storefront.
+- All 733 sellable SKUs are mapped to live Wix V3 variants, including the 20 reviewed variant families. The grouped Dior Sauvage product was spot-checked in Wix with six selectable variants; Dior Eau Sauvage remains a separate product.
 - Manual cash payment is connected, active and carries the approved collection-confirmation instruction.
 - Fulfillment is not launch-safe: Wix still exposes the inherited `Domestic Ghana` free-shipping region and `Rest of the world` free-shipping region, with no configured Nassau or Harbour Island pickup location.
-- The production storefront remains on the legacy commerce provider with both checkout launch controls disabled. This is intentional until catalogue import, fulfillment setup and acceptance testing are complete.
+- The production storefront reads the controlled catalogue from Wix. Both checkout launch controls remain disabled until fulfillment setup and acceptance testing are complete.
 
 ## Information still required from the client
 
@@ -60,8 +61,7 @@ The storefront must not advertise a street address, opening hours, delivery rate
 4. Bank-transfer instructions: beneficiary name, bank, account details, currency, payment reference format and proof-of-payment process.
 5. The monitored order email address and phone/WhatsApp number.
 6. Written approval of the returns, cancellations, refunds, privacy and terms content.
-7. Wix authorization for the protected server credential and webhook configuration.
-8. Confirmation that the nine inherited Wix placeholder products may be removed.
+7. Confirmation that the nine inherited Wix placeholder products may be removed.
 
 ## SEO ownership
 
@@ -69,8 +69,8 @@ The custom storefront controls technical SEO: page titles and descriptions, cano
 
 ## Launch acceptance checklist
 
-- Import and review the prepared Wix catalogue.
-- Confirm every reviewed product family and its variant pricing.
+- [Complete] Import the controlled Wix catalogue and build the 733-SKU live mapping.
+- [Complete] Verify the reviewed variant model in Wix, including the six-edition Dior Sauvage family.
 - Configure and verify the three fulfillment markets with real business details.
 - Complete one cash-pickup order from a phone and a desktop browser.
 - Confirm that the order appears in Wix with the correct SKU, quantity, customer, total and pickup location.
@@ -78,4 +78,4 @@ The custom storefront controls technical SEO: page titles and descriptions, cano
 - Test cancellation, refund and stock-update behaviour.
 - Approve production checkout and monitoring.
 
-Until those acceptance checks pass, the public storefront remains available for browsing while checkout stays deliberately gated.
+Until the remaining fulfillment and order acceptance checks pass, the public storefront remains available for Wix-backed browsing while checkout stays deliberately gated.

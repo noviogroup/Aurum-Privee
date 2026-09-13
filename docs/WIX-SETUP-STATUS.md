@@ -1,6 +1,6 @@
 # Wix headless setup status
 
-Last verified: 12 September 2026
+Last verified: 13 September 2026
 
 This document records the live Wix configuration for the existing Aurum Privée site and the remaining gates for the headless-commerce cutover. It contains no credentials.
 
@@ -25,8 +25,12 @@ This document records the live Wix configuration for the existing Aurum Privée 
 - Manual cash payment connected and active, with instructions requiring customers to wait for pickup confirmation before travelling
 - Wix-aware order confirmation and fail-closed 733-SKU mapping check
 - Wix catalogue overlay for client-managed names, brands, descriptions, prices, visibility, stock status and media
-- Matching non-secret Wix configuration stored in Netlify's production context; it will take effect on the next approved deploy.
-- Commerce provider remains `legacy`; Wix checkout remains disabled until the catalog mapping and fulfillment acceptance are complete.
+- Controlled Wix import completed cleanly for 707 products and 733 sellable variants
+- Complete live mapping for all 733 approved SKUs
+- Wix product list verified at 716 total products: 707 controlled records plus nine inherited placeholders
+- Reviewed Dior Sauvage family spot-checked in Wix with six variants, separate from Dior Eau Sauvage
+- Matching non-secret Wix configuration stored in Netlify's production context and applied by the current production release.
+- Production catalogue provider set to `wix`; checkout remains disabled until fulfillment acceptance is complete.
 
 ## Verified incomplete
 
@@ -62,9 +66,11 @@ A branded Wix checkout subdomain can be added later. The initial hosted checkout
 
 Custom Wix webhook subscriptions are not required for the initial client-managed Wix order flow. Add them only if Novio later introduces automated downstream order or inventory synchronization, with idempotent handling for order, cancellation, fulfillment and refund events.
 
-### Catalogue
+### Inherited catalogue cleanup
 
-The Wix account contains 9 placeholder products with 21 variants using legacy GHS-era data. They are not the controlled catalogue and should not be deleted or overwritten without explicit approval. A Wix-template-compatible import has been prepared and accepted by the uploader for 707 customer-facing product pages, 733 sellable SKUs and 20 reviewed variant families. The final import action still requires owner confirmation.
+The Wix account retains nine placeholder products with legacy GHS-era data. They are not referenced by the 733-SKU storefront map and therefore cannot appear in the custom storefront. They have not been deleted because destructive Wix cleanup still requires explicit owner approval.
+
+The product importer on this Wix V3 catalogue rejected optional category assignment even when supplied with Wix-compatible slugs. The final clean import therefore leaves `categorySlugs` and `primaryCategorySlug` blank. Customer-facing audience, fragrance-family and new-arrival classification remains in the custom storefront. Wix-native categories can be curated separately if the client later needs Wix-hosted catalogue navigation.
 
 ## Readiness command
 
@@ -74,4 +80,4 @@ Run:
 npm run preflight:wix
 ```
 
-The command is expected to fail closed until all 733 approved SKUs are mapped, the Wix provider is selected, and both checkout launch controls are enabled after acceptance testing. A private administrative credential is not required for hosted checkout.
+The command now verifies all 733 approved SKUs are mapped and the Wix provider is selected. It is expected to remain fail-closed only on the two checkout launch controls until fulfillment and order acceptance testing pass. A private administrative credential is not required for hosted checkout.

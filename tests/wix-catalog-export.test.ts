@@ -34,3 +34,13 @@ test("escapes descriptions with punctuation and line breaks", () => {
   const result = buildWixCatalogCsv([{ ...base, description: 'Bright, polished\nand "warm".' }], "https://aurumprivee.com");
   assert.match(result.csv, /"Bright, polished\nand ""warm""\."/);
 });
+
+test("leaves optional Wix categories blank and caps inventory at the import maximum", () => {
+  const result = buildWixCatalogCsv([{ ...base, stock: 999999, audience: "Men", newArrival: true }], "https://aurumprivee.com");
+  const productCells = result.csv.trim().split("\n")[1].split(",");
+  assert.equal(productCells[5], "");
+  assert.equal(productCells[6], "");
+  assert.equal(productCells[18], "99999");
+  assert.doesNotMatch(result.csv, /all-fragrances/);
+  assert.doesNotMatch(result.csv, /999999/);
+});

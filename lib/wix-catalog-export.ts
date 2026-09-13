@@ -85,11 +85,8 @@ function cleanProduct(product: Product): Product {
   };
 }
 
-function categorySlugs(product: Product) {
-  const audience = product.audience === "Women" ? "for-her" : product.audience === "Men" ? "for-him" : "unisex";
-  return ["all-fragrances", audience, product.family.toLowerCase(), product.newArrival ? "new-arrivals" : ""]
-    .filter(Boolean)
-    .join(";");
+function wixInventory(stock: number) {
+  return String(Math.min(99_999, Math.max(0, Math.floor(stock))));
 }
 
 function mediaUrl(product: Product, storefrontOrigin: string) {
@@ -120,13 +117,15 @@ function productRow(product: Product, handle: string, optionChoices?: string[]):
     name: product.name.slice(0, 80),
     visible: "TRUE",
     plainDescription: product.description.slice(0, 16000),
-    categorySlugs: categorySlugs(product),
-    primaryCategorySlug: "all-fragrances",
+    // The current Wix importer rejects category creation for this V3 catalog.
+    // Keep these optional fields blank and curate Wix categories separately.
+    categorySlugs: "",
+    primaryCategorySlug: "",
     ribbon: product.newArrival ? "New" : "",
     brand: product.brand.slice(0, 50),
     price: product.price.toFixed(2),
     strikethroughPrice: product.compareAtPrice && product.compareAtPrice > product.price ? product.compareAtPrice.toFixed(2) : "",
-    inventory: optionChoices ? "" : String(Math.max(0, Math.floor(product.stock))),
+    inventory: optionChoices ? "" : wixInventory(product.stock),
     preOrderEnabled: "FALSE",
     sku: optionChoices ? "" : (product.loyverseVariantId || product.id).slice(0, 40),
     productOptionName1: optionChoices ? "Edition" : "",
@@ -150,7 +149,7 @@ function variantRow(product: Product, handle: string, choice: string): CsvRow {
     fieldType: "VARIANT",
     price: product.price.toFixed(2),
     strikethroughPrice: product.compareAtPrice && product.compareAtPrice > product.price ? product.compareAtPrice.toFixed(2) : "",
-    inventory: String(Math.max(0, Math.floor(product.stock))),
+    inventory: wixInventory(product.stock),
     preOrderEnabled: "FALSE",
     sku: (product.loyverseVariantId || product.id).slice(0, 40),
     productOptionChoices1: choice,
