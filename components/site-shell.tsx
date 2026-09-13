@@ -5,7 +5,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { CartProvider } from "@/components/cart-provider";
 import { WishlistProvider } from "@/components/wishlist-provider";
-import { Truck } from "@phosphor-icons/react";
+import { MapPin } from "@phosphor-icons/react";
 import type { CommerceProvider } from "@/lib/wix-config";
 
 export function SiteShell({ children, commerceProvider }: { children: React.ReactNode; commerceProvider: CommerceProvider }) {
@@ -17,7 +17,7 @@ export function SiteShell({ children, commerceProvider }: { children: React.Reac
   return (
     <CartProvider commerceProvider={commerceProvider}>
       <WishlistProvider>
-        <div className="announcement"><span><Truck size={14} weight="light" />Complimentary delivery in Nassau &amp; Harbour Island</span><b>Bahamas · BSD</b></div>
+        <div className="announcement"><span><MapPin size={14} weight="light" />Personal fragrance service in Nassau &amp; Harbour Island</span><b>Bahamas · BSD</b></div>
         <Header />
         <main id="main">{children}</main>
         <Footer />

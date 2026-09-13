@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChatCircleDots, Gift, SealCheck, Truck, WhatsappLogo } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight, ChatCircleDots, Gift, MapPin, SealCheck, WhatsappLogo } from "@phosphor-icons/react/dist/ssr";
 import { ProductBrowser } from "@/components/product-browser";
 import { getCatalogProducts } from "@/lib/catalog";
 
@@ -66,7 +66,7 @@ export default async function HomePage() {
       </section>
 
       <section className="home-assurance-bar" aria-label="Aurum Privée services">
-        <article><Truck size={25} weight="light" /><div><strong>Complimentary delivery</strong><span>Nassau &amp; Harbour Island</span></div></article>
+        <article><MapPin size={25} weight="light" /><div><strong>Private client service</strong><span>Nassau &amp; Harbour Island</span></div></article>
         <article><Gift size={25} weight="light" /><div><strong>Luxury packaging</strong><span>Every order beautifully wrapped</span></div></article>
         <article><SealCheck size={25} weight="light" /><div><strong>Authentic &amp; curated</strong><span>100% authentic guarantee</span></div></article>
         <article><ChatCircleDots size={25} weight="light" /><div><strong>Personal service</strong><span>We&apos;re here to help</span></div></article>
