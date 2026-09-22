@@ -7,6 +7,7 @@ import {
   ArrowSquareOut,
   CheckCircle,
   EnvelopeSimple,
+  FileText,
   Gear,
   ImageSquare,
   MagnifyingGlass,
@@ -138,6 +139,7 @@ export function OperationsImagesConsole({ commerceProvider, initialCatalog }: { 
         <p className="operations-rail-label">Operations</p>
         <nav aria-label="Operations navigation">
           <Link href="/operations"><Package size={21} weight="light" />Orders</Link>
+          <Link href="/operations/quotes"><FileText size={21} weight="light" />Quote requests</Link>
           <Link href="/operations/inquiries"><EnvelopeSimple size={21} weight="light" />Client care</Link>
           <Link href="/operations/catalog"><Tag size={21} weight="light" />Catalog</Link>
           <Link className="is-selected" href="/operations/images"><ImageSquare size={21} weight="light" />Product images</Link>
@@ -152,7 +154,7 @@ export function OperationsImagesConsole({ commerceProvider, initialCatalog }: { 
 
       <section className="operations-workspace">
         <header className="operations-topbar">
-          <div><Storefront size={18} weight="light" /><span>Nassau store</span></div>
+          <div><Storefront size={18} weight="light" /><span>Trade catalogue</span></div>
           <div className="operations-sync"><span>{wixManaged ? "Wix catalog" : "Catalog"}</span>{catalog.preview ? <WarningCircle size={18} weight="fill" /> : <CheckCircle size={18} weight="fill" />}{wixManaged ? "Read only" : catalog.preview ? "Preview" : "Live"}</div>
         </header>
         <div className="operations-page-head operations-image-page-head">

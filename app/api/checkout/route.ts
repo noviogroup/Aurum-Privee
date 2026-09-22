@@ -149,7 +149,7 @@ export async function POST(request: Request) {
       payment_intent_data: { metadata: { channel: "aurum-privee-web", checkout_reference: checkoutReference } },
       shipping_address_collection: input.fulfillment === "delivery" ? { allowed_countries: ["BS"] } : undefined,
       shipping_options: input.fulfillment === "delivery"
-        ? [{ shipping_rate_data: { type: "fixed_amount", fixed_amount: { amount: Math.round(deliveryGrossAmount * 100), currency: siteConfig.currency.toLowerCase() }, display_name: "New Providence delivery", delivery_estimate: { minimum: { unit: "business_day", value: 1 }, maximum: { unit: "business_day", value: 3 } } } }]
+        ? [{ shipping_rate_data: { type: "fixed_amount", fixed_amount: { amount: Math.round(deliveryGrossAmount * 100), currency: siteConfig.currency.toLowerCase() }, display_name: "Delivery", delivery_estimate: { minimum: { unit: "business_day", value: 1 }, maximum: { unit: "business_day", value: 3 } } } }]
         : [{ shipping_rate_data: { type: "fixed_amount", fixed_amount: { amount: 0, currency: siteConfig.currency.toLowerCase() }, display_name: siteConfig.pickupLabel } }],
       expires_at: Math.floor(sessionExpiresAt.getTime() / 1000),
       metadata: {

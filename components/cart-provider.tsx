@@ -6,8 +6,6 @@ import { CartItem, Product } from "@/lib/types";
 import { formatMoney } from "@/lib/config";
 import { calculateAddedTax } from "@/lib/tax";
 import type { CommerceProvider } from "@/lib/wix-config";
-import { parseClientCatalogResponse } from "@/lib/client-catalog-response";
-import { requestJson } from "@/lib/client-json-request";
 import { productVariantLabel } from "@/lib/product-variants";
 
 type CartContextValue = {
@@ -54,7 +52,6 @@ export function CartProvider({ children, commerceProvider, showCart = true }: { 
 
   useEffect(() => {
     let cancelled = false;
-    const controller = new AbortController();
     async function hydrateCart() {
       let savedItems: CartItem[] = [];
       try {
@@ -73,24 +70,9 @@ export function CartProvider({ children, commerceProvider, showCart = true }: { 
         setHydrated(true);
       }
 
-      try {
-        const ids = savedItems.map((item) => item.product.id).join(",");
-        const { response, data } = await requestJson<unknown>(`/api/catalog?ids=${encodeURIComponent(ids)}`, { signal: controller.signal });
-        if (!response.ok) throw new Error("Catalog refresh failed");
-        const result = parseClientCatalogResponse(data);
-        const currentProducts = new Map(result.products.map((product) => [product.id, product]));
-        const refreshed = savedItems.flatMap((item) => {
-          const product = currentProducts.get(item.product.id);
-          if (!product || product.stock < 1) return [];
-          return [{ product, quantity: Math.min(item.quantity, product.stock) }];
-        });
-        if (!cancelled) setItems(refreshed);
-      } catch {
-        // Keep the locally saved selection. Checkout validates live price and stock server-side.
-      }
     }
     hydrateCart();
-    return () => { cancelled = true; controller.abort(); };
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {

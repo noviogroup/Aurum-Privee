@@ -83,18 +83,14 @@ export function ContactForm() {
       </div>
       <div className="contact-field">
         <label htmlFor="contact-topic">How can we help?</label>
-        <select id="contact-topic" name="topic" defaultValue="Fragrance guidance" required>
+        <select id="contact-topic" name="topic" defaultValue="Trade quote help" required>
           {inquiryTopics.map((topic) => <option value={topic} key={topic}>{topic}</option>)}
         </select>
       </div>
       <div className="contact-field contact-field-wide">
-        <label htmlFor="contact-order">Order number <span>Only if this is about an order</span></label>
-        <input id="contact-order" name="orderNumber" type="text" maxLength={64} />
-      </div>
-      <div className="contact-field contact-field-wide">
         <label htmlFor="contact-message">Your note</label>
         <textarea id="contact-message" name="message" minLength={20} maxLength={2000} rows={7} required />
-        <small>Tell us what you’re looking for, or include anything we should know about your order.</small>
+        <small>Tell us about your business, the assortment you need, or how we can help with your quote.</small>
       </div>
       <div className="contact-form-foot contact-field-wide">
         <p>By sending this note, you agree that Aurum Privée may use these details to respond to your inquiry.</p>

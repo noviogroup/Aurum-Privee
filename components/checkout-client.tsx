@@ -147,7 +147,7 @@ export function CheckoutClient({ initialEmail, paymentReady, checkoutCancelled, 
               <label className={fulfillment === "delivery" ? "is-selected" : ""}>
                 <input type="radio" name="fulfillment" value="delivery" checked={fulfillment === "delivery"} onChange={() => setFulfillment("delivery")} />
                 <Truck size={24} weight="light" />
-                <span><strong>New Providence delivery</strong><small>Your Bahamian delivery address is collected securely next.</small></span>
+                <span><strong>Delivery</strong><small>Your delivery address is collected securely next.</small></span>
                 <b>{formatMoney(deliveryFee)}</b>
               </label>
             </div>

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MagnifyingGlass, SlidersHorizontal, X } from "@phosphor-icons/react";
-import { Product, ProductAudience, ScentFamily } from "@/lib/types";
+import type { ProductAudience, PublicProduct, ScentFamily } from "@/lib/types";
 import { ProductCard } from "@/components/product-card";
 import { matchesCatalogSearch } from "@/lib/catalog-search";
 import { parseClientCatalogResponse } from "@/lib/client-catalog-response";
@@ -15,7 +15,7 @@ const families: CatalogFilter[] = ["All", "New", "Floral", "Fresh", "Woody", "Am
 type CatalogSort = "featured" | "name";
 type CatalogAudience = ProductAudience | "All";
 
-export function ProductBrowser({ products, compact = false, searchable = false, initialFilter = "All", initialAudience = "All", initialQuery = "", initialSort = "featured", remote = false, catalogTotal }: { products: Product[]; compact?: boolean; searchable?: boolean; initialFilter?: CatalogFilter; initialAudience?: CatalogAudience; initialQuery?: string; initialSort?: string; remote?: boolean; catalogTotal?: number }) {
+export function ProductBrowser({ products, compact = false, searchable = false, initialFilter = "All", initialAudience = "All", initialQuery = "", initialSort = "featured", remote = false, catalogTotal }: { products: PublicProduct[]; compact?: boolean; searchable?: boolean; initialFilter?: CatalogFilter; initialAudience?: CatalogAudience; initialQuery?: string; initialSort?: string; remote?: boolean; catalogTotal?: number }) {
   const [family, setFamily] = useState<CatalogFilter>(initialFilter);
   const [audience, setAudience] = useState<CatalogAudience>(initialAudience);
   const [query, setQuery] = useState(initialQuery);

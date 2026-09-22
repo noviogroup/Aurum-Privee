@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight } from "@phosphor-icons/react/dist/ssr";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 import { ProductCard } from "@/components/product-card";
 import { ProductVariantOptions } from "@/components/product-variant-options";
 import { SaveButton } from "@/components/save-button";
@@ -74,13 +74,13 @@ export default async function ProductPage({ params }: Props) {
           </p>
           <div className="product-primary-purchase product-primary-discovery">
             <div className="product-purchase-actions">
-              <Link className="button button-primary" href="/contact">Request availability <ArrowRight size={17} /></Link>
               <SaveButton productId={product.id} productName={product.name} detail />
+              <Link className="button button-secondary" href="/quote-list">Review quote list</Link>
             </div>
           </div>
           <ProductVariantOptions current={product} variants={variants} />
           <p className="detail-description">{product.description}</p>
-          <p className="detail-consultation-note">Contact client care for availability and personal fragrance guidance.</p>
+          <p className="detail-consultation-note">Add this edition to your list. Trade pricing and availability are confirmed in a private quote.</p>
         </div>
       </div>
       {hasNotes && (

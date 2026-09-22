@@ -9,6 +9,7 @@ import {
   CreditCard,
   Database,
   EnvelopeSimple,
+  FileText,
   GlobeHemisphereWest,
   ImageSquare,
   LockKey,
@@ -72,6 +73,7 @@ export function OperationsIntegrationsConsole({ initialReadiness }: { initialRea
         <p className="operations-rail-label">Operations</p>
         <nav aria-label="Operations navigation">
           <Link href="/operations"><Package size={21} weight="light" />Orders</Link>
+          <Link href="/operations/quotes"><FileText size={21} weight="light" />Quote requests</Link>
           <Link href="/operations/inquiries"><EnvelopeSimple size={21} weight="light" />Client care</Link>
           <Link href="/operations/catalog"><Tag size={21} weight="light" />Catalog</Link>
           <Link href="/operations/images"><ImageSquare size={21} weight="light" />Product images</Link>
@@ -86,7 +88,7 @@ export function OperationsIntegrationsConsole({ initialReadiness }: { initialRea
 
       <section className="operations-workspace">
         <header className="operations-topbar">
-          <div><Storefront size={18} weight="light" /><span>Nassau store</span></div>
+          <div><Storefront size={18} weight="light" /><span>Trade catalogue</span></div>
           <div className="operations-sync"><span>Launch readiness</span>{readiness.ready === readiness.total ? <CheckCircle size={18} weight="fill" /> : <WarningCircle size={18} weight="fill" />}{readiness.ready} of {readiness.total}</div>
         </header>
         <div className="operations-page-head operations-integrations-page-head">

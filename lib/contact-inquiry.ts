@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const inquiryTopics = ["Fragrance guidance", "Order help", "Gifting", "Authenticity", "Other"] as const;
+export const inquiryTopics = ["Trade quote help", "Product guidance", "Partnership", "Authenticity", "Other"] as const;
 
 const optionalText = (maximum: number) => z.string().trim().max(maximum).optional().transform((value) => value || undefined);
 

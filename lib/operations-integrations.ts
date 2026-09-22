@@ -170,7 +170,7 @@ export function buildConfigurationReadiness(env: Environment, catalog: CatalogTo
       ],
       requirements: paymentConfigured
         ? ["Verify the live account and webhook callback", ...(!checkoutEnabled ? ["Set NEXT_PUBLIC_CHECKOUT_ENABLED=true only after acceptance testing"] : [])]
-        : ["Select the Bahamas acquiring provider", "Provide sandbox credentials and callback signing rules", "Complete a payment and refund acceptance test"],
+        : ["Select the acquiring provider", "Provide sandbox credentials and callback signing rules", "Complete a payment and refund acceptance test"],
     }),
     service({
       id: "email",

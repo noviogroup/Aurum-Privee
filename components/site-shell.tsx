@@ -23,7 +23,7 @@ export function SiteShell({ children, commerceProvider }: { children: React.Reac
   return (
     <CartProvider commerceProvider={commerceProvider} showCart={false}>
       <WishlistProvider>
-        <div className="announcement"><span><Sparkle size={14} weight="light" />Private fragrance discovery</span><b>A considered edit</b></div>
+        <div className="announcement"><span><Sparkle size={14} weight="light" />Trade fragrance catalogue</span><b>Build a quote request</b></div>
         <Header />
         <main id="main">{children}</main>
         <Footer />

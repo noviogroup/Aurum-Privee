@@ -8,6 +8,7 @@ import {
   ArrowSquareOut,
   CheckCircle,
   EnvelopeSimple,
+  FileText,
   ImageSquare,
   LockKey,
   MagnifyingGlass,
@@ -149,6 +150,7 @@ export function OperationsCatalogConsole({ commerceProvider, initialCatalog }: {
         <p className="operations-rail-label">Operations</p>
         <nav aria-label="Operations navigation">
           <Link href="/operations"><Package size={21} weight="light" />Orders</Link>
+          <Link href="/operations/quotes"><FileText size={21} weight="light" />Quote requests</Link>
           <Link href="/operations/inquiries"><EnvelopeSimple size={21} weight="light" />Client care</Link>
           <Link className="is-selected" href="/operations/catalog"><Tag size={21} weight="light" />Catalog</Link>
           <Link href="/operations/images"><ImageSquare size={21} weight="light" />Product images</Link>
@@ -163,7 +165,7 @@ export function OperationsCatalogConsole({ commerceProvider, initialCatalog }: {
 
       <section className="operations-workspace">
         <header className="operations-topbar">
-          <div><Storefront size={18} weight="light" /><span>Nassau store</span></div>
+          <div><Storefront size={18} weight="light" /><span>Trade catalogue</span></div>
           <div className="operations-sync"><CheckCircle size={18} weight="fill" />{catalog.totals.all} active</div>
         </header>
         <div className="operations-page-head operations-catalog-page-head">

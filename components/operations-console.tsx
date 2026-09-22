@@ -7,6 +7,7 @@ import {
   ArrowSquareOut,
   CheckCircle,
   EnvelopeSimple,
+  FileText,
   Gear,
   ImageSquare,
   MagnifyingGlass,
@@ -48,11 +49,11 @@ function maskedEmail(email: string) {
 
 function deliveryAddress(order: OperationsOrder) {
   const details = order.deliveryDetails;
-  if (!details) return "Nassau store pickup";
+  if (!details) return "Pickup";
   const address = (details.address || details) as Record<string, unknown>;
   return [address.line1, address.line2, address.city, address.state, address.country]
     .filter((part): part is string => typeof part === "string" && Boolean(part.trim()))
-    .join(", ") || "New Providence delivery";
+    .join(", ") || "Delivery";
 }
 
 function statusLabel(order: OperationsOrder) {
@@ -144,6 +145,7 @@ export function OperationsConsole({ commerceProvider, initialOrders, preview = f
         <p className="operations-rail-label">Operations</p>
         <nav aria-label="Operations navigation">
           <a className="is-selected" href="/operations"><Package size={21} weight="light" />Orders</a>
+          <Link href="/operations/quotes"><FileText size={21} weight="light" />Quote requests</Link>
           <Link href="/operations/inquiries"><EnvelopeSimple size={21} weight="light" />Client care</Link>
           <Link href="/operations/catalog"><Tag size={21} weight="light" />Catalog</Link>
           <Link href="/operations/images"><ImageSquare size={21} weight="light" />Product images</Link>
@@ -158,7 +160,7 @@ export function OperationsConsole({ commerceProvider, initialOrders, preview = f
 
       <section className="operations-workspace">
         <header className="operations-topbar">
-          <div><Storefront size={18} weight="light" /><span>Nassau store</span></div>
+          <div><Storefront size={18} weight="light" /><span>Trade catalogue</span></div>
           <div className="operations-sync"><span>{wixManaged ? "Wix" : "Loyverse"}</span>{preview ? <WarningCircle size={18} weight="fill" /> : <CheckCircle size={18} weight="fill" />}{wixManaged ? "Provider managed" : preview ? "Preview" : "Synced"}</div>
         </header>
         <div className="operations-page-head">

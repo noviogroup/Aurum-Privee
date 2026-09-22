@@ -49,7 +49,7 @@ test("order confirmation uses stable customer and merchant idempotency keys", as
 test("contact notification fails loudly when Resend returns an API error", async () => {
   await assert.rejects(
     () => withResendResponse(500, { name: "application_error", message: "Temporary failure", statusCode: 500 }, () => sendContactInquiryNotification({
-      reference: "APC-TEST", name: "Client", email: "client@example.com", topic: "Order help", message: "Please help me with my recent fragrance order.",
+      reference: "APC-TEST", name: "Client", email: "client@example.com", topic: "Trade quote help", message: "Please help me shape a fragrance assortment for my business.",
     })),
     /Temporary failure/,
   );

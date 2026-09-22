@@ -94,7 +94,7 @@ export default function AboutPage() {
         <div className="about-closing-copy section-shell">
           <h2>Your next signature may be the one you did not expect.</h2>
           <div>
-            <Link href="/shop" className="button button-light">Shop fragrances <ArrowRight size={17} /></Link>
+            <Link href="/shop" className="button button-light">Browse catalogue <ArrowRight size={17} /></Link>
             <Link href="/contact" className="about-closing-link">Ask for guidance</Link>
           </div>
         </div>

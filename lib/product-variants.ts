@@ -1,4 +1,4 @@
-import type { Product } from "@/lib/types";
+import type { Product, PublicProduct } from "@/lib/types";
 
 export type ProductVariantFamily = {
   key: string;
@@ -216,7 +216,7 @@ export function getProductVariants(productId: string, products: Product[]) {
     .sort((left, right) => (order.get(left.id) || 0) - (order.get(right.id) || 0));
 }
 
-export function productVariantLabel(product: Product) {
+export function productVariantLabel(product: PublicProduct) {
   const parts = [product.size, product.concentration].filter((part) => part
     && part !== "Fine fragrance"
     && part !== "Size not specified");

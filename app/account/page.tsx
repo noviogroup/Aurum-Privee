@@ -59,14 +59,14 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         <section className="account-intro">
           <UserCircle size={34} weight="thin" />
           <h1>Accounts are being prepared.</h1>
-          <p>Customer sign-in is not active yet. Saved fragrances stay on this device, and client care can help with any order.</p>
+          <p>Buyer sign-in is not active yet. Your quote list stays on this device, and client care can help with a trade enquiry.</p>
           <div className="account-availability-actions">
-            <Link href="/saved" className="button button-primary">View saved fragrances</Link>
+            <Link href="/quote-list" className="button button-primary">View quote list</Link>
             <Link href="/contact" className="text-link">Contact client care</Link>
           </div>
         </section>
         <aside className="account-benefits">
-          <div><Heart size={22} weight="light" /><h2>Saved fragrances</h2><p>Keep a private edit on this device without creating an account.</p></div>
+          <div><Heart size={22} weight="light" /><h2>Quote list</h2><p>Build a private trade selection on this device without creating an account.</p></div>
           <div><Package size={22} weight="light" /><h2>Order support</h2><p>Use your confirmation email or contact client care for help with an order.</p></div>
           <div><ChatCircleDots size={22} weight="light" /><h2>Private assistance</h2><p>Client care can help with availability and fragrance guidance.</p></div>
         </aside>

@@ -70,7 +70,7 @@ test("configuration readiness classifies partial Loyverse setup without claiming
   }, catalog);
   const loyverse = result.services.find((item) => item.id === "loyverse");
   assert.equal(loyverse?.state, "attention");
-  assert.equal(loyverse?.requirements.some((item) => item.includes("New Providence Delivery")), true);
+  assert.equal(loyverse?.requirements.some((item) => item.includes("delivery service item")), true);
   assert.equal(loyverse?.requirements.includes("Rotate the access token"), true);
   assert.deepEqual(loyverse?.facts.find((fact) => fact.label === "Images")?.value, "659 sourced / 75 missing");
 });

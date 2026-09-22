@@ -28,6 +28,26 @@ export type Product = {
   stock: number;
 };
 
+// Anonymous catalogue clients receive only merchandising fields. Commercial
+// values and provider identifiers stay server-side for staff and integrations.
+export type PublicProduct = Pick<Product,
+  | "id"
+  | "slug"
+  | "brand"
+  | "name"
+  | "concentration"
+  | "size"
+  | "description"
+  | "audience"
+  | "family"
+  | "notes"
+  | "detailsSource"
+  | "image"
+  | "imageAlt"
+  | "featured"
+  | "newArrival"
+>;
+
 export type CartItem = {
   product: Product;
   quantity: number;

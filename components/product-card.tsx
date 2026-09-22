@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Product } from "@/lib/types";
+import type { PublicProduct } from "@/lib/types";
 import { SaveButton } from "@/components/save-button";
 import { productVariantLabel } from "@/lib/product-variants";
 
-export function ProductCard({ product, priority = false, headingLevel = 3, mobileImage }: { product: Product; priority?: boolean; headingLevel?: 2 | 3; mobileImage?: string }) {
+export function ProductCard({ product, priority = false, headingLevel = 3, mobileImage }: { product: PublicProduct; priority?: boolean; headingLevel?: 2 | 3; mobileImage?: string }) {
   const ProductHeading = headingLevel === 2 ? "h2" : "h3";
 
   return (

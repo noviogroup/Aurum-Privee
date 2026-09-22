@@ -1,6 +1,6 @@
-import type { Product } from "@/lib/types";
+import type { PublicProduct } from "@/lib/types";
 
-function searchableWords(product: Product) {
+function searchableWords(product: PublicProduct) {
   return [product.name, product.brand, product.family, product.concentration, product.size, ...product.notes.top, ...product.notes.heart, ...product.notes.base]
     .join(" ")
     .toLowerCase()
@@ -8,7 +8,7 @@ function searchableWords(product: Product) {
     .filter(Boolean);
 }
 
-export function matchesCatalogSearch(product: Product, query: string) {
+export function matchesCatalogSearch(product: PublicProduct, query: string) {
   const words = searchableWords(product);
   const tokens = query.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean).slice(0, 8);
   return tokens.every((token) => words.some((word) => word.startsWith(token)));

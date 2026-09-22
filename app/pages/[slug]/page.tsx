@@ -9,13 +9,13 @@ type ContentPage = { title: string; intro: string; sections: ContentSection[]; a
 
 const pages: Record<string, ContentPage> = {
   "shipping-returns": {
-    title: "Shipping & returns",
-    intro: "Service, return and cancellation details are confirmed before any order is accepted.",
+    title: "Trade fulfilment",
+    intro: "Availability, lead times and fulfilment terms are confirmed privately for each accepted trade quote.",
     awaitingApproval: true,
     sections: [
-      { heading: "Availability", body: "Online ordering is not open yet. Aurum Privée will confirm product availability directly through client care." },
-      { heading: "Service", body: "Service details will be shared directly once ordering becomes available. No purchase option is currently offered through this website." },
-      { heading: "Returns & cancellations", body: "Final return, cancellation and refund terms are still awaiting merchant approval. Contact client care before purchasing if you need the current terms.", link: { href: "/contact", label: "Contact client care" } },
+      { heading: "Availability and lead times", body: "Catalogue inclusion does not guarantee supply. Aurum Privée confirms quantities, lead times and any substitutions when responding to a quote request." },
+      { heading: "Fulfilment", body: "Freight method, destination, handoff and related costs are agreed as part of the private commercial quote. No purchase or payment is completed through this website." },
+      { heading: "Returns and cancellations", body: "Applicable return, cancellation and claim terms are supplied with the commercial quote before an order is accepted.", link: { href: "/contact", label: "Ask about trade fulfilment" } },
     ],
   },
   authenticity: {
@@ -28,17 +28,17 @@ const pages: Record<string, ContentPage> = {
     intro: "Aurum Privée is preparing its final merchant-approved privacy notice.",
     awaitingApproval: true,
     sections: [
-      { heading: "Before you share information", body: "Saved fragrances remain on your device. Contact and private-list forms send only the information you choose to provide. Online ordering remains closed while the full notice is finalized." },
+      { heading: "Before you share information", body: "Your quote list remains on your device. Contact and trade-enquiry forms send only the information you choose to provide. Online ordering is not offered through this catalogue." },
       { heading: "Privacy questions", body: "Contact client care before submitting information if you have a question about access, correction, deletion, service providers or retention.", link: { href: "/contact", label: "Ask a privacy question" } },
     ],
   },
   terms: {
     title: "Terms",
-    intro: "Online ordering is closed while Aurum Privée’s final terms of sale are approved.",
+    intro: "This website is a trade catalogue and quote-request service; it does not accept purchases or payments.",
     awaitingApproval: true,
     sections: [
-      { heading: "Current status", body: "The catalogue may be browsed and saved, but an order cannot be completed through this website until the final purchase and service terms are published." },
-      { heading: "Before ordering", body: "Contact client care for current availability. Nothing shown in the catalogue should be treated as a completed sale or service commitment.", link: { href: "/contact", label: "Contact client care" } },
+      { heading: "Quote requests", body: "Submitting a list is an invitation to discuss availability and commercial terms. It is not an order, reservation, price quote or acceptance by Aurum Privée." },
+      { heading: "Commercial agreement", body: "Pricing, minimum quantities, lead times, freight, payment and other binding terms are provided privately. A transaction exists only after both parties separately accept those terms.", link: { href: "/contact", label: "Ask a trade question" } },
     ],
   },
   "aurum-room": {

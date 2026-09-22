@@ -11,7 +11,7 @@ export function Footer() {
           <p>Exceptional fragrance.<br />Without boundaries.</p>
         </div>
         <div>
-          <h2>Shop</h2>
+          <h2>Catalogue</h2>
           <Link href="/shop">All fragrances</Link>
           <Link href="/shop?audience=Women">For her</Link>
           <Link href="/shop?audience=Men">For him</Link>
@@ -20,23 +20,22 @@ export function Footer() {
         </div>
         <div>
           <h2>Client care</h2>
-          <Link href="/pages/shipping-returns">Shipping & returns</Link>
+          <Link href="/pages/shipping-returns">Trade fulfilment</Link>
           <Link href="/contact">Contact</Link>
           <Link href="/pages/authenticity">Authenticity</Link>
           <Link href="/pages/privacy">Privacy</Link>
           <Link href="/pages/terms">Terms</Link>
-          <Link href="/account">My account</Link>
         </div>
         <div>
           <h2>About</h2>
           <Link href="/about">Our story</Link>
           <Link href="/pages/aurum-room">The Aurum Room</Link>
           <Link href="/#collections">Collections</Link>
-          <Link href="/saved">Saved fragrances</Link>
+          <Link href="/quote-list">Request a quote</Link>
         </div>
         <div className="footer-newsletter">
           <h2>Private list</h2>
-          <p>New arrivals, gifting ideas and the occasional invitation.</p>
+          <p>New arrivals, catalogue notes and occasional trade updates.</p>
           <Newsletter />
         </div>
       </div>

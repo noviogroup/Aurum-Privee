@@ -25,7 +25,7 @@ test("homepage presents the primary action without layout overflow", async ({ pa
   await navigate(page, "/");
 
   await expect(page.getByRole("heading", { level: 1, name: "Without boundaries." })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Shop the collection" })).toBeInViewport();
+  await expect(page.getByRole("link", { name: "Browse the catalogue" })).toBeInViewport();
   await expect(page.getByRole("button", { name: /Open bag/ })).toHaveCount(0);
   await expect(page.getByText(/Nassau|The Bahamas|Harbour Island|New Providence/i)).toHaveCount(0);
   if (page.viewportSize()!.width >= 981) {
@@ -84,8 +84,7 @@ test("catalog search returns useful results and preserves a stable layout", asyn
     await menuToggle.click();
     const fragranceMenu = page.locator("#fragrance-menu");
     await expect(fragranceMenu).toHaveAttribute("aria-hidden", "false");
-    await expectMinimumTapTarget(fragranceMenu.getByRole("link", { name: "Saved fragrances" }));
-    await expectMinimumTapTarget(fragranceMenu.getByRole("link", { name: "My account" }));
+    await expectMinimumTapTarget(fragranceMenu.getByRole("link", { name: "Quote list" }));
     await page.getByRole("button", { name: "Close menu" }).click();
   }
 });
@@ -129,7 +128,7 @@ test("reviewed retail corrections survive the live Wix catalogue overlay", async
   await expect(page.getByRole("main").locator(".product-format")).toContainText("1.7 oz");
 });
 
-test("saved fragrance and browse-only product flow behave coherently", async ({ page }) => {
+test("trade catalogue and quote-list product flow behave coherently", async ({ page }) => {
   await navigate(page, "/shop/christian-dior-sauvage-edp-6-8-oz-bb4bf3");
 
   await expect(page.getByRole("heading", { level: 1, name: "Sauvage" })).toBeVisible();
@@ -141,17 +140,55 @@ test("saved fragrance and browse-only product flow behave coherently", async ({ 
   await expect(page.locator(".detail-price")).toHaveCount(0);
   await expect(page.getByRole("button", { name: /Add Sauvage to bag/ })).toHaveCount(0);
   await expect(page.getByRole("button", { name: /Open bag/ })).toHaveCount(0);
-  const availability = page.getByRole("link", { name: "Request availability" });
-  await expect(availability).toBeVisible();
-  if (page.viewportSize()!.width >= 981) await expect(availability).toBeInViewport();
+  const quoteAction = page.getByRole("button", { name: "Add Sauvage to quote list", exact: true });
+  await expect(quoteAction).toBeVisible();
+  if (page.viewportSize()!.width >= 981) await expect(quoteAction).toBeInViewport();
   await expect(page.getByRole("region", { name: "Choose your edition" })).not.toContainText("$");
 
-  await page.getByRole("button", { name: "Save Sauvage", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Remove Sauvage from saved fragrances" })).toHaveAttribute("aria-pressed", "true");
+  await quoteAction.click();
+  await expect(page.getByRole("button", { name: "Remove Sauvage from quote list" })).toHaveAttribute("aria-pressed", "true");
+  await navigate(page, "/quote-list");
+  await expect(page.getByRole("heading", { level: 1, name: "Quote list" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 3, name: "Sauvage" })).toBeVisible();
+  await expect(page.getByRole("spinbutton", { name: "Quantity" })).toHaveValue("1");
 
   await navigate(page, "/checkout");
   await expect(page).toHaveURL(/\/shop$/);
   await expect(page.getByRole("heading", { level: 1, name: "Find the one that stays with you." })).toBeVisible();
+});
+
+test("buyer can submit a structured quote request without price data", async ({ page }) => {
+  let submitted: Record<string, unknown> | null = null;
+  let submissionAttempts = 0;
+  let releaseRequest = () => {};
+  const heldRequest = new Promise<void>((resolve) => { releaseRequest = resolve; });
+  await page.route("**/api/quote-requests", async (route) => {
+    submissionAttempts += 1;
+    submitted = route.request().postDataJSON() as Record<string, unknown>;
+    await heldRequest;
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ message: "Received", reference: "APQ-DEMO12345" }) });
+  });
+  await navigate(page, "/shop/christian-dior-sauvage-edp-6-8-oz-bb4bf3");
+  await page.getByRole("button", { name: "Add Sauvage to quote list", exact: true }).click();
+  await navigate(page, "/quote-list");
+  await page.getByRole("spinbutton", { name: "Quantity" }).fill("24");
+  await page.getByLabel("Buyer note").fill("Please quote by the case.");
+  await page.getByLabel("Company name").fill("Maison Retail Ltd");
+  await page.getByLabel("Contact name").fill("Amara Clarke");
+  await page.getByLabel("Business email").fill("amara@example.com");
+  await page.getByLabel("I agree that Aurum Privée may use these details to prepare and respond to this trade enquiry.").check();
+  await page.evaluate(() => {
+    const form = document.querySelector<HTMLFormElement>(".quote-request-form");
+    form?.requestSubmit();
+    form?.requestSubmit();
+  });
+  await expect.poll(() => submissionAttempts).toBe(1);
+  releaseRequest();
+  await expect(page.getByRole("heading", { level: 1, name: "Your request is with us." })).toBeVisible();
+  await expect(page.getByText("Reference APQ-DEMO12345")).toBeVisible();
+  expect(submitted).not.toBeNull();
+  expect(JSON.stringify(submitted)).not.toContain("price");
+  expect((submitted!.lines as Array<{ productId: string; quantity: number; note?: string }>)[0]).toMatchObject({ quantity: 24, note: "Please quote by the case." });
 });
 
 test("search dialog rejects malformed catalogue data and restores focus when dismissed", async ({ page }) => {
@@ -176,7 +213,7 @@ test("search dialog rejects malformed catalogue data and restores focus when dis
 test("reduced-motion mode keeps state feedback without spatial animation", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await navigate(page, "/");
-  const primaryAction = page.getByRole("link", { name: "Shop the collection" });
+  const primaryAction = page.getByRole("link", { name: "Browse the catalogue" });
   const primaryActionMotion = await primaryAction.evaluate((element) => {
     const style = getComputedStyle(element);
     return { animationName: style.animationName, transitionProperty: style.transitionProperty, transitionDuration: style.transitionDuration };
@@ -203,6 +240,7 @@ test("core public pages pass automated WCAG A and AA checks", async ({ page }) =
     "/shop",
     "/shop/christian-dior-sauvage-edp-6-8-oz-bb4bf3",
     "/contact",
+    "/quote-list",
   ]) {
     await navigate(page, path);
     await page.getByRole("heading", { level: 1 }).waitFor({ state: "visible" });
@@ -215,7 +253,7 @@ test("public support routes, redirects and private-page metadata are coherent", 
   for (const path of [
     "/about",
     "/pages/aurum-room",
-    "/saved",
+    "/quote-list",
     "/account",
     "/pages/shipping-returns",
     "/pages/authenticity",
@@ -273,7 +311,7 @@ test("contact and newsletter forms complete their browser-side workflows", async
     expect(request.postDataJSON()).toMatchObject({
       name: "Amara Clarke",
       email: "amara@example.com",
-      topic: "Fragrance guidance",
+      topic: "Trade quote help",
     });
     contactAttempts += 1;
     if (contactAttempts === 1) {

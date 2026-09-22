@@ -4,13 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MagnifyingGlass, X } from "@phosphor-icons/react";
 import { FormEvent, KeyboardEvent as ReactKeyboardEvent, RefObject, useEffect, useRef, useState } from "react";
-import type { Product } from "@/lib/types";
+import type { PublicProduct } from "@/lib/types";
 import { parseClientCatalogResponse } from "@/lib/client-catalog-response";
 import { requestJson } from "@/lib/client-json-request";
 
 export function StoreSearch({ open, onClose, returnFocusRef }: { open: boolean; onClose: () => void; returnFocusRef: RefObject<HTMLElement | null> }) {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<Product[]>([]);
+  const [results, setResults] = useState<PublicProduct[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

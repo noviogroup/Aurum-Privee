@@ -4,6 +4,7 @@ import { updateJsonAtomically } from "@/lib/blob-atomic";
 import type { OrderSyncLine } from "@/lib/loyverse-order-sync";
 import { requestFingerprint } from "@/lib/request-security";
 import type { InquiryReply, InquiryStatus, OperationsInquiry } from "@/lib/operations-inquiry-types";
+import type { OperationsQuoteRequest, QuoteRequestLine, QuoteRequestStatus } from "@/lib/operations-quote-types";
 
 export type CommerceOrderStatus = "paid" | "partially_refunded" | "refunded";
 export type CommerceFulfillmentStatus = "unfulfilled" | "ready" | "fulfilled" | "cancelled";
@@ -81,6 +82,14 @@ function paymentIntentKey(paymentIntentId: string) {
 
 function contactInquiryIndexKey(id: string) {
   return `indexes/contact-inquiry/${id}.json`;
+}
+
+function quoteRequestIndexKey(id: string) {
+  return `indexes/quote-request/${id}.json`;
+}
+
+function quoteSubmissionIndexKey(submissionId: string) {
+  return `indexes/quote-submission/${submissionId}.json`;
 }
 
 async function saveContactInquiryIndex(id: string, key: string) {
@@ -312,6 +321,88 @@ export async function recordContactInquiryReply(id: string, reply: InquiryReply)
     },
   });
   return result.value ? { inquiry: normalizeContactInquiry(result.value), duplicate } : null;
+}
+
+export async function saveQuoteRequest(input: {
+  submissionId: string;
+  reference: string;
+  companyName: string;
+  contactName: string;
+  email: string;
+  phone?: string;
+  buyerType: string;
+  destinationCountry?: string;
+  message?: string;
+  lines: QuoteRequestLine[];
+}) {
+  const store = commerceStore();
+  const existing = await readJSON<{ id: string; key: string }>(quoteSubmissionIndexKey(input.submissionId));
+  if (existing?.key) {
+    const request = await readJSON<OperationsQuoteRequest>(existing.key);
+    if (request) return { request, duplicate: true };
+  }
+  const id = crypto.randomUUID();
+  const createdAt = new Date().toISOString();
+  const key = `quote-requests/${input.submissionId}.json`;
+  const request: OperationsQuoteRequest = {
+    id,
+    submissionId: input.submissionId,
+    reference: input.reference,
+    companyName: input.companyName,
+    contactName: input.contactName,
+    email: input.email,
+    phone: input.phone || null,
+    buyerType: input.buyerType,
+    destinationCountry: input.destinationCountry || null,
+    message: input.message || null,
+    lines: input.lines,
+    status: "new",
+    notificationStatus: "pending",
+    createdAt,
+    updatedAt: createdAt,
+  };
+  const creation = await store.setJSON(key, request, { onlyIfNew: true });
+  if (!creation.modified) {
+    const winner = await readJSON<OperationsQuoteRequest>(key);
+    if (!winner) throw new Error("Quote submission was reserved without a readable request");
+    return { request: winner, duplicate: true };
+  }
+  await Promise.all([
+    store.setJSON(quoteRequestIndexKey(id), { key }),
+    store.setJSON(quoteSubmissionIndexKey(input.submissionId), { id, key }),
+  ]);
+  return { request, duplicate: false };
+}
+
+async function findQuoteRequest(id: string) {
+  const index = await readJSON<{ key: string }>(quoteRequestIndexKey(id));
+  if (!index?.key) return null;
+  const request = await readJSON<OperationsQuoteRequest>(index.key);
+  return request ? { key: index.key, request } : null;
+}
+
+export async function listQuoteRequests(limit = 500) {
+  const { blobs } = await commerceStore().list({ prefix: "quote-requests/" });
+  const requests = (await Promise.all(blobs.slice(-limit).map(({ key }) => readJSON<OperationsQuoteRequest>(key))))
+    .filter((value): value is OperationsQuoteRequest => Boolean(value))
+    .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+  return requests.slice(0, limit);
+}
+
+export async function updateQuoteRequest(id: string, patch: Partial<Pick<OperationsQuoteRequest, "status" | "notificationStatus">>) {
+  const stored = await findQuoteRequest(id);
+  if (!stored) return null;
+  const store = commerceStore();
+  const result = await updateJsonAtomically<OperationsQuoteRequest>({
+    read: async () => await store.getWithMetadata(stored.key, { type: "json" }) as { data: OperationsQuoteRequest; etag?: string } | null,
+    write: async (value, condition) => await store.setJSON(stored.key, value, condition),
+    update: (current) => current ? { ...current, ...patch, updatedAt: new Date().toISOString() } : undefined,
+  });
+  return result.value || null;
+}
+
+export async function transitionQuoteRequest(id: string, status: QuoteRequestStatus) {
+  return updateQuoteRequest(id, { status });
 }
 
 export async function saveNewsletterConfirmation(input: { email: string; tokenHash: string; expiresAt: string }) {

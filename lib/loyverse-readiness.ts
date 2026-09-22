@@ -13,5 +13,5 @@ export function loyverseBusinessNameMatches(actual: string, expected: string) {
 }
 
 export function deliveryItemRequirement() {
-  return "Create and approve a fixed-price, non-stock ‘New Providence Delivery’ service item in Loyverse, apply the correct taxes, then configure its variant ID";
+  return "Create and approve a fixed-price, non-stock delivery service item in Loyverse, apply the correct taxes, then configure its variant ID";
 }
