@@ -55,6 +55,8 @@ test("catalog search returns useful results and preserves a stable layout", asyn
   ).toContain(expectedEditorialSource);
   await expect(main.getByRole("button", { name: "All fragrances" })).toBeVisible();
   await expect(main.getByRole("button", { name: "Unisex" })).toBeVisible();
+  await expect(main.getByRole("link", { name: "Azlan Oud Amber", exact: true })).toBeVisible();
+  await expect(main.getByRole("link", { name: "Azlan Oud Amber Extrait De", exact: true })).toHaveCount(0);
   if (page.viewportSize()!.width >= 981) {
     const firstProduct = await main.locator(".product-card").first().boundingBox();
     expect(firstProduct, "first product row should be rendered").not.toBeNull();
@@ -252,7 +254,11 @@ test("public support routes, redirects and private-page metadata are coherent", 
   }
 
   await navigate(page, "/pages/aurum-room");
-  await expect(page.getByRole("link", { name: "Request a consultation" }).first()).toBeVisible();
+  const consultationCta = page.getByRole("link", { name: "Request a consultation" }).first();
+  await expect(consultationCta).toBeVisible();
+  const consultationBox = await consultationCta.boundingBox();
+  expect(consultationBox, "consultation action should be rendered").not.toBeNull();
+  expect(consultationBox!.y + consultationBox!.height).toBeLessThanOrEqual(page.viewportSize()!.height);
 
   await navigate(page, "/pages/about");
   await expect(page).toHaveURL(/\/about$/);

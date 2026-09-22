@@ -8,7 +8,7 @@ Do not place credentials in chat, tickets or this repository. Enter them directl
 
 - The production catalogue provider is Wix and all 733 approved SKUs are mapped.
 - The public checkout remains deliberately closed through both `NEXT_PUBLIC_CHECKOUT_ENABLED=false` and `WIX_CHECKOUT_ENABLED=false`.
-- The current public deployment was published on September 13, 2026 and predates the hardened release candidate. Deploy preview `6aadd3c1b7561c14dcf6c188` passed the complete Chromium and WebKit hosted browser gate on September 18, including malformed-catalogue recovery, bag preservation, cancellation-safe pagination, reduced-motion behavior, minimum primary and menu touch targets, the branded 404 recovery path, resilient customer-form and checkout handoffs, and the route-layer frame, referrer, permissions and Content Security Policy headers. Production has not been changed.
+- The hardened storefront hotfix was published to production on September 22, 2026. Production passed the complete 70-check Chromium and WebKit desktop/mobile browser matrix after publication, including malformed-catalogue recovery, bag preservation, cancellation-safe pagination, reduced-motion behavior, minimum primary and menu touch targets, the branded 404 recovery path, resilient customer-form and checkout handoffs, and the route-layer frame, referrer, permissions and Content Security Policy headers. Checkout remains closed.
 - `docs/WIX-SETUP-STATUS.md` is the source of truth for the live Wix account and remaining business configuration.
 - `LOYVERSE-SETUP.md` applies only if the legacy provider is deliberately restored.
 
@@ -21,6 +21,7 @@ Do not place credentials in chat, tickets or this repository. Enter them directl
 - Confirm that `noviogroup@gmail.com` is actively monitored for Netlify notifications, verify the Wix merchant-order recipient during a controlled order, and approve returns, cancellations, refunds, privacy and terms language.
 - Approve direct correction of the three reviewed Wix catalogue records for Baccarat Rouge 540 and the 1.7/3.4 oz Phantom editions. The storefront is corrected through an explicit source-backed layer, but Wix order/admin display names remain unchanged until those records are reviewed and updated. Do not bulk-import the regenerated 733-SKU CSV without a separate catalogue-change review.
 - Approve removal of the nine isolated Wix placeholder products if they should be deleted.
+- Provide or authorize accurate, clean photography for the remaining visually flagged featured products, including Tom Ford Black Orchid, Versace Crystal Noir Set and the low-resolution Creed source. Sauvage has already been replaced with a clean local Eau de Parfum asset.
 
 ## Production access and configuration
 
@@ -52,11 +53,11 @@ Remote Resend preflights now require a domain-scoped Sending-access key. A full-
 
 ## Local release evidence
 
-The hardened release candidate passed the following checks through September 18, 2026:
+The hardened release passed the following checks through September 22, 2026:
 
-- Lint, TypeScript, the production build and all 157 unit/contract tests, including a static 733-SKU catalogue/map integrity contract, an implausible-ounce-size guard, customer-request timeout, lifecycle cancellation and response-format contracts, catalogue payload validation, credential-free HTTPS checkout redirects, and a least-privilege Resend deployment guard.
+- Lint, TypeScript, the production build and all 161 unit/contract tests, including a static 733-SKU catalogue/map integrity contract, an implausible-ounce-size guard, customer-request timeout, lifecycle cancellation and response-format contracts, catalogue payload validation, credential-free HTTPS checkout redirects, and a least-privilege Resend deployment guard.
 - All 65 locally applicable Playwright journeys across desktop and mobile Chromium and WebKit; the five hosted-header checks were skipped locally by design and passed on the deploy preview.
-- All 70 hosted Playwright checks on deploy preview `6aadd3c1b7561c14dcf6c188`, covering desktop Chromium, desktop WebKit, 390-pixel Chromium and WebKit, and a 430-pixel Chromium breakpoint. The hosted checks include WCAG A/AA automation, security headers, public health liveness, redirects, malformed-catalogue recovery with bag preservation, duplicate-safe form recovery workflows, responsive-image selection, corrected retail facts, branded 404 recovery and closed-checkout behavior. The complete run passed without retries.
+- All 70 hosted Playwright checks on production on September 22, covering desktop Chromium, desktop WebKit, 390-pixel Chromium and WebKit, and a 430-pixel Chromium breakpoint. The hosted checks include WCAG A/AA automation, security headers, public health liveness, redirects, malformed-catalogue recovery with bag preservation, duplicate-safe form recovery workflows, responsive-image selection, corrected retail facts, branded 404 recovery and closed-checkout behavior. The complete run passed without retries.
 - Netlify Blobs webhook claims, fallback rate limits and inquiry updates use conditional writes so concurrent requests cannot silently double-process or overwrite each other.
 - The Wix handoff contract rejects unmapped products, unsafe quantities and noncanonical callback origins; abandoned checkouts return to a clear bag-preserved state.
 - Checkout launch requests time out after 15 seconds, abort on navigation, reject rapid duplicates before React can rerender and accept only absolute credential-free HTTPS handoff URLs. Network failures, malformed proxy responses and unsafe redirects recover without clearing the bag. Long catalogue and receipt text wraps without displacing amounts on narrow screens.
@@ -70,6 +71,7 @@ The hardened release candidate passed the following checks through September 18,
 - Structural checks across all 730 product pages: one H1, Product JSON-LD, a primary image and non-empty primary-image alt text on every page.
 - A rendered desktop and mobile design audit after the accessibility polish across the homepage, catalogue, product, about, contact, saved, checkout and operations-login surfaces. Branded, responsive loading skeletons now preserve catalogue and product geometry; unexpected routes have an accessible editorial 404 with recovery paths; and page-level render failures offer retry and collection recovery actions. The only remaining detector advisories are intentional brand treatments or false positives from text over photography and fixed-height buttons.
 - A final product-page polish pass preserved the established ivory/gold editorial system while stacking the related-products explanation under its heading. The same rendered pass found and corrected catalogue truth that structural tests missed: Baccarat Rouge 540 now renders as 2.4 oz Extrait de Parfum, Phantom's malformed `17 oz` value is corrected to 1.7 oz, and both Phantom records use the established Paco Rabanne spelling. The correction layer is keyed to the three reviewed source IDs, survives Wix display-name overlays, and records review evidence rather than changing general numeric parsing.
+- The production design review also protected the clean Sauvage image from Wix media overlays, kept its primary purchase action beside the selected price and ahead of compact variants, shortened the catalogue hero, removed unfinished size copy, standardized All fragrances, Unisex and Gift sets labels, developed The Aurum Room with imagery and an above-the-fold consultation action, and normalized truncated `Extrait De` suffixes from live Azlan names.
 - Customer-facing hover treatments are capability-gated to fine-pointer devices so taps cannot leave product imagery or controls in a stuck hover state; saved-item and detail controls retain explicit touch press feedback.
 - The Wix-backed homepage now uses a 60-second ISR window while catalogue APIs, product pages and checkout remain live. In repeated local mobile Lighthouse runs, performance scored 92–94 and Accessibility, Best Practices and SEO each scored 100; root response time fell from 3.18 seconds before ISR to 10–30 milliseconds after it. These are local lab measurements, not hosted guarantees.
 - Two hosted mobile Lighthouse runs against preview `6aad4fee52c77d5bb2f1f3c9` scored 92–93 Performance, 100 Accessibility and 100 Best Practices, with 1.0–1.3-second FCP, 3.0–3.1-second LCP, 20–50-millisecond total blocking time and zero cumulative layout shift. The preview SEO score is intentionally reduced by Netlify's `X-Robots-Tag: noindex`; production SEO is verified separately through metadata, canonical and sitemap checks.
@@ -95,7 +97,7 @@ These checks prove the release candidate and hosted runtime, not fulfillment acc
 
 ## Product photography
 
-The approved snapshot has 658 acceptable source images mirrored locally and 75 bottle-free Aurum Privée editorial placeholders awaiting approved photography. Use `data/missing-product-images.csv` as the acquisition list. Put approved supplier/manufacturer packshots or Aurum Privée-owned photographs in `product-image-intake`, named by SKU or barcode, then run:
+The approved snapshot has 658 source images mirrored locally and 75 bottle-free Aurum Privée editorial placeholders awaiting approved photography. A rendered visual audit on September 22 additionally flagged the Tom Ford Black Orchid, Versace Crystal Noir Set and Creed featured sources for authorized replacement, so a resolving image URL is not by itself visual approval. Use `data/missing-product-images.csv` as the acquisition list. Put approved supplier/manufacturer packshots or Aurum Privée-owned photographs in `product-image-intake`, named by SKU or barcode, then run:
 
 ```bash
 npm run images:check

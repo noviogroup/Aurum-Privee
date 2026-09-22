@@ -63,6 +63,15 @@ test("a generic Wix brand does not erase a normalized catalogue house", () => {
   assert.equal(managed.name, "Sauvage");
 });
 
+test("a truncated Wix concentration suffix is removed from the customer-facing name", () => {
+  const azlan = { ...product, brand: "Al Haramain", name: "Azlan Oud Amber" };
+  const [managed] = mergeWixCatalogProducts([azlan], new Map([["sku-1", override({
+    brand: "Al Haramain",
+    name: "Azlan Oud Amber Extrait De",
+  })]]));
+  assert.equal(managed.name, "Azlan Oud Amber");
+});
+
 test("a reviewed retail correction survives an outdated Wix display name", () => {
   const baccarat = {
     ...product,

@@ -68,7 +68,7 @@ export function customerFacingProductName(value: string, brand?: string) {
   return name
     .replace(/\s+\d+(?:\.\d+)?\s*(?:fl\.?\s*)?oz\b.*$/i, "")
     .replace(/\s+\d+(?:\.\d+)?\s+(?=(?:EDP|EDT|EDC|Parfum|Cologne)\b).*$/i, "")
-    .replace(/\s+(?:Extrait de Parfum|Eau de Parfum|Eau de Toilette|Eau de Cologne|EDP|EDT|EDC|Parfum|Cologne)(?:\s+Spray)?(?:\s+SP)?$/i, "")
+    .replace(/\s+(?:Extrait de Parfum|Extrait de|Eau de Parfum|Eau de Toilette|Eau de Cologne|EDP|EDT|EDC|Parfum|Cologne)(?:\s+Spray)?(?:\s+SP)?$/i, "")
     .replace(/\s+(?:Women|Woman|Men|Unisex|Pour Femme|Pour Homme)$/i, "")
     .replace(/\s+SP$/i, "")
     .replace(/\s{2,}/g, " ")

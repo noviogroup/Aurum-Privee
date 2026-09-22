@@ -944,11 +944,12 @@ h3 { font-size: 1.65rem; }
 .content-sections p { color: var(--muted); }
 .content-section-link { width: fit-content; margin-top: 18px; padding-bottom: 4px; display: inline-flex; border-bottom: 1px solid currentColor; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
 
-.aurum-room-hero { min-height: 620px; padding: 0; display: grid; grid-template-columns: minmax(360px, .82fr) minmax(0, 1.18fr); border: 1px solid var(--line); background: var(--surface); }
-.aurum-room-hero-copy { padding: clamp(52px, 7vw, 100px); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
-.aurum-room-hero-copy h1 { max-width: 8ch; margin: 22px 0 24px; font-size: clamp(4.2rem, 7vw, 7.4rem); line-height: .86; }
+.aurum-room-page.page-top { padding-top: clamp(28px, 4vw, 56px); }
+.aurum-room-hero { min-height: 560px; padding: 0; display: grid; grid-template-columns: minmax(360px, .82fr) minmax(0, 1.18fr); border: 1px solid var(--line); background: var(--surface); }
+.aurum-room-hero-copy { padding: clamp(40px, 4vw, 64px); display: flex; flex-direction: column; align-items: flex-start; justify-content: center; }
+.aurum-room-hero-copy h1 { max-width: 8ch; margin: 22px 0 24px; font-size: clamp(4rem, 5.6vw, 6.2rem); line-height: .86; }
 .aurum-room-hero-copy > p:not(.utility-label) { max-width: 42ch; margin: 0 0 32px; color: var(--muted); font-size: 1rem; line-height: 1.7; }
-.aurum-room-hero-image { position: relative; min-height: 620px; overflow: hidden; background: var(--paper-deep); }
+.aurum-room-hero-image { position: relative; min-height: 560px; overflow: hidden; background: var(--paper-deep); }
 .aurum-room-hero-image img { object-fit: cover; }
 .aurum-room-details { padding-block: clamp(80px, 9vw, 128px); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .aurum-room-details article { min-height: 230px; padding: 34px clamp(24px, 3vw, 44px) 34px 0; border-top: 2px solid var(--accent); border-bottom: 1px solid var(--line); }
@@ -1400,9 +1401,9 @@ h3 { font-size: 1.65rem; }
   .save-detail-button { width: 100%; }
   .aurum-room-page.page-top { padding-top: 24px; }
   .aurum-room-hero { width: calc(100% - 32px); min-height: 0; grid-template-columns: 1fr; }
-  .aurum-room-hero-image { order: -1; min-height: 0; aspect-ratio: 4 / 3; }
-  .aurum-room-hero-copy { padding: 42px 24px 48px; }
-  .aurum-room-hero-copy h1 { font-size: clamp(4rem, 19vw, 5.7rem); }
+  .aurum-room-hero-image { order: -1; min-height: 0; aspect-ratio: 16 / 9; }
+  .aurum-room-hero-copy { padding: 34px 20px 38px; }
+  .aurum-room-hero-copy h1 { font-size: clamp(3.7rem, 17vw, 4.8rem); }
   .aurum-room-details { width: calc(100% - 32px); padding-block: 72px; grid-template-columns: 1fr; }
   .aurum-room-details article { min-height: 0; padding: 28px 0 30px; }
   .aurum-room-details article + article { padding-left: 0; border-left: 0; }
