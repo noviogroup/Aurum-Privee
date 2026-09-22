@@ -4,6 +4,8 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 import type { OperationsCatalog, OperationsCatalogProduct, ProductCurationInput } from "@/lib/operations-catalog-types";
 import type { Product, ScentFamily } from "@/lib/types";
 import { customerFacingBrand, customerFacingCopy } from "@/lib/brand";
+import { activeCommerceProvider } from "@/lib/provider-operations";
+import { getCatalogProducts } from "@/lib/catalog";
 
 function totals(products: OperationsCatalogProduct[]) {
   return {
@@ -55,7 +57,33 @@ async function localCatalog(): Promise<OperationsCatalog> {
   return { products, configured: false, preview: true, totals: totals(products) };
 }
 
+async function wixCatalog(): Promise<OperationsCatalog> {
+  const sourceProducts = await getCatalogProducts();
+  const products: OperationsCatalogProduct[] = sourceProducts.map((product, index) => ({
+    id: product.id,
+    slug: product.slug,
+    brand: product.brand,
+    name: product.name,
+    sku: product.loyverseVariantId || null,
+    barcode: null,
+    category: product.family,
+    imageUrl: product.image,
+    price: product.price,
+    stock: product.stock,
+    description: product.description,
+    scentFamily: product.family,
+    notes: product.notes,
+    featured: Boolean(product.featured),
+    newArrival: Boolean(product.newArrival),
+    storefrontVisible: true,
+    sortOrder: 100 + index,
+    curatedAt: "wix-managed",
+  }));
+  return { products, configured: true, preview: true, totals: totals(products) };
+}
+
 export async function getOperationsCatalog(): Promise<OperationsCatalog> {
+  if (activeCommerceProvider() === "wix") return wixCatalog();
   const supabase = getSupabaseAdmin();
   if (!supabase) return localCatalog();
   const products: OperationsCatalogProduct[] = [];

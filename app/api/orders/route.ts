@@ -2,11 +2,13 @@ import { NextResponse } from "next/server";
 import { hasBearerSecret } from "@/lib/env";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { listCommerceOrders } from "@/lib/netlify-commerce";
+import { legacyCommerceEnabled } from "@/lib/provider-operations";
 
 const allowedFulfillmentStatuses = new Set(["all", "unfulfilled", "ready", "fulfilled", "cancelled"]);
 
 export async function GET(request: Request) {
   if (!hasBearerSecret(request, process.env.SYNC_SECRET)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!legacyCommerceEnabled()) return NextResponse.json({ error: "Wix owns active orders while Wix commerce is active." }, { status: 409 });
   const supabase = getSupabaseAdmin();
   const url = new URL(request.url);
   const status = allowedFulfillmentStatuses.has(url.searchParams.get("fulfillment") || "") ? url.searchParams.get("fulfillment") || "all" : "all";

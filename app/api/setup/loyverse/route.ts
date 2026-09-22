@@ -16,6 +16,7 @@ import {
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { hasBearerSecret, isConfiguredSecret, isStrongSecret } from "@/lib/env";
 import { deliveryItemRequirement, expectedLoyverseBusinessName, loyverseBusinessNameMatches } from "@/lib/loyverse-readiness";
+import { legacyCommerceEnabled } from "@/lib/provider-operations";
 
 export const runtime = "nodejs";
 
@@ -143,6 +144,7 @@ async function getDiagnostics() {
 
 export async function GET(request: Request) {
   if (!isAuthorized(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!legacyCommerceEnabled()) return NextResponse.json({ error: "Loyverse setup is locked while Wix commerce is active." }, { status: 409 });
   try {
     return NextResponse.json(await getDiagnostics());
   } catch (error) {
@@ -152,6 +154,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   if (!isAuthorized(request)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!legacyCommerceEnabled()) return NextResponse.json({ error: "Loyverse setup is locked while Wix commerce is active." }, { status: 409 });
   try {
     const url = getLoyverseWebhookUrl();
     const existing = await listLoyverseWebhooks();

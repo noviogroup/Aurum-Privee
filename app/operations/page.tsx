@@ -10,6 +10,6 @@ export default async function OperationsPage({ searchParams }: { searchParams: P
   const { order } = await searchParams;
   const result = await getOperationsOrders();
   return (
-    <OperationsConsole initialOrders={result.orders} preview={result.preview} initialOrder={order} />
+    <OperationsConsole commerceProvider={result.provider} initialOrders={result.orders} preview={result.preview} initialOrder={order} />
   );
 }

@@ -20,6 +20,7 @@ import {
   X,
 } from "@phosphor-icons/react";
 import type { OperationsImageCatalog, OperationsImageProduct } from "@/lib/operations-image-types";
+import type { CommerceProvider } from "@/lib/wix-config";
 
 type View = "missing" | "curated" | "loyverse" | "all";
 
@@ -31,7 +32,8 @@ function imageStatus(product: OperationsImageProduct) {
   return "Loyverse";
 }
 
-export function OperationsImagesConsole({ initialCatalog }: { initialCatalog: OperationsImageCatalog }) {
+export function OperationsImagesConsole({ commerceProvider, initialCatalog }: { commerceProvider: CommerceProvider; initialCatalog: OperationsImageCatalog }) {
+  const wixManaged = commerceProvider === "wix";
   const [catalog, setCatalog] = useState(initialCatalog);
   const [view, setView] = useState<View>(initialCatalog.totals.missing ? "missing" : "all");
   const [query, setQuery] = useState("");
@@ -74,7 +76,7 @@ export function OperationsImagesConsole({ initialCatalog }: { initialCatalog: Op
 
   function acceptFile(next: File | undefined) {
     resetFile();
-    if (!next) return;
+    if (wixManaged || !next) return;
     if (next.size > 10_000_000) {
       setNotice({ tone: "error", text: "Image must be 10 MB or smaller." });
       return;
@@ -92,6 +94,7 @@ export function OperationsImagesConsole({ initialCatalog }: { initialCatalog: Op
   function onDrop(event: DragEvent<HTMLDivElement>) {
     event.preventDefault();
     setDragging(false);
+    if (wixManaged) return;
     acceptFile(event.dataTransfer.files?.[0]);
   }
 
@@ -150,20 +153,20 @@ export function OperationsImagesConsole({ initialCatalog }: { initialCatalog: Op
       <section className="operations-workspace">
         <header className="operations-topbar">
           <div><Storefront size={18} weight="light" /><span>Nassau store</span></div>
-          <div className="operations-sync"><span>Catalog</span>{catalog.preview ? <WarningCircle size={18} weight="fill" /> : <CheckCircle size={18} weight="fill" />}{catalog.preview ? "Preview" : "Live"}</div>
+          <div className="operations-sync"><span>{wixManaged ? "Wix catalog" : "Catalog"}</span>{catalog.preview ? <WarningCircle size={18} weight="fill" /> : <CheckCircle size={18} weight="fill" />}{wixManaged ? "Read only" : catalog.preview ? "Preview" : "Live"}</div>
         </header>
         <div className="operations-page-head operations-image-page-head">
           <h1>Product images</h1>
-          <p>Complete the catalog with approved retail photography.</p>
+          <p>{wixManaged ? "Review live Wix photography. Publish image changes in Wix or through the repository intake workflow." : "Complete the catalog with approved retail photography."}</p>
         </div>
-        {catalog.preview && <div className="operations-preview-banner"><WarningCircle size={17} weight="fill" />Catalog preview. Publish approved photography through the versioned repository image-intake workflow.</div>}
+        {catalog.preview && <div className="operations-preview-banner"><WarningCircle size={17} weight="fill" />{wixManaged ? "Read-only Wix catalog. Publish approved photography in Wix or through the versioned repository intake workflow." : "Catalog preview. Publish approved photography through the versioned repository image-intake workflow."}</div>}
 
         <div className="operations-frame operations-image-frame">
           <section className="operations-queue operations-image-queue">
             <div className="operations-summary operations-image-summary" aria-label="Product image summary">
               <button type="button" onClick={() => setView("missing")}><span>Needs images</span><strong>{catalog.totals.missing}</strong></button>
               <button type="button" onClick={() => setView("curated")}><span>Curated</span><strong>{catalog.totals.curated}</strong></button>
-              <button type="button" onClick={() => setView("loyverse")}><span>From Loyverse</span><strong>{catalog.totals.loyverse}</strong></button>
+              <button type="button" onClick={() => setView("loyverse")}><span>From {wixManaged ? "provider" : "Loyverse"}</span><strong>{catalog.totals.loyverse}</strong></button>
               <button type="button" onClick={() => setView("all")}><span>Catalog</span><strong>{catalog.totals.all}</strong></button>
             </div>
             <div className="operations-search-wrap">
@@ -174,7 +177,7 @@ export function OperationsImagesConsole({ initialCatalog }: { initialCatalog: Op
             <div className="operations-tabs" role="tablist" aria-label="Product image status">
               {(Object.keys(labels) as View[]).map((key) => (
                 <button key={key} type="button" role="tab" aria-selected={view === key} onClick={() => setView(key)}>
-                  {labels[key]}<span>{key === "all" ? catalog.totals.all : catalog.totals[key]}</span>
+                  {key === "loyverse" && wixManaged ? "From provider" : labels[key]}<span>{key === "all" ? catalog.totals.all : catalog.totals[key]}</span>
                 </button>
               ))}
             </div>
@@ -210,16 +213,16 @@ export function OperationsImagesConsole({ initialCatalog }: { initialCatalog: Op
                 onDragLeave={() => setDragging(false)}
                 onDrop={onDrop}
               >
-                <input ref={inputRef} id="product-image-file" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/tiff" onChange={onFileChange} />
+                <input ref={inputRef} id="product-image-file" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/tiff" disabled={wixManaged} onChange={onFileChange} />
                 <UploadSimple size={25} weight="light" />
-                <strong>Drag and drop an image here</strong>
-                <label htmlFor="product-image-file">Choose a photograph</label>
+                <strong>{wixManaged ? "Images are managed outside this console" : "Drag and drop an image here"}</strong>
+                {!wixManaged && <label htmlFor="product-image-file">Choose a photograph</label>}
                 <p>JPG, PNG, WebP, AVIF or TIFF. Minimum 800×800, maximum 10 MB.</p>
               </div>
               {file && <div className="operations-file-row"><div><strong>{file.name}</strong><span>{(file.size / 1_000_000).toFixed(2)} MB</span></div><button type="button" aria-label="Remove selected image" onClick={resetFile}><X size={16} /></button></div>}
               {notice && <div className={`operations-notice is-${notice.tone}`} role={notice.tone === "error" ? "alert" : "status"}>{notice.tone === "success" ? <CheckCircle size={18} weight="fill" /> : <WarningCircle size={18} weight="fill" />}{notice.text}</div>}
               <div className="operations-actions operations-image-actions">
-                <button type="button" className="operations-primary-button" disabled={!file || busy || catalog.preview} onClick={upload}>{busy ? "Publishing" : catalog.preview ? "Connect storage" : "Publish image"}</button>
+                <button type="button" className="operations-primary-button" disabled={!file || busy || catalog.preview || wixManaged} onClick={upload}>{busy ? "Publishing" : wixManaged ? "Managed in Wix" : catalog.preview ? "Connect storage" : "Publish image"}</button>
                 {selected.imageUrl && !selected.missing && <a href={selected.imageUrl} target="_blank" rel="noreferrer">View current</a>}
               </div>
               <p className="operations-image-rights">Only publish Aurum Privée-owned photography or supplier/manufacturer assets licensed for retail use.</p>

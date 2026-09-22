@@ -2,10 +2,18 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { ArrowRight, GlobeHemisphereWest, LockKey, Package, Storefront, Truck, UserCircle } from "@phosphor-icons/react";
 import { useCart } from "@/components/cart-provider";
+import {
+  CheckoutResponseBody,
+  checkoutNetworkError,
+  checkoutRedirectUrlFromBody,
+  checkoutResponseError,
+} from "@/lib/checkout-response";
+import { ClientRequestTimeoutError, ClientResponseFormatError, requestJson } from "@/lib/client-json-request";
 import { formatMoney } from "@/lib/config";
+import { productVariantLabel } from "@/lib/product-variants";
 import { calculateAddedTax } from "@/lib/tax";
 
 type Fulfillment = "pickup" | "delivery";
@@ -13,12 +21,13 @@ type Fulfillment = "pickup" | "delivery";
 type CheckoutClientProps = {
   initialEmail: string;
   paymentReady: boolean;
+  checkoutCancelled: boolean;
   pickupLabel: string;
   deliveryFee: number;
   commerceProvider: "legacy" | "wix";
 };
 
-export function CheckoutClient({ initialEmail, paymentReady, pickupLabel, deliveryFee, commerceProvider }: CheckoutClientProps) {
+export function CheckoutClient({ initialEmail, paymentReady, checkoutCancelled, pickupLabel, deliveryFee, commerceProvider }: CheckoutClientProps) {
   const { items, hydrated } = useCart();
   const [name, setName] = useState("");
   const [email, setEmail] = useState(initialEmail);
@@ -26,6 +35,10 @@ export function CheckoutClient({ initialEmail, paymentReady, pickupLabel, delive
   const [fulfillment, setFulfillment] = useState<Fulfillment>("pickup");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const requestPending = useRef(false);
+  const requestController = useRef<AbortController | null>(null);
+
+  useEffect(() => () => requestController.current?.abort(), []);
 
   const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const tax = items.reduce((sum, item) => sum + calculateAddedTax(item.product.price * item.quantity, item.product.loyverseTaxes), 0);
@@ -34,14 +47,18 @@ export function CheckoutClient({ initialEmail, paymentReady, pickupLabel, delive
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (requestPending.current) return;
     setError("");
     if (!paymentReady) {
       setError("The checkout experience is ready, but secure payment still needs the production payment, email and inventory credentials.");
       return;
     }
+    requestPending.current = true;
+    const controller = new AbortController();
+    requestController.current = controller;
     setSubmitting(true);
     try {
-      const response = await fetch("/api/checkout", {
+      const { response, data } = await requestJson<CheckoutResponseBody>("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -49,13 +66,24 @@ export function CheckoutClient({ initialEmail, paymentReady, pickupLabel, delive
           customer: commerceProvider === "legacy" ? { name, email, phone } : undefined,
           fulfillment,
         }),
+        signal: controller.signal,
       });
-      const body = await response.json() as { url?: string; error?: string };
-      if (!response.ok || !body.url) throw new Error(body.error || "Checkout could not be started.");
-      window.location.assign(body.url);
+      window.location.assign(checkoutRedirectUrlFromBody(response, data));
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Checkout could not be started.");
+      if (controller.signal.aborted) return;
+      setError(caught instanceof ClientRequestTimeoutError
+        ? "Checkout took too long. Check your connection and try again."
+        : caught instanceof ClientResponseFormatError
+          ? checkoutResponseError
+          : caught instanceof TypeError
+            ? checkoutNetworkError
+            : caught instanceof Error ? caught.message : checkoutNetworkError);
       setSubmitting(false);
+    } finally {
+      if (requestController.current === controller) {
+        requestController.current = null;
+        requestPending.current = false;
+      }
     }
   }
 
@@ -84,10 +112,17 @@ export function CheckoutClient({ initialEmail, paymentReady, pickupLabel, delive
         <Link href="/account" className="checkout-account-link"><UserCircle size={20} />{initialEmail ? "Account connected" : "Sign in for faster checkout"}</Link>
       </header>
 
+      {checkoutCancelled && (
+        <div className="checkout-return-notice" role="status">
+          <strong>Checkout wasn’t completed.</strong>
+          <span>Your shopping bag is still saved. Review it whenever you’re ready to continue.</span>
+        </div>
+      )}
+
       <div className="checkout-layout">
-        <form className="checkout-form" onSubmit={submit}>
+        <form className="checkout-form" onSubmit={submit} aria-busy={submitting}>
           {commerceProvider === "legacy" ? <section className="checkout-section" aria-labelledby="checkout-contact-title">
-            <div className="checkout-section-heading"><span>01</span><div><h2 id="checkout-contact-title">Contact details</h2><p>Your receipt and order updates will be sent here.</p></div></div>
+            <div className="checkout-section-heading"><div><h2 id="checkout-contact-title">Contact details</h2><p>Your receipt and order updates will be sent here.</p></div></div>
             <div className="checkout-fields">
               <label><span>Full name</span><input value={name} onChange={(event) => setName(event.target.value)} autoComplete="name" required minLength={2} maxLength={100} /></label>
               <label><span>Email</span><input value={email} onChange={(event) => setEmail(event.target.value)} type="email" autoComplete="email" required maxLength={320} /></label>
@@ -95,13 +130,13 @@ export function CheckoutClient({ initialEmail, paymentReady, pickupLabel, delive
             </div>
           </section> : (
             <section className="checkout-section" aria-labelledby="checkout-contact-title">
-              <div className="checkout-section-heading"><span>01</span><div><h2 id="checkout-contact-title">Secure Wix checkout</h2><p>Contact, delivery and payment details are collected on the next page and managed in the Aurum Privée Wix dashboard.</p></div></div>
-              <div className="checkout-security"><LockKey size={20} /><span>Your order details are transferred directly to Wix commerce.</span></div>
+              <div className="checkout-section-heading"><div><h2 id="checkout-contact-title">Secure checkout</h2><p>Contact, delivery and payment details are collected securely on the next page.</p></div></div>
+              <div className="checkout-security"><LockKey size={20} /><span>Your order details are transferred through an encrypted checkout handoff.</span></div>
             </section>
           )}
 
           {commerceProvider === "legacy" ? <section className="checkout-section" aria-labelledby="checkout-fulfillment-title">
-            <div className="checkout-section-heading"><span>02</span><div><h2 id="checkout-fulfillment-title">Pickup or delivery</h2><p>Select how you would like to receive your order.</p></div></div>
+            <div className="checkout-section-heading"><div><h2 id="checkout-fulfillment-title">Pickup or delivery</h2><p>Select how you would like to receive your order.</p></div></div>
             <div className="fulfillment-options">
               <label className={fulfillment === "pickup" ? "is-selected" : ""}>
                 <input type="radio" name="fulfillment" value="pickup" checked={fulfillment === "pickup"} onChange={() => setFulfillment("pickup")} />
@@ -118,13 +153,13 @@ export function CheckoutClient({ initialEmail, paymentReady, pickupLabel, delive
             </div>
           </section> : (
             <section className="checkout-section" aria-labelledby="checkout-fulfillment-title">
-              <div className="checkout-section-heading"><span>02</span><div><h2 id="checkout-fulfillment-title">Choose your market</h2><p>Available delivery and collection methods are calculated from your location in secure checkout.</p></div></div>
-              <div className="checkout-security"><GlobeHemisphereWest size={20} /><span>Nassau · Harbour Island · Ghana</span></div>
+              <div className="checkout-section-heading"><div><h2 id="checkout-fulfillment-title">Delivery or collection</h2><p>Available methods are calculated from your location in secure checkout.</p></div></div>
+              <div className="checkout-security"><GlobeHemisphereWest size={20} /><span>Service availability is confirmed for your address.</span></div>
             </section>
           )}
 
           <section className="checkout-section checkout-payment" aria-labelledby="checkout-payment-title">
-            <div className="checkout-section-heading"><span>03</span><div><h2 id="checkout-payment-title">{commerceProvider === "wix" ? "Payment and fulfillment" : "Secure payment"}</h2><p>{commerceProvider === "wix" ? "Choose an available manual payment method and confirm delivery or collection in Wix checkout." : "Payment details are entered on the hosted payment page and never touch this website."}</p></div></div>
+            <div className="checkout-section-heading"><div><h2 id="checkout-payment-title">{commerceProvider === "wix" ? "Payment and fulfillment" : "Secure payment"}</h2><p>{commerceProvider === "wix" ? "Choose an available payment method and confirm delivery or collection in secure checkout." : "Payment details are entered on the hosted payment page and never touch this website."}</p></div></div>
             <div className="checkout-security"><LockKey size={20} /><span>Encrypted payment handoff</span></div>
             {!paymentReady && (
               <p className="checkout-gate-notice" role="status">
@@ -144,7 +179,7 @@ export function CheckoutClient({ initialEmail, paymentReady, pickupLabel, delive
             {items.map(({ product, quantity }) => (
               <article key={product.id}>
                 <div className="checkout-summary-image"><Image src={product.image} alt="" fill sizes="92px" /></div>
-                <div><p>{product.brand}</p><h3>{product.name}</h3><span>Quantity {quantity}</span></div>
+                <div><p>{product.brand}</p><h3>{product.name}</h3><span>{productVariantLabel(product)} · Quantity {quantity}</span></div>
                 <strong>{formatMoney(product.price * quantity)}</strong>
               </article>
             ))}

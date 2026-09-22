@@ -12,6 +12,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Checkout",
   description: "Review your Aurum Privée order and continue to secure payment.",
+  robots: { index: false, follow: false },
 };
 
 function paymentIsReady() {
@@ -38,7 +39,8 @@ async function signedInEmail() {
   return typeof data?.claims?.email === "string" ? data.claims.email : "";
 }
 
-export default async function CheckoutPage() {
+export default async function CheckoutPage({ searchParams }: { searchParams: Promise<{ cancelled?: string }> }) {
+  const { cancelled } = await searchParams;
   const commerceProvider = getCommerceProvider(process.env.COMMERCE_PROVIDER);
   const deliveryBase = Number(process.env.NEXT_PUBLIC_DELIVERY_FEE || 10);
   const deliveryTaxRate = Number(process.env.LOYVERSE_DELIVERY_ADDED_TAX_RATE || 0);
@@ -51,6 +53,7 @@ export default async function CheckoutPage() {
     <CheckoutClient
       initialEmail={await signedInEmail()}
       paymentReady={paymentIsReady()}
+      checkoutCancelled={cancelled === "1"}
       commerceProvider={commerceProvider}
       pickupLabel={siteConfig.pickupLabel}
       deliveryFee={deliveryFee}

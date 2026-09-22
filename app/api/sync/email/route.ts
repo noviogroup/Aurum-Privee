@@ -8,6 +8,7 @@ import {
   deliverFulfillmentUpdate,
   deliverOrderConfirmation,
 } from "@/lib/transactional-email";
+import { legacyCommerceEnabled } from "@/lib/provider-operations";
 
 const schema = z.object({ limit: z.number().int().min(1).max(50).default(25) }).default({ limit: 25 });
 
@@ -15,6 +16,7 @@ type Result = { kind: "confirmation" | "fulfillment" | "contact"; id: string; st
 
 export async function POST(request: Request) {
   if (!hasBearerSecret(request, process.env.SYNC_SECRET)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!legacyCommerceEnabled()) return NextResponse.json({ processed: 0, sent: 0, failed: 0, results: [], skipped: "wix-commerce-active" });
   const supabase = getSupabaseAdmin();
   if (!supabase) return NextResponse.json({ error: "Supabase is not configured" }, { status: 503 });
   try {

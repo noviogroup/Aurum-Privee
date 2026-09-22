@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
     if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix") {
       if (!evaluateWixReadiness(process.env).checkoutReady) {
-        return NextResponse.json({ error: "Wix checkout is not ready yet." }, { status: 503 });
+        return NextResponse.json({ error: "Secure checkout is not ready yet." }, { status: 503 });
       }
       const { createWixCheckoutRedirect } = await import("@/lib/wix-checkout");
       const url = await createWixCheckoutRedirect(

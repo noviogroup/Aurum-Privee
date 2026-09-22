@@ -27,6 +27,7 @@ test("Sauvage formats share an explicit reviewed family", () => {
   assert.equal(getProductVariantFamily(edp.id)?.key, "dior-sauvage");
   assert.deepEqual(getProductVariants(edp.id, [edt, edp]).map((item) => item.id), [edp.id, edt.id]);
   assert.equal(productVariantLabel(edp), "2.0 oz · Eau de Parfum");
+  assert.equal(productVariantLabel(product("unknown", "Size not specified", "Fine fragrance")), "Edition details available on request");
 });
 
 test("Eau Sauvage is not merged into the Sauvage family", () => {

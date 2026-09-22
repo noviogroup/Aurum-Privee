@@ -8,7 +8,7 @@ import { consumeRateLimit, readJsonBody, RequestBodyTooLargeError } from "@/lib/
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { deliverContactNotification } from "@/lib/transactional-email";
 import { sendContactInquiryNotification } from "@/lib/email";
-import { consumeBlobRateLimit, saveContactInquiry } from "@/lib/netlify-commerce";
+import { consumeBlobRateLimit, saveContactInquiry, updateContactInquiry } from "@/lib/netlify-commerce";
 
 export async function POST(request: Request) {
   if (!isSameOriginRequest(request)) return NextResponse.json({ message: "Invalid request origin." }, { status: 403 });
@@ -51,7 +51,9 @@ export async function POST(request: Request) {
           orderNumber: input.orderNumber || undefined,
           message: input.message,
         });
+        await updateContactInquiry(created.id, { notificationStatus: "sent" });
       } catch (notificationError) {
+        await updateContactInquiry(created.id, { notificationStatus: "failed" });
         const errorMessage = notificationError instanceof Error ? notificationError.message : "Notification failed";
         console.error("Contact inquiry notification failed", { inquiryId: created.id, error: errorMessage });
       }

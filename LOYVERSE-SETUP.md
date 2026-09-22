@@ -1,5 +1,7 @@
 # Aurum Privée Loyverse integration runbook
 
+> Legacy rollback only: the active release path uses Wix for catalogue, checkout, orders and standard order email. This Supabase/Stripe/Loyverse workflow must not be enabled alongside Wix. Use it only after an intentional `COMMERCE_PROVIDER=legacy` rollback and completion of its full acceptance matrix.
+
 This integration treats Loyverse as the source of truth for item identity, store price and stock. Supabase stores the storefront catalog and preserves the editorial fields that make Aurum Privée feel curated: imagery, fragrance family, notes, descriptions, featured placement and sort order.
 
 ## What the integration does
@@ -93,7 +95,7 @@ For Resend, provide an API key after the Aurum Privée sending domain has been v
 - Store: the connected Loyverse business still uses its former operating name, ID `abdd8cc2-2fd5-40d8-8ac3-98b9af876818`, with four POS devices. Rename the business and selected store to `Aurum Privée`, or document an approved legal-name exception.
 - Tax: `Value Added Tax - 10`, 10%, type `ADDED`, automatically applied to new items and currently attached to about 1,990 items.
 - Payment types: Cash, Card, RBC Direct and Gift certificate. Existing Card ID: `54b01027-7497-4b3b-9244-4ba6873ec85f`.
-- Catalog: 1,994 items and 1,999 variants. The fragrance-only, tester-excluded, positive-stock local assortment currently contains 734 fixed-price variants. It includes 659 acceptable Loyverse images mirrored locally and 75 bottle-free Aurum Privée editorial placeholders awaiting approved photography. Dolce & Gabbana Dolce Rose is among those 75 because its Loyverse source is only 80×80 pixels. The missing-image worksheet is `data/missing-product-images.csv`.
+- Catalog: 1,994 items and 1,999 variants. The current approved fragrance-only, tester-excluded, positive-stock storefront assortment contains 733 fixed-price variants. It includes 658 acceptable Loyverse images mirrored locally and 75 bottle-free Aurum Privée editorial placeholders awaiting approved photography. Dolce & Gabbana Dolce Rose is among those 75 because its Loyverse source is only 80×80 pixels. The missing-image worksheet is `data/missing-product-images.csv`.
 - Webhooks: none are registered yet. Registration requires the final public HTTPS origin; localhost cannot receive Loyverse callbacks.
 - Access: the supplied personal token is working and has been verified against merchant, store, payment-type, tax, catalog, inventory, receipt and webhook-list endpoints. Because a personal token has full account access and was shared through chat, rotate it before production.
 

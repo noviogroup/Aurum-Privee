@@ -1,6 +1,9 @@
 import { media } from "@wix/sdk";
+import { unstable_cache } from "next/cache";
 import { BRAND_EDIT, customerFacingBrand, customerFacingCopy, customerFacingProductName } from "@/lib/brand";
 import type { Product } from "@/lib/types";
+import { applyProductRetailCorrection } from "@/lib/product-retail-corrections";
+import { applyProductEnrichment } from "@/lib/product-enrichment";
 import { wixCatalogReferenceForSku } from "@/lib/wix-catalog-map";
 import { createWixVisitorClient } from "@/lib/wix-visitor";
 
@@ -23,6 +26,23 @@ type CacheEntry = {
 
 let catalogCache: CacheEntry | null = null;
 
+export async function retryWixCatalogFetch<T>(
+  request: () => Promise<T>,
+  wait: (milliseconds: number) => Promise<void> = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)),
+  attempts = 2,
+) {
+  let lastError: unknown;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    try {
+      return await request();
+    } catch (error) {
+      lastError = error;
+      if (attempt + 1 < attempts) await wait(250 * (attempt + 1));
+    }
+  }
+  throw lastError;
+}
+
 function wixImageUrl(identifier: string | null | undefined) {
   if (!identifier) return undefined;
   if (identifier.startsWith("https://")) return identifier;
@@ -35,13 +55,6 @@ function wixImageUrl(identifier: string | null | undefined) {
 
 async function fetchWixCatalogOverrides() {
   const client = createWixVisitorClient();
-  let productPage = await client.products.queryProducts().limit(100).find();
-  const products = [...productPage.items];
-  while (productPage.hasNext()) {
-    productPage = await productPage.next();
-    products.push(...productPage.items);
-  }
-
   let variantPage = await client.variants.queryVariants().limit(1000).find();
   const variants = [...variantPage.items];
   while (variantPage.hasNext()) {
@@ -49,7 +62,6 @@ async function fetchWixCatalogOverrides() {
     variants.push(...variantPage.items);
   }
 
-  const productById = new Map(products.flatMap((product) => product._id ? [[product._id, product] as const] : []));
   const overrides = new Map<string, WixCatalogOverride>();
 
   for (const variant of variants) {
@@ -62,20 +74,19 @@ async function fetchWixCatalogOverrides() {
     if (mapped.productId !== productId || mapped.variantId !== variantId) {
       throw new Error(`The Wix catalog map is stale for SKU ${sku}`);
     }
-    const wixProduct = productById.get(productId);
     const amount = Number(variant.price?.actualPrice?.amount);
     if (!Number.isFinite(amount) || amount < 0) throw new Error(`Wix returned an invalid price for SKU ${sku}`);
-    const imageIdentifier = variant.media?.image || wixProduct?.media?.main?.image;
+    const imageIdentifier = variant.media?.image;
     overrides.set(sku, {
       productId,
       variantId,
-      name: wixProduct?.name || variant.productData?.name || "Fragrance",
-      brand: wixProduct?.brand?.name || undefined,
-      description: wixProduct?.plainDescription || undefined,
+      name: variant.productData?.name || "Fragrance",
       image: wixImageUrl(imageIdentifier),
-      imageAlt: variant.media?.altText || wixProduct?.media?.main?.altText || undefined,
+      imageAlt: variant.media?.altText || undefined,
       price: amount,
-      inStock: variant.inventoryStatus?.inStock !== false,
+      inStock: variant.visible !== false
+        && variant.productData?.visible !== false
+        && variant.inventoryStatus?.inStock !== false,
     });
   }
 
@@ -85,7 +96,7 @@ async function fetchWixCatalogOverrides() {
 export async function getWixCatalogOverrides() {
   const now = Date.now();
   if (catalogCache && catalogCache.expiresAt > now) return catalogCache.value;
-  const value = fetchWixCatalogOverrides();
+  const value = retryWixCatalogFetch(fetchWixCatalogOverrides);
   catalogCache = { expiresAt: now + 60_000, value };
   try {
     return await value;
@@ -95,6 +106,24 @@ export async function getWixCatalogOverrides() {
   }
 }
 
+export async function getCacheableWixCatalogOverrideEntries(
+  load: () => Promise<Map<string, WixCatalogOverride>> = getWixCatalogOverrides,
+) {
+  try {
+    return [...(await load()).entries()] as Array<[string, WixCatalogOverride]>;
+  } catch {
+    // Wix SDK transport errors can contain recursively nested runtimeError/cause
+    // values. Next logs background cache failures, so expose a bounded error only.
+    throw new Error("Wix storefront catalogue refresh failed");
+  }
+}
+
+const getCachedWixCatalogOverrideEntries = unstable_cache(
+  getCacheableWixCatalogOverrideEntries,
+  ["wix-storefront-catalog-v2"],
+  { revalidate: 60, tags: ["wix-storefront-catalog"] },
+);
+
 export function mergeWixCatalogProducts(products: Product[], overrides: ReadonlyMap<string, WixCatalogOverride>) {
   return products.flatMap((product) => {
     const sku = product.loyverseVariantId || product.id;
@@ -103,7 +132,7 @@ export function mergeWixCatalogProducts(products: Product[], overrides: Readonly
     const wixBrand = customerFacingBrand(override.brand || product.brand);
     const brand = wixBrand === BRAND_EDIT && product.brand !== BRAND_EDIT ? product.brand : wixBrand;
     const name = customerFacingProductName(override.name, brand);
-    return [{
+    return [applyProductEnrichment(applyProductRetailCorrection({
       ...product,
       wixProductId: override.productId,
       wixVariantId: override.variantId,
@@ -114,10 +143,11 @@ export function mergeWixCatalogProducts(products: Product[], overrides: Readonly
       imageAlt: customerFacingCopy(override.imageAlt || product.imageAlt),
       price: override.price,
       stock: 999999,
-    }];
+    }))];
   });
 }
 
 export async function applyWixCatalog(products: Product[]) {
-  return mergeWixCatalogProducts(products, await getWixCatalogOverrides());
+  const overrides = new Map<string, WixCatalogOverride>(await getCachedWixCatalogOverrideEntries());
+  return mergeWixCatalogProducts(products, overrides);
 }

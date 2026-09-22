@@ -16,8 +16,11 @@ import { checkoutIsEnabled } from "@/lib/checkout-availability";
 import {
   isRestrictedResendKeyError,
   resendDomainIsConfirmed,
+  resendKeyMustBeRestricted,
   resendSenderDomain,
+  validateResendConfiguration,
 } from "@/lib/resend-config";
+import { evaluateWixReadiness, getCommerceProvider } from "@/lib/wix-config";
 
 type Environment = NodeJS.ProcessEnv | Record<string, string | undefined>;
 type CatalogTotals = { all: number; loyverse: number; missing: number; curated: number };
@@ -38,9 +41,11 @@ function configuredPayment(env: Environment) {
 }
 
 function configuredEmail(env: Environment) {
-  return isConfiguredSecret(env.RESEND_API_KEY)
-    && isConfiguredSecret(env.RESEND_FROM_EMAIL)
-    && isConfiguredSecret(env.STORE_NOTIFICATION_EMAIL);
+  return emailRequirements(env).length === 0;
+}
+
+function emailRequirements(env: Environment) {
+  return validateResendConfiguration(env).issues.map((issue) => issue.replace(/\.$/, ""));
 }
 
 function configuredLoyverse(env: Environment) {
@@ -52,8 +57,20 @@ function configuredLoyverse(env: Environment) {
 
 function configuredSecurity(env: Environment) {
   return isStrongSecret(env.RATE_LIMIT_SECRET)
+    && isStrongSecret(env.SYNC_SECRET)
+    && isStrongSecret(env.HEALTH_MONITOR_SECRET)
     && isStrongSecret(env.OPERATIONS_SESSION_SECRET)
     && isStrongSecret(env.OPERATIONS_PASSWORD, 12);
+}
+
+function securityRequirements(env: Environment) {
+  return [
+    ...(!isStrongSecret(env.RATE_LIMIT_SECRET) ? ["Configure an independent rate-limit secret"] : []),
+    ...(!isStrongSecret(env.SYNC_SECRET) ? ["Configure an independent sync-worker secret"] : []),
+    ...(!isStrongSecret(env.HEALTH_MONITOR_SECRET) ? ["Configure an independent health-monitor secret"] : []),
+    ...(!isStrongSecret(env.OPERATIONS_PASSWORD, 12) ? ["Configure a unique staff-console password of at least 12 characters"] : []),
+    ...(!isStrongSecret(env.OPERATIONS_SESSION_SECRET) ? ["Configure an independent staff-session signing key"] : []),
+  ];
 }
 
 function service(input: OperationsIntegration) {
@@ -63,16 +80,34 @@ function service(input: OperationsIntegration) {
 export function buildConfigurationReadiness(env: Environment, catalog: CatalogTotals, checkedAt = new Date().toISOString()): OperationsReadiness {
   const host = publicHost(env.NEXT_PUBLIC_SITE_URL);
   const securityReady = configuredSecurity(env);
+  const securityGaps = securityRequirements(env);
   const loyverseConfigured = configuredLoyverse(env);
+  const commerceProvider = getCommerceProvider(env.COMMERCE_PROVIDER);
+  const wixReadiness = evaluateWixReadiness(env);
   const paymentConfigured = configuredPayment(env);
   const checkoutEnabled = checkoutIsEnabled(env.NEXT_PUBLIC_CHECKOUT_ENABLED);
   const emailConfigured = configuredEmail(env);
+  const emailGaps = emailRequirements(env);
   const deliveryConfigured = isConfiguredSecret(env.LOYVERSE_DELIVERY_VARIANT_ID);
   const credentialsRotated = env.LOYVERSE_CREDENTIALS_ROTATED === "true";
   const expectedBusiness = expectedLoyverseBusinessName(env);
 
   const services: OperationsIntegration[] = [
-    service({
+    service(commerceProvider === "wix" ? {
+      id: "loyverse",
+      name: "Loyverse legacy connector",
+      summary: "Retained only for a controlled provider rollback",
+      state: "ready",
+      status: "Standby",
+      connection: "Not active while Wix owns commerce",
+      facts: [
+        { label: "Active authority", value: "Wix catalog and orders" },
+        { label: "Legacy routes", value: "Fail closed" },
+        { label: "Recovery workers", value: "Wix-mode no-op" },
+        { label: "Rollback", value: "Requires full legacy acceptance" },
+      ],
+      requirements: [],
+    } : {
       id: "loyverse",
       name: "Loyverse",
       summary: "Catalog, inventory, customers and receipts",
@@ -106,7 +141,21 @@ export function buildConfigurationReadiness(env: Environment, catalog: CatalogTo
       ],
       requirements: [],
     }),
-    service({
+    service(commerceProvider === "wix" ? {
+      id: "payments",
+      name: "Payments",
+      summary: "Wix-hosted checkout, payment and fulfillment",
+      state: wixReadiness.checkoutReady ? "ready" : "attention",
+      status: wixReadiness.checkoutReady ? "Ready" : "Acceptance gated",
+      connection: "Wix Hosted Checkout selected",
+      facts: [
+        { label: "Provider", value: "Wix Hosted Checkout" },
+        { label: "Catalog", value: `${wixReadiness.mappedSkuCount} of ${wixReadiness.expectedSkuCount} SKUs mapped` },
+        { label: "Checkout", value: wixReadiness.checkoutEnabled ? "Open" : "Launch switch off" },
+        { label: "Currency", value: env.NEXT_PUBLIC_STORE_CURRENCY || "BSD" },
+      ],
+      requirements: wixReadiness.requirements,
+    } : {
       id: "payments",
       name: "Payments",
       summary: "Secure online checkout, callbacks and refunds",
@@ -126,16 +175,16 @@ export function buildConfigurationReadiness(env: Environment, catalog: CatalogTo
     service({
       id: "email",
       name: "Transactional email",
-      summary: "Order, fulfillment and subscriber notifications",
+      summary: commerceProvider === "wix" ? "Client-care and subscriber notifications" : "Order, fulfillment and subscriber notifications",
       state: emailConfigured ? "attention" : "missing",
       status: emailConfigured ? "Configured" : "Needs setup",
       connection: emailConfigured ? "Resend credentials present" : "Resend not connected",
       facts: [
         { label: "Provider", value: "Resend" },
         { label: "Sending domain", value: emailConfigured ? "Run live checks" : "Not verified" },
-        { label: "Messages", value: "Orders, fulfillment, newsletter" },
+        { label: "Messages", value: commerceProvider === "wix" ? "Client care and newsletter" : "Orders, fulfillment, newsletter" },
       ],
-      requirements: emailConfigured ? ["Verify the sending domain and approved From address"] : ["Provide a Resend API key", "Verify the sending domain", "Confirm order notification recipients"],
+      requirements: emailConfigured ? ["Verify the sending domain and approved From address"] : emailGaps,
     }),
     service({
       id: "domain",
@@ -162,9 +211,11 @@ export function buildConfigurationReadiness(env: Environment, catalog: CatalogTo
         { label: "Staff console", value: isStrongSecret(env.OPERATIONS_PASSWORD, 12) ? "Protected" : "Needs password" },
         { label: "Sessions", value: isStrongSecret(env.OPERATIONS_SESSION_SECRET) ? "Signed, HttpOnly" : "Needs signing key" },
         { label: "API protection", value: isStrongSecret(env.RATE_LIMIT_SECRET) ? "Configured" : "Needs rate-limit secret" },
+        { label: "Recovery workers", value: isStrongSecret(env.SYNC_SECRET) ? "Protected" : "Needs sync secret" },
+        { label: "Health monitor", value: isStrongSecret(env.HEALTH_MONITOR_SECRET) ? "Protected" : "Needs monitor secret" },
         { label: "Storage", value: "Private Netlify site scope" },
       ],
-      requirements: securityReady ? [] : ["Configure independent high-entropy security secrets"],
+      requirements: securityGaps,
     }),
   ];
 
@@ -175,6 +226,13 @@ function updateService(readiness: OperationsReadiness, id: IntegrationId, patch:
   readiness.services = readiness.services.map((item) => item.id === id ? { ...item, ...patch } : item);
 }
 
+export function wixLiveCheckFailureRequirements(requirements: string[]) {
+  return [
+    ...requirements,
+    "Retry the live Wix catalogue and order-verification checks from the deployed environment",
+  ];
+}
+
 export async function getOperationsReadiness({ live = false }: { live?: boolean } = {}): Promise<OperationsReadiness> {
   const catalog = await getOperationsImageCatalog();
   const readiness = buildConfigurationReadiness(process.env, catalog.totals);
@@ -182,6 +240,7 @@ export async function getOperationsReadiness({ live = false }: { live?: boolean 
 
   await Promise.all([
     (async () => {
+      if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix") return;
       if (!configuredLoyverse(process.env)) return;
       try {
         const deliveryId = isConfiguredSecret(process.env.LOYVERSE_DELIVERY_VARIANT_ID) ? process.env.LOYVERSE_DELIVERY_VARIANT_ID : null;
@@ -223,6 +282,7 @@ export async function getOperationsReadiness({ live = false }: { live?: boolean 
       }
     })(),
     (async () => {
+      if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix") return;
       const supabase = getSupabaseAdmin();
       if (!supabase) return;
       try {
@@ -254,6 +314,53 @@ export async function getOperationsReadiness({ live = false }: { live?: boolean 
       }
     })(),
     (async () => {
+      if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix") {
+        const wix = evaluateWixReadiness(process.env);
+        try {
+          const { getWixCatalogOverrides } = await import("@/lib/wix-catalog");
+          const { wixOrderApiIsReachable } = await import("@/lib/wix-admin");
+          const adminCredentialConfigured = isConfiguredSecret(process.env.WIX_API_KEY)
+            || isConfiguredSecret(process.env.WIX_CLIENT_SECRET);
+          const [overrides, orderApiReachable] = await Promise.all([
+            getWixCatalogOverrides(),
+            adminCredentialConfigured ? wixOrderApiIsReachable() : Promise.resolve(false),
+          ]);
+          const reachable = overrides.size > 0;
+          const requirements = [
+            ...wix.requirements,
+            ...(!reachable ? ["Confirm the Wix storefront catalogue contains visible in-stock products"] : []),
+            ...(adminCredentialConfigured && !orderApiReachable ? ["Confirm the Wix server credential can read eCommerce orders for the Aurum Privée site"] : []),
+          ];
+          updateService(readiness, "payments", {
+            state: requirements.length ? "attention" : "ready",
+            status: requirements.length ? "Acceptance gated" : "Ready",
+            connection: !reachable
+              ? "Wix catalogue returned no available products"
+              : !adminCredentialConfigured
+                ? "Wix catalogue reachable; server credential missing"
+                : orderApiReachable
+                  ? "Wix catalogue and order APIs reachable"
+                  : "Wix catalogue reachable; order API rejected the credential",
+            facts: [
+              { label: "Provider", value: "Wix Hosted Checkout" },
+              { label: "Catalog API", value: `${overrides.size} available mapped variants` },
+              { label: "Mapping", value: `${wix.mappedSkuCount} of ${wix.expectedSkuCount} approved SKUs` },
+              { label: "Order verification", value: orderApiReachable ? "Server API verified" : adminCredentialConfigured ? "Credential rejected" : "Credential missing" },
+              { label: "Checkout", value: wix.checkoutEnabled ? "Open" : "Launch switch off" },
+              { label: "Currency", value: process.env.NEXT_PUBLIC_STORE_CURRENCY || "BSD" },
+            ],
+            requirements,
+          });
+        } catch {
+          updateService(readiness, "payments", {
+            state: "error",
+            status: "Check failed",
+            connection: "Wix catalogue API could not be reached",
+            requirements: wixLiveCheckFailureRequirements(wix.requirements),
+          });
+        }
+        return;
+      }
       if (!configuredPayment(process.env)) return;
       try {
         const key = process.env.STRIPE_SECRET_KEY!;
@@ -298,13 +405,28 @@ export async function getOperationsReadiness({ live = false }: { live?: boolean 
               { label: "Provider", value: "Resend" },
               { label: "Sending domain", value: domain || "Could not determine" },
               { label: "Domain status", value: confirmed ? "Verified in dashboard" : "Awaiting operator confirmation" },
-              { label: "Messages", value: "Orders, fulfillment, newsletter" },
+              { label: "Messages", value: getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix" ? "Client care and newsletter" : "Orders, fulfillment, newsletter" },
             ],
             requirements: confirmed ? [] : ["Confirm the sending domain is verified, then set RESEND_DOMAIN_VERIFIED=true"],
           });
           return;
         }
         if (response.error) throw new Error("Email verification failed");
+        if (resendKeyMustBeRestricted(process.env)) {
+          updateService(readiness, "email", {
+            state: "attention",
+            status: "Key over-privileged",
+            connection: "Full-access Resend key detected",
+            facts: [
+              { label: "Provider", value: "Resend" },
+              { label: "Sending domain", value: domain || "Could not determine" },
+              { label: "Domain status", value: "Key can read account-wide domains" },
+              { label: "Messages", value: getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix" ? "Client care and newsletter" : "Orders, fulfillment, newsletter" },
+            ],
+            requirements: ["Replace RESEND_API_KEY with a domain-scoped Sending access key"],
+          });
+          return;
+        }
         const entry = response.data?.data?.find((item) => item.name.toLowerCase() === domain);
         const verified = entry?.status === "verified";
         updateService(readiness, "email", {
@@ -315,7 +437,7 @@ export async function getOperationsReadiness({ live = false }: { live?: boolean 
             { label: "Provider", value: "Resend" },
             { label: "Sending domain", value: domain || "Could not determine" },
             { label: "Domain status", value: entry?.status || "Not found" },
-            { label: "Messages", value: "Orders, fulfillment, newsletter" },
+            { label: "Messages", value: getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix" ? "Client care and newsletter" : "Orders, fulfillment, newsletter" },
           ],
           requirements: verified ? [] : ["Verify the configured sending domain in Resend"],
         });

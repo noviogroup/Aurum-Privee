@@ -5,6 +5,7 @@ import { getOperationsCustomers, publishCustomerProfile } from "@/lib/operations
 import { isSameOriginRequest } from "@/lib/operator-auth";
 import { hasOperatorSession } from "@/lib/operator-session";
 import { readJsonBody, RequestBodyTooLargeError } from "@/lib/request-security";
+import { legacyOperationsWritesEnabled } from "@/lib/provider-operations";
 
 export async function GET() {
   if (!await hasOperatorSession()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -15,6 +16,7 @@ export async function GET() {
 export async function POST(request: Request) {
   if (!await hasOperatorSession()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!isSameOriginRequest(request)) return NextResponse.json({ error: "Invalid request origin" }, { status: 403 });
+  if (!legacyOperationsWritesEnabled()) return NextResponse.json({ error: "Wix owns customer records while Wix commerce is active." }, { status: 409 });
   try {
     const input = customerProfileSchema.parse(await readJsonBody<unknown>(request, 8_192));
     return NextResponse.json(await publishCustomerProfile(input));

@@ -1,16 +1,16 @@
 # Aurum Privée storefront handover
 
-Prepared for client review on 13 September 2026.
+Prepared for client review on 17 September 2026.
 
 ## What has been built
 
 - A custom Aurum Privée storefront at `https://aurumprivee.com`, hosted on Netlify and maintained from the Novio Group GitHub repository.
-- A responsive luxury-fragrance experience covering the homepage, searchable catalogue, product pages, saved fragrances, account area, bag, checkout shell, client-care form and operations area.
+- A responsive luxury-fragrance experience covering the homepage, searchable catalogue, product pages, saved fragrances, an honest account-availability state, bag, checkout shell, client-care form and operations area.
 - Clean public routes for `/about` and `/contact`, with permanent redirects from the former `/pages/about` and `/pages/contact` addresses.
 - A structured catalogue of 733 sellable fragrance SKUs. Twenty product families have been reviewed for presentation as one product with selectable editions instead of unrelated duplicate pages.
 - An explainable relationship model for every SKU. Each product page shows four distinct in-stock alternatives ranked from verified notes, scent family, audience, brand line, concentration and price, with a visible reason for each connection.
 - Consistent BSD price presentation, customer-facing brand names, concentration labels, sizes and stock-aware catalogue behaviour.
-- Transactional email infrastructure through Resend for the existing order and client-care workflows. Credentials are stored as protected hosting variables, not in source control.
+- Transactional email infrastructure through Resend for the existing order and client-care workflows. The sending domain is verified and its restricted credential is stored as a protected hosting variable, not in source control. A monitored notification inbox is still required before acceptance messages can be tested.
 - A connected Wix Headless client for the existing Wix account. Wix is being established as the business-management layer while the custom Aurum Privée design remains on Netlify.
 - A Wix catalogue read layer that reflects client-managed names, brands, descriptions, prices, visibility, stock status and product media in the custom storefront after cutover. The storefront refreshes its Wix catalogue cache automatically; no design rebuild is required for routine product edits.
 
@@ -26,6 +26,8 @@ Once the commerce cutover is accepted, the client can use Wix for:
 - store automations, customer emails and commerce analytics.
 
 The custom page design, navigation, editorial layouts and frontend code are not edited in the Wix drag-and-drop editor. Novio Group maintains those in the storefront repository. Promotional content can be connected to Wix CMS later if the client needs routine editing access.
+
+Customer account sign-in remains deferred until the business chooses a Wix guest/member policy and accepts the complete login and order-history flow. Until then, the account page does not offer a separate Supabase identity that would omit Wix orders. Saved fragrances remain private to the customer's device, and order help routes through client care.
 
 ## Catalogue model
 
@@ -63,6 +65,7 @@ The storefront must not advertise a street address, opening hours, delivery rate
 - Manual cash payment is connected, active and carries the approved collection-confirmation instruction.
 - Fulfillment is not launch-safe: Wix still exposes the inherited `Domestic Ghana` free-shipping region and `Rest of the world` free-shipping region, with no configured Nassau or Harbour Island pickup location.
 - The production storefront reads the controlled catalogue from Wix. Both checkout launch controls remain disabled until fulfillment setup and acceptance testing are complete.
+- A site-restricted Wix API key with only Wix eCommerce permission was generated and stored as a non-readable Netlify production and deploy-preview secret on 17 September 2026. It still requires runtime verification through the next preview before checkout acceptance.
 
 ## Information still required from the client
 
@@ -87,6 +90,7 @@ The custom storefront controls technical SEO: page titles and descriptions, cano
 - Complete one cash-pickup order from a phone and a desktop browser.
 - Confirm that the order appears in Wix with the correct SKU, quantity, customer, total and pickup location.
 - Verify customer and merchant notifications.
+- Configure server-side Wix order verification and prove that only an approved order can display confirmation and clear the bag.
 - Test cancellation, refund and stock-update behaviour.
 - Approve production checkout and monitoring.
 

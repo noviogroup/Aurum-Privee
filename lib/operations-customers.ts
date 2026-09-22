@@ -1,6 +1,7 @@
 import { getSupabaseAdmin } from "@/lib/supabase";
 import type { OperationsCustomer, OperationsCustomers } from "@/lib/operations-customer-types";
 import type { ScentFamily } from "@/lib/types";
+import { activeCommerceProvider, localOperationsDemoEnabled } from "@/lib/provider-operations";
 
 type OrderRow = {
   id: string; order_number: string; status: string; total: number | string; currency: string;
@@ -38,8 +39,15 @@ function localCustomers(): OperationsCustomers {
 }
 
 export async function getOperationsCustomers(): Promise<OperationsCustomers> {
+  if (activeCommerceProvider() === "wix") {
+    return { customers: [], configured: false, preview: false, totals: { all: 0, returning: 0, vip: 0, newsletter: 0 } };
+  }
   const supabase = getSupabaseAdmin();
-  if (!supabase) return localCustomers();
+  if (!supabase) {
+    return localOperationsDemoEnabled()
+      ? localCustomers()
+      : { customers: [], configured: false, preview: false, totals: { all: 0, returning: 0, vip: 0, newsletter: 0 } };
+  }
   const orders: OrderRow[] = [];
   for (let from = 0; ; from += 1000) {
     const { data, error } = await supabase.from("orders")

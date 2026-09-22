@@ -217,6 +217,8 @@ export function getProductVariants(productId: string, products: Product[]) {
 }
 
 export function productVariantLabel(product: Product) {
-  const parts = [product.size, product.concentration].filter((part) => part && part !== "Fine fragrance");
-  return parts.join(" · ") || "Standard edition";
+  const parts = [product.size, product.concentration].filter((part) => part
+    && part !== "Fine fragrance"
+    && part !== "Size not specified");
+  return parts.join(" · ") || "Edition details available on request";
 }

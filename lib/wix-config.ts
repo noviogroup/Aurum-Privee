@@ -69,6 +69,9 @@ export function evaluateWixReadiness(
 
   if (!isConfiguredSecret(env.NEXT_PUBLIC_WIX_CLIENT_ID)) requirements.push("Set the Wix Headless OAuth client ID in NEXT_PUBLIC_WIX_CLIENT_ID");
   if (!validUuid(env.WIX_SITE_ID)) requirements.push("Set the Aurum Privée Wix site ID in WIX_SITE_ID");
+  if (!isConfiguredSecret(env.WIX_API_KEY) && !isConfiguredSecret(env.WIX_CLIENT_SECRET)) {
+    requirements.push("Configure a server-side Wix API key or app secret so returned orders can be verified");
+  }
   if (!validHttpsOrigin(env.WIX_STOREFRONT_ORIGIN || env.NEXT_PUBLIC_SITE_URL)) {
     requirements.push("Set the canonical production HTTPS storefront origin in WIX_STOREFRONT_ORIGIN");
   }

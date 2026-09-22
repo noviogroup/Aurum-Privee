@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+const { skipLegacyWorker } = require("./provider-mode.cjs");
+
 function getConfiguration() {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
   const syncSecret = process.env.SYNC_SECRET;
@@ -6,6 +9,8 @@ function getConfiguration() {
 }
 
 async function handler() {
+  const skipped = skipLegacyWorker("Loyverse nightly reconciliation");
+  if (skipped) return skipped;
   const { siteUrl, syncSecret } = getConfiguration();
   const response = await fetch(`${siteUrl}/api/sync/loyverse`, {
     method: "POST",

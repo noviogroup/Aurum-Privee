@@ -1,18 +1,21 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, KeyboardEvent as ReactKeyboardEvent, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Minus, Plus, ShoppingBag, X } from "@phosphor-icons/react";
 import { CartItem, Product } from "@/lib/types";
 import { formatMoney } from "@/lib/config";
 import { calculateAddedTax } from "@/lib/tax";
 import type { CommerceProvider } from "@/lib/wix-config";
+import { parseClientCatalogResponse } from "@/lib/client-catalog-response";
+import { requestJson } from "@/lib/client-json-request";
+import { productVariantLabel } from "@/lib/product-variants";
 
 type CartContextValue = {
   items: CartItem[];
   count: number;
   hydrated: boolean;
-  addItem: (product: Product) => void;
-  openCart: () => void;
+  addItem: (product: Product, returnFocus?: HTMLElement) => void;
+  openCart: (returnFocus?: HTMLElement) => void;
   clearCart: () => void;
 };
 
@@ -39,9 +42,19 @@ export function CartProvider({ children, commerceProvider }: { children: React.R
   const [items, setItems] = useState<CartItem[]>([]);
   const [open, setOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const drawerRef = useRef<HTMLElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  const rememberReturnFocus = useCallback((returnFocus?: HTMLElement) => {
+    const activeElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const target = returnFocus || activeElement;
+    previousFocusRef.current = target && target !== document.body ? target : null;
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
+    const controller = new AbortController();
     async function hydrateCart() {
       let savedItems: CartItem[] = [];
       try {
@@ -55,12 +68,17 @@ export function CartProvider({ children, commerceProvider }: { children: React.R
         return;
       }
 
+      if (!cancelled) {
+        setItems(savedItems);
+        setHydrated(true);
+      }
+
       try {
         const ids = savedItems.map((item) => item.product.id).join(",");
-        const response = await fetch(`/api/catalog?ids=${encodeURIComponent(ids)}`);
+        const { response, data } = await requestJson<unknown>(`/api/catalog?ids=${encodeURIComponent(ids)}`, { signal: controller.signal });
         if (!response.ok) throw new Error("Catalog refresh failed");
-        const data = await response.json() as { products?: Product[] };
-        const currentProducts = new Map((data.products || []).map((product) => [product.id, product]));
+        const result = parseClientCatalogResponse(data);
+        const currentProducts = new Map(result.products.map((product) => [product.id, product]));
         const refreshed = savedItems.flatMap((item) => {
           const product = currentProducts.get(item.product.id);
           if (!product || product.stock < 1) return [];
@@ -68,13 +86,11 @@ export function CartProvider({ children, commerceProvider }: { children: React.R
         });
         if (!cancelled) setItems(refreshed);
       } catch {
-        if (!cancelled) setItems(savedItems);
-      } finally {
-        if (!cancelled) setHydrated(true);
+        // Keep the locally saved selection. Checkout validates live price and stock server-side.
       }
     }
     hydrateCart();
-    return () => { cancelled = true; };
+    return () => { cancelled = true; controller.abort(); };
   }, []);
 
   useEffect(() => {
@@ -82,7 +98,22 @@ export function CartProvider({ children, commerceProvider }: { children: React.R
     window.localStorage.setItem(storageKey, JSON.stringify(items));
   }, [hydrated, items]);
 
-  const addItem = useCallback((product: Product) => {
+  useEffect(() => {
+    if (open) {
+      closeButtonRef.current?.focus({ preventScroll: true });
+      return;
+    }
+    const returnFocus = previousFocusRef.current;
+    previousFocusRef.current = null;
+    if (!returnFocus) return;
+    const frame = window.requestAnimationFrame(() => {
+      if (returnFocus.isConnected) returnFocus.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [open]);
+
+  const addItem = useCallback((product: Product, returnFocus?: HTMLElement) => {
+    rememberReturnFocus(returnFocus);
     setItems((current) => {
       const existing = current.find((item) => item.product.id === product.id);
       if (existing) {
@@ -95,7 +126,12 @@ export function CartProvider({ children, commerceProvider }: { children: React.R
       return [...current, { product, quantity: 1 }];
     });
     setOpen(true);
-  }, []);
+  }, [rememberReturnFocus]);
+
+  const openCart = useCallback((returnFocus?: HTMLElement) => {
+    rememberReturnFocus(returnFocus);
+    setOpen(true);
+  }, [rememberReturnFocus]);
 
   const changeQuantity = (productId: string, delta: number) => {
     setItems((current) =>
@@ -110,6 +146,11 @@ export function CartProvider({ children, commerceProvider }: { children: React.R
   };
 
   const reviewCheckout = () => {
+    try {
+      window.localStorage.setItem(storageKey, JSON.stringify(items));
+    } catch {
+      // Checkout can still proceed when browser storage is unavailable.
+    }
     setOpen(false);
     window.location.assign("/checkout");
   };
@@ -123,23 +164,45 @@ export function CartProvider({ children, commerceProvider }: { children: React.R
     setOpen(false);
     window.localStorage.removeItem(storageKey);
   }, []);
-  const value = useMemo(() => ({ items, count, hydrated, addItem, openCart: () => setOpen(true), clearCart }), [items, count, hydrated, addItem, clearCart]);
+  const value = useMemo(() => ({ items, count, hydrated, addItem, openCart, clearCart }), [items, count, hydrated, addItem, openCart, clearCart]);
+
+  function handleDrawerKeyDown(event: ReactKeyboardEvent<HTMLElement>) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setOpen(false);
+      return;
+    }
+    if (event.key !== "Tab") return;
+    const focusable = drawerRef.current?.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    );
+    if (!focusable?.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
 
   return (
     <CartContext.Provider value={value}>
       {children}
-      <button className="cart-fab" aria-label={`Open bag with ${count} items`} onClick={() => setOpen(true)}>
+      <button className="cart-fab" aria-label={`Open bag with ${count} items`} onClick={(event) => openCart(event.currentTarget)}>
         <ShoppingBag size={20} weight="light" />
         {count > 0 && <span>{count}</span>}
       </button>
       {open && <button className="drawer-scrim" aria-label="Close bag" onClick={() => setOpen(false)} />}
-      <aside className={`cart-drawer ${open ? "is-open" : ""}`} aria-hidden={!open} inert={!open} aria-label="Shopping bag">
+      <aside ref={drawerRef} className={`cart-drawer ${open ? "is-open" : ""}`} aria-hidden={!open} inert={!open} aria-label="Shopping bag" role="dialog" aria-modal={open} onKeyDown={handleDrawerKeyDown}>
         <div className="drawer-head">
           <div>
             <p className="utility-label">Your selection</p>
             <h2>Shopping bag</h2>
           </div>
-          <button className="icon-button" aria-label="Close bag" onClick={() => setOpen(false)}><X size={21} /></button>
+          <button ref={closeButtonRef} className="icon-button" aria-label="Close bag" onClick={() => setOpen(false)}><X size={21} /></button>
         </div>
         <div className="drawer-body">
           {items.length === 0 ? (
@@ -157,7 +220,7 @@ export function CartProvider({ children, commerceProvider }: { children: React.R
                 <div>
                   <p className="product-brand">{product.brand}</p>
                   <h3>{product.name}</h3>
-                  <p>{product.size}</p>
+                  <p>{productVariantLabel(product)}</p>
                   <div className="quantity-control" aria-label={`Quantity for ${product.name}`}>
                     <button aria-label="Decrease quantity" onClick={() => changeQuantity(product.id, -1)}><Minus size={14} /></button>
                     <span>{quantity}</span>
@@ -175,7 +238,7 @@ export function CartProvider({ children, commerceProvider }: { children: React.R
             {commerceProvider === "legacy" && taxTotal > 0 && <div className="cart-total"><span>VAT</span><strong>{formatMoney(taxTotal)}</strong></div>}
             {commerceProvider === "legacy" && taxTotal > 0 && <div className="cart-total"><span>Total before delivery</span><strong>{formatMoney(total)}</strong></div>}
             {commerceProvider === "wix" && <div className="cart-total"><span>Taxes &amp; fulfillment</span><strong>Calculated next</strong></div>}
-            <p>{commerceProvider === "wix" ? "Location, delivery or collection, and payment are confirmed securely in Wix checkout." : "Delivery or pickup, contact details and payment are confirmed at checkout."}</p>
+            <p>{commerceProvider === "wix" ? "Location, delivery or collection, and payment are confirmed securely at checkout." : "Delivery or pickup, contact details and payment are confirmed at checkout."}</p>
             <button className="button button-primary button-full" onClick={reviewCheckout}>
               Checkout
             </button>

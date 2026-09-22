@@ -1,0 +1,71 @@
+name: Verify storefront
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      AURUM_TEST_DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:55432/postgres
+      COMMERCE_PROVIDER: wix
+      NEXT_PUBLIC_CHECKOUT_ENABLED: "false"
+      NEXT_PUBLIC_SITE_URL: http://127.0.0.1:3040
+      NEXT_PUBLIC_STORE_CURRENCY: BSD
+      NEXT_PUBLIC_STORE_LOCALE: en-BS
+      NEXT_PUBLIC_WIX_CLIENT_ID: 77a2c2cf-cc30-4612-b97c-c148ad908c1e
+      WIX_CATALOG_VERSION: v3
+      WIX_CHECKOUT_ENABLED: "false"
+      WIX_EXPECTED_SKU_COUNT: "733"
+      WIX_SITE_ID: 7cdfe7ac-5427-4d9f-b8bb-53e568ca63bd
+      WIX_STOREFRONT_ORIGIN: https://aurumprivee.com
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 55432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22.22.2
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.22.2
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client
+
+      - name: Audit runtime dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Verify database migrations
+        run: npm run test:migrations
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Run release verification
+        run: npm run verify

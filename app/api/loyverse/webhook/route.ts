@@ -11,6 +11,7 @@ import { normalizeLoyverseStock, syncLoyverseCatalog } from "@/lib/loyverse-sync
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { isStrongSecret } from "@/lib/env";
 import { readRequestText, RequestBodyTooLargeError } from "@/lib/request-security";
+import { legacyCommerceEnabled } from "@/lib/provider-operations";
 import { z } from "zod";
 
 export const runtime = "nodejs";
@@ -58,6 +59,9 @@ async function syncItemUpdate(payload: LoyverseWebhookPayload, supabase: NonNull
 }
 
 export async function POST(request: Request) {
+  if (!legacyCommerceEnabled()) {
+    return NextResponse.json({ received: true, skipped: "wix-commerce-active" });
+  }
   const signature = request.headers.get("x-loyverse-signature");
   const token = new URL(request.url).searchParams.get("token");
   const mode = process.env.LOYVERSE_WEBHOOK_AUTH_MODE || (process.env.LOYVERSE_CLIENT_SECRET ? "oauth" : "token");

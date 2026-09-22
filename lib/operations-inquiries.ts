@@ -1,5 +1,7 @@
 import { getSupabaseAdmin } from "@/lib/supabase";
 import type { InquiryReply, InquiryStatus, OperationsInquiries, OperationsInquiry } from "@/lib/operations-inquiry-types";
+import { listContactInquiries } from "@/lib/netlify-commerce";
+import { localOperationsDemoEnabled } from "@/lib/provider-operations";
 
 type InquiryRow = {
   id: string; reference: string; customer_name: string; customer_email: string; customer_phone: string | null;
@@ -28,8 +30,10 @@ function result(inquiries: OperationsInquiry[], configured: boolean, preview: bo
 export async function getOperationsInquiries(): Promise<OperationsInquiries> {
   const supabase = getSupabaseAdmin();
   if (!supabase) {
-    const localPreview = process.env.OPERATIONS_DEMO_MODE === "true" && (() => { try { return ["localhost", "127.0.0.1", "::1"].includes(new URL(process.env.NEXT_PUBLIC_SITE_URL || "").hostname); } catch { return false; } })();
-    if (!localPreview) return result([], false, false);
+    if (!localOperationsDemoEnabled()) {
+      try { return result(await listContactInquiries(500), true, false); }
+      catch { return result([], false, false); }
+    }
     const now = Date.now();
     return result([
       { id: "40000000-0000-0000-0000-000000000001", reference: "APC-8F2A913C44", customerName: "Amara Clarke", customerEmail: "amara@example.com", customerPhone: "(242) 555-0148", topic: "Fragrance guidance", orderNumber: null, message: "I’m looking for a polished floral fragrance for evening events. I usually enjoy rose, iris and soft woods, but nothing overly sweet.", status: "new", notificationStatus: "sent", createdAt: new Date(now - 34 * 60_000).toISOString(), updatedAt: new Date(now - 34 * 60_000).toISOString(), replies: [] },

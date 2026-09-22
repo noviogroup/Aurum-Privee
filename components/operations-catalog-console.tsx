@@ -21,6 +21,7 @@ import {
 } from "@phosphor-icons/react";
 import type { OperationsCatalog, OperationsCatalogProduct } from "@/lib/operations-catalog-types";
 import type { ScentFamily } from "@/lib/types";
+import type { CommerceProvider } from "@/lib/wix-config";
 
 type View = "needsCuration" | "featured" | "hidden" | "all";
 type Draft = Pick<OperationsCatalogProduct, "description" | "scentFamily" | "featured" | "newArrival" | "storefrontVisible" | "sortOrder"> & {
@@ -59,7 +60,8 @@ function curationLabel(product: OperationsCatalogProduct) {
   return "Curated";
 }
 
-export function OperationsCatalogConsole({ initialCatalog }: { initialCatalog: OperationsCatalog }) {
+export function OperationsCatalogConsole({ commerceProvider, initialCatalog }: { commerceProvider: CommerceProvider; initialCatalog: OperationsCatalog }) {
+  const wixManaged = commerceProvider === "wix";
   const initialSelected = initialCatalog.products.find((product) => product.name.includes("Dolce Rose")) || initialCatalog.products.find((product) => !product.curatedAt) || initialCatalog.products[0];
   const [catalog, setCatalog] = useState(initialCatalog);
   const [view, setView] = useState<View>(initialCatalog.totals.needsCuration ? "needsCuration" : "all");
@@ -166,7 +168,7 @@ export function OperationsCatalogConsole({ initialCatalog }: { initialCatalog: O
         </header>
         <div className="operations-page-head operations-catalog-page-head">
           <h1>Catalog</h1>
-          <p>Shape how the live Loyverse assortment appears in the Aurum Privée store.</p>
+          <p>{wixManaged ? "Review the live Wix assortment. Publish product changes in Wix to keep one source of truth." : "Shape how the live Loyverse assortment appears in the Aurum Privée store."}</p>
         </div>
 
         <div className="operations-frame operations-catalog-frame">
@@ -207,7 +209,7 @@ export function OperationsCatalogConsole({ initialCatalog }: { initialCatalog: O
                 <span>{selected.imageUrl === "/images/product-awaiting-photography.webp" ? <ImageSquare size={25} weight="thin" /> : <Image src={selected.imageUrl} alt="" width={78} height={92} />}</span>
                 <div><small>{selected.brand}</small><h2>{selected.name}</h2><p className={`is-${selected.curatedAt ? "curated" : "needed"}`}><i />{curationLabel(selected)}</p></div>
               </div>
-              <div className="operations-curation-form">
+              <fieldset className="operations-curation-form" disabled={wixManaged}>
                 <label><span>Scent family</span><select value={draft.scentFamily} onChange={(event) => updateDraft("scentFamily", event.target.value as ScentFamily)}>{families.map((family) => <option key={family}>{family}</option>)}</select></label>
                 <label className="is-description"><span>Storefront description</span><textarea value={draft.description} maxLength={1200} onChange={(event) => updateDraft("description", event.target.value)} /></label>
                 <label><span>Top notes</span><input value={draft.topNotes} placeholder="Comma-separated" onChange={(event) => updateDraft("topNotes", event.target.value)} /></label>
@@ -217,14 +219,14 @@ export function OperationsCatalogConsole({ initialCatalog }: { initialCatalog: O
                 <label className="operations-switch-row"><span>New arrival</span><input type="checkbox" checked={draft.newArrival} onChange={(event) => updateDraft("newArrival", event.target.checked)} /><i /></label>
                 <label className="operations-switch-row"><span>Visible online</span><input type="checkbox" checked={draft.storefrontVisible} onChange={(event) => updateDraft("storefrontVisible", event.target.checked)} /><i /></label>
                 <label className="is-sort"><span>Sort order</span><input type="number" min="0" max="100000" value={draft.sortOrder} onChange={(event) => updateDraft("sortOrder", Number(event.target.value))} /></label>
-              </div>
-              <div className="operations-loyverse-source-head"><span><CheckCircle size={16} weight="fill" />Synced from Loyverse</span></div>
+              </fieldset>
+              <div className="operations-loyverse-source-head"><span><CheckCircle size={16} weight="fill" />Synced from {wixManaged ? "Wix" : "Loyverse"}</span></div>
               <dl className="operations-loyverse-source">
                 <div><dt>Price BSD</dt><dd>{money(selected.price)}</dd></div><div><dt>Stock</dt><dd>{selected.stock}</dd></div><div><dt>SKU</dt><dd>{selected.sku || "Not set"}</dd></div><div><dt>Barcode</dt><dd>{selected.barcode || "Not set"}</dd></div>
               </dl>
-              <p className="operations-source-note"><LockKey size={14} weight="light" />Price, stock, SKU and barcode remain controlled by Loyverse.</p>
+              <p className="operations-source-note"><LockKey size={14} weight="light" />Price, stock, SKU and barcode remain controlled by {wixManaged ? "Wix" : "Loyverse"}.</p>
               {notice && <div className={`operations-notice is-${notice.tone}`} role={notice.tone === "error" ? "alert" : "status"}>{notice.tone === "success" ? <CheckCircle size={18} weight="fill" /> : <WarningCircle size={18} weight="fill" />}{notice.text}</div>}
-              <div className="operations-catalog-actions"><button type="button" className="operations-primary-button" disabled={busy || catalog.preview} onClick={save}>{busy ? "Saving" : catalog.preview ? "Connect database" : "Save curation"}</button><Link href={`/shop/${selected.slug}`} target="_blank">View product <ArrowRight size={15} /></Link></div>
+              <div className="operations-catalog-actions"><button type="button" className="operations-primary-button" disabled={busy || catalog.preview || wixManaged} onClick={save}>{busy ? "Saving" : wixManaged ? "Managed in Wix" : catalog.preview ? "Connect database" : "Save curation"}</button><Link href={`/shop/${selected.slug}`} target="_blank">View product <ArrowRight size={15} /></Link></div>
             </> : <div className="operations-empty"><Tag size={30} weight="thin" /><h2>Select a product.</h2></div>}
           </aside>
         </div>

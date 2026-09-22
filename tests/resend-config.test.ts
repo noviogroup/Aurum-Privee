@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   extractMailbox,
   isRestrictedResendKeyError,
+  resendKeyMustBeRestricted,
   resendSenderDomain,
   validateResendConfiguration,
 } from "@/lib/resend-config";
@@ -36,4 +37,12 @@ test("Resend configuration does not accept an example mailbox as a merchant reci
 test("Resend configuration recognizes a restricted sending key response", () => {
   assert.equal(isRestrictedResendKeyError({ name: "restricted_api_key", statusCode: 401 }), true);
   assert.equal(isRestrictedResendKeyError({ name: "invalid_api_key", statusCode: 403 }), false);
+});
+
+test("deployed contexts require a least-privilege Resend key", () => {
+  assert.equal(resendKeyMustBeRestricted({ CONTEXT: "production" }), true);
+  assert.equal(resendKeyMustBeRestricted({ CONTEXT: "deploy-preview" }), true);
+  assert.equal(resendKeyMustBeRestricted({ CONTEXT: "branch-deploy" }), true);
+  assert.equal(resendKeyMustBeRestricted({ CONTEXT: "dev" }), false);
+  assert.equal(resendKeyMustBeRestricted({}), false);
 });

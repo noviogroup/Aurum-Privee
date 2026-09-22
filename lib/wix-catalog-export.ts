@@ -1,6 +1,7 @@
 import { customerFacingBrand, customerFacingConcentration, customerFacingProductName, customerFacingSize } from "@/lib/brand";
 import { PRODUCT_VARIANT_FAMILIES } from "@/lib/product-variants";
 import { audienceForProduct } from "@/lib/product-normalization";
+import { applyProductRetailCorrection } from "@/lib/product-retail-corrections";
 import type { Product } from "@/lib/types";
 
 const WIX_BASE_COLUMNS = [
@@ -75,14 +76,14 @@ function rowToCsv(row: CsvRow) {
 
 function cleanProduct(product: Product): Product {
   const brand = customerFacingBrand(product.brand);
-  return {
+  return applyProductRetailCorrection({
     ...product,
     brand,
     name: customerFacingProductName(product.name, brand),
     concentration: customerFacingConcentration(product.concentration),
     size: customerFacingSize(product.size, product.name),
     audience: product.audience || audienceForProduct(null, product.name, product.description),
-  };
+  });
 }
 
 function wixInventory(stock: number) {

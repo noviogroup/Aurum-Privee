@@ -1,32 +1,48 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-POSTGRES_BIN="${POSTGRES_BIN:-/usr/local/opt/postgresql@16/bin}"
-PSQL="$POSTGRES_BIN/psql"
-INITDB="$POSTGRES_BIN/initdb"
-PG_CTL="$POSTGRES_BIN/pg_ctl"
-
-for executable in "$PSQL" "$INITDB" "$PG_CTL"; do
-  if [[ ! -x "$executable" ]]; then
-    echo "PostgreSQL 16 tools were not found at $POSTGRES_BIN" >&2
-    exit 1
-  fi
-done
-
-database_directory="$(mktemp -d /tmp/aurum-privee-pg-XXXXXX)"
-socket_directory="$(mktemp -d /tmp/aurum-privee-pg-socket-XXXXXX)"
-port="${AURUM_TEST_POSTGRES_PORT:-55432}"
+database_url="${AURUM_TEST_DATABASE_URL:-}"
+database_directory=""
+socket_directory=""
+psql_arguments=()
 
 cleanup() {
-  "$PG_CTL" -D "$database_directory" stop -m fast >/dev/null 2>&1 || true
-  rm -rf "$database_directory" "$socket_directory"
+  if [[ -n "$database_directory" ]]; then
+    "$PG_CTL" -D "$database_directory" stop -m fast >/dev/null 2>&1 || true
+    rm -rf "$database_directory" "$socket_directory"
+  fi
 }
 trap cleanup EXIT
 
-"$INITDB" -D "$database_directory" --no-locale --encoding=UTF8 --auth=trust >/dev/null
-"$PG_CTL" -D "$database_directory" -o "-k $socket_directory -p $port" -l "$database_directory/postgres.log" start >/dev/null
+if [[ -n "$database_url" ]]; then
+  PSQL="${PSQL:-$(command -v psql || true)}"
+  if [[ ! -x "$PSQL" ]]; then
+    echo "psql was not found on PATH" >&2
+    exit 1
+  fi
+  psql_arguments=("$database_url")
+else
+  POSTGRES_BIN="${POSTGRES_BIN:-/usr/local/opt/postgresql@16/bin}"
+  PSQL="$POSTGRES_BIN/psql"
+  INITDB="$POSTGRES_BIN/initdb"
+  PG_CTL="$POSTGRES_BIN/pg_ctl"
 
-"$PSQL" -v ON_ERROR_STOP=1 -q -h "$socket_directory" -p "$port" -U "$USER" -d postgres <<'SQL'
+  for executable in "$PSQL" "$INITDB" "$PG_CTL"; do
+    if [[ ! -x "$executable" ]]; then
+      echo "PostgreSQL 16 tools were not found at $POSTGRES_BIN" >&2
+      exit 1
+    fi
+  done
+
+  database_directory="$(mktemp -d /tmp/aurum-privee-pg-XXXXXX)"
+  socket_directory="$(mktemp -d /tmp/aurum-privee-pg-socket-XXXXXX)"
+  port="${AURUM_TEST_POSTGRES_PORT:-55432}"
+  "$INITDB" -D "$database_directory" --no-locale --encoding=UTF8 --auth=trust >/dev/null
+  "$PG_CTL" -D "$database_directory" -o "-k $socket_directory -p $port" -l "$database_directory/postgres.log" start >/dev/null
+  psql_arguments=(-h "$socket_directory" -p "$port" -U "$USER" -d postgres)
+fi
+
+"$PSQL" "${psql_arguments[@]}" -v ON_ERROR_STOP=1 -q <<'SQL'
 create role anon nologin;
 create role authenticated nologin;
 create role service_role nologin;
@@ -34,10 +50,10 @@ SQL
 
 for migration in supabase/migrations/*.sql; do
   echo "Applying $(basename "$migration")"
-  "$PSQL" -v ON_ERROR_STOP=1 -q -h "$socket_directory" -p "$port" -U "$USER" -d postgres -f "$migration"
+  "$PSQL" "${psql_arguments[@]}" -v ON_ERROR_STOP=1 -q -f "$migration"
 done
 
-"$PSQL" -v ON_ERROR_STOP=1 -q -h "$socket_directory" -p "$port" -U "$USER" -d postgres <<'SQL'
+"$PSQL" "${psql_arguments[@]}" -v ON_ERROR_STOP=1 -q <<'SQL'
 do $$
 begin
   if to_regclass('public.catalog_products_available') is null then raise exception 'Catalog availability view is missing'; end if;

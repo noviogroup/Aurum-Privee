@@ -12,7 +12,7 @@ export function Footer() {
           <p>Nassau, The Bahamas</p>
         </div>
         <div>
-          <h3>Shop</h3>
+          <h2>Shop</h2>
           <Link href="/shop">All fragrances</Link>
           <Link href="/shop?audience=Women">For her</Link>
           <Link href="/shop?audience=Men">For him</Link>
@@ -20,7 +20,7 @@ export function Footer() {
           <Link href="/shop?query=gift%20set">Gift sets</Link>
         </div>
         <div>
-          <h3>Client care</h3>
+          <h2>Client care</h2>
           <Link href="/pages/shipping-returns">Shipping & returns</Link>
           <Link href="/contact">Contact</Link>
           <Link href="/pages/authenticity">Authenticity</Link>
@@ -29,14 +29,14 @@ export function Footer() {
           <Link href="/account">My account</Link>
         </div>
         <div>
-          <h3>About</h3>
+          <h2>About</h2>
           <Link href="/about">Our story</Link>
           <Link href="/pages/aurum-room">The Aurum Room</Link>
           <Link href="/#collections">Collections</Link>
           <Link href="/saved">Saved fragrances</Link>
         </div>
         <div className="footer-newsletter">
-          <h3>Private list</h3>
+          <h2>Private list</h2>
           <p>New arrivals, gifting ideas and the occasional invitation.</p>
           <Newsletter />
         </div>

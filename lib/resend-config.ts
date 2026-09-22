@@ -25,6 +25,11 @@ export function isRestrictedResendKeyError(error: unknown) {
   return "name" in error && error.name === "restricted_api_key";
 }
 
+export function resendKeyMustBeRestricted(env: Environment) {
+  const context = env.CONTEXT?.trim().toLowerCase();
+  return context === "production" || context === "deploy-preview" || context === "branch-deploy";
+}
+
 export function validateResendConfiguration(env: Environment) {
   const issues: string[] = [];
   const apiKey = env.RESEND_API_KEY;

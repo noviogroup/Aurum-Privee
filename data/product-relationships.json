@@ -12,10 +12,10 @@
     "signalCounts": {
       "same-family": 2901,
       "same-audience": 2907,
-      "same-concentration": 2256,
+      "same-concentration": 2244,
       "similar-price": 2910,
       "same-brand": 2287,
-      "same-brand-line": 971
+      "same-brand-line": 977
     }
   },
   "weights": {
@@ -15220,10 +15220,10 @@
           "sharedNotes": []
         },
         {
-          "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
-          "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
-          "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
-          "displayName": "Aurum Privée Edit Paco Robanne Phantom",
+          "productId": "0d3d921d-63b2-480a-9085-7308897d58bf",
+          "wixProductId": "9c986c95-0e83-41ed-92c8-5bd8d687ef3c",
+          "slug": "azzaro-wanted-edt-3-4-0d3d92",
+          "displayName": "Azzaro Wanted EDT 3.4",
           "score": 80,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -15241,10 +15241,10 @@
           "sharedNotes": []
         },
         {
-          "productId": "0d3d921d-63b2-480a-9085-7308897d58bf",
-          "wixProductId": "9c986c95-0e83-41ed-92c8-5bd8d687ef3c",
-          "slug": "azzaro-wanted-edt-3-4-0d3d92",
-          "displayName": "Azzaro Wanted EDT 3.4",
+          "productId": "2d3a8739-213a-47d7-9ace-23d3ff2d2203",
+          "wixProductId": "fedf4b07-6ba4-4285-8507-a2626647a520",
+          "slug": "burberry-touch-eau-de-toilette-3-3-2d3a87",
+          "displayName": "Burberry Touch Eau De Toilette 3.3",
           "score": 80,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -18692,27 +18692,6 @@
           "sharedNotes": []
         },
         {
-          "productId": "22858c43-33e7-461f-bf0f-6a247e500594",
-          "wixProductId": "392d1fd8-9528-4846-8889-0a0054d189c0",
-          "slug": "paco-rabbane-men-s-phantom-edt-spray-3-4-oz-22858c",
-          "displayName": "Aurum Privée Edit Paco Rabbane Men's Phantom",
-          "score": 80,
-          "primaryReason": "Same woody scent family",
-          "reasons": [
-            "Same woody scent family",
-            "Selected for men",
-            "Same eau de toilette format",
-            "Comparable price point"
-          ],
-          "signals": [
-            "same-family",
-            "same-audience",
-            "same-concentration",
-            "similar-price"
-          ],
-          "sharedNotes": []
-        },
-        {
           "productId": "9ae86ef1-a9ea-4d03-b9bd-89c2ceebef1f",
           "wixProductId": "bded7029-1da1-4323-9a85-fef30a07533e",
           "slug": "tom-eau-de-soleil-blanc-1-7-edt-sp-9ae86e",
@@ -18738,6 +18717,27 @@
           "wixProductId": "56d4fd8e-abe8-464d-a189-b12d6a65c2af",
           "slug": "bvlgari-aqua-edt-5-0-24b3e3",
           "displayName": "Bvlgari Aqua EDT 5.0",
+          "score": 80,
+          "primaryReason": "Same woody scent family",
+          "reasons": [
+            "Same woody scent family",
+            "Selected for men",
+            "Same eau de toilette format",
+            "Comparable price point"
+          ],
+          "signals": [
+            "same-family",
+            "same-audience",
+            "same-concentration",
+            "similar-price"
+          ],
+          "sharedNotes": []
+        },
+        {
+          "productId": "f6c3a60c-a77e-499d-965c-b04669fc059e",
+          "wixProductId": "3edd5484-3ca9-43d4-8fc4-b48e8816dbdb",
+          "slug": "carolina-herrera-ch-men-6-7-edt-sp-f6c3a6",
+          "displayName": "Carolina Herrera \"CH\"",
           "score": 80,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -19654,10 +19654,10 @@
           "sharedNotes": []
         },
         {
-          "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
-          "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
-          "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
-          "displayName": "Aurum Privée Edit Paco Robanne Phantom",
+          "productId": "0d3d921d-63b2-480a-9085-7308897d58bf",
+          "wixProductId": "9c986c95-0e83-41ed-92c8-5bd8d687ef3c",
+          "slug": "azzaro-wanted-edt-3-4-0d3d92",
+          "displayName": "Azzaro Wanted EDT 3.4",
           "score": 80,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -19675,10 +19675,10 @@
           "sharedNotes": []
         },
         {
-          "productId": "0d3d921d-63b2-480a-9085-7308897d58bf",
-          "wixProductId": "9c986c95-0e83-41ed-92c8-5bd8d687ef3c",
-          "slug": "azzaro-wanted-edt-3-4-0d3d92",
-          "displayName": "Azzaro Wanted EDT 3.4",
+          "productId": "2d3a8739-213a-47d7-9ace-23d3ff2d2203",
+          "wixProductId": "fedf4b07-6ba4-4285-8507-a2626647a520",
+          "slug": "burberry-touch-eau-de-toilette-3-3-2d3a87",
+          "displayName": "Burberry Touch Eau De Toilette 3.3",
           "score": 80,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -21851,10 +21851,10 @@
           "sharedNotes": []
         },
         {
-          "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
-          "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
-          "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
-          "displayName": "Aurum Privée Edit Paco Robanne Phantom",
+          "productId": "b5670a5a-f560-467e-8533-90b7ed2235c6",
+          "wixProductId": "d1cd3999-9181-4a6f-b0f7-2a61a54cdbff",
+          "slug": "yacht-master-1-men-3-4-edt-b5670a",
+          "displayName": "Aurum Privée Edit Yacht Master 1",
           "score": 90,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -23894,10 +23894,10 @@
           "sharedNotes": []
         },
         {
-          "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
-          "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
-          "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
-          "displayName": "Aurum Privée Edit Paco Robanne Phantom",
+          "productId": "0d3d921d-63b2-480a-9085-7308897d58bf",
+          "wixProductId": "9c986c95-0e83-41ed-92c8-5bd8d687ef3c",
+          "slug": "azzaro-wanted-edt-3-4-0d3d92",
+          "displayName": "Azzaro Wanted EDT 3.4",
           "score": 80,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -26203,10 +26203,10 @@
           "sharedNotes": []
         },
         {
-          "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
-          "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
-          "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
-          "displayName": "Aurum Privée Edit Paco Robanne Phantom",
+          "productId": "0d3d921d-63b2-480a-9085-7308897d58bf",
+          "wixProductId": "9c986c95-0e83-41ed-92c8-5bd8d687ef3c",
+          "slug": "azzaro-wanted-edt-3-4-0d3d92",
+          "displayName": "Azzaro Wanted EDT 3.4",
           "score": 80,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -26224,10 +26224,10 @@
           "sharedNotes": []
         },
         {
-          "productId": "0d3d921d-63b2-480a-9085-7308897d58bf",
-          "wixProductId": "9c986c95-0e83-41ed-92c8-5bd8d687ef3c",
-          "slug": "azzaro-wanted-edt-3-4-0d3d92",
-          "displayName": "Azzaro Wanted EDT 3.4",
+          "productId": "2d3a8739-213a-47d7-9ace-23d3ff2d2203",
+          "wixProductId": "fedf4b07-6ba4-4285-8507-a2626647a520",
+          "slug": "burberry-touch-eau-de-toilette-3-3-2d3a87",
+          "displayName": "Burberry Touch Eau De Toilette 3.3",
           "score": 80,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -26474,61 +26474,11 @@
       "variantFamily": null,
       "related": [
         {
-          "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
-          "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
-          "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
-          "displayName": "Aurum Privée Edit Paco Robanne Phantom",
-          "score": 126,
-          "primaryReason": "Another Paco fragrance from Aurum Privée Edit",
-          "reasons": [
-            "Another Paco fragrance from Aurum Privée Edit",
-            "Same woody scent family",
-            "Selected for men",
-            "More from Aurum Privée Edit",
-            "Same eau de toilette format",
-            "Comparable price point"
-          ],
-          "signals": [
-            "same-brand-line",
-            "same-family",
-            "same-audience",
-            "same-brand",
-            "same-concentration",
-            "similar-price"
-          ],
-          "sharedNotes": []
-        },
-        {
           "productId": "184d0e82-e8c8-497a-9895-9d71921256ba",
           "wixProductId": "97ac127c-3d75-4b01-b7ac-10e2ae44a553",
           "slug": "paco-invictus-aqua-men-3-4-edt-sp-184d0e",
           "displayName": "Aurum Privée Edit Paco Invictus Aqua",
           "score": 122,
-          "primaryReason": "Another Paco fragrance from Aurum Privée Edit",
-          "reasons": [
-            "Another Paco fragrance from Aurum Privée Edit",
-            "Same woody scent family",
-            "Selected for men",
-            "More from Aurum Privée Edit",
-            "Same eau de toilette format",
-            "Comparable price point"
-          ],
-          "signals": [
-            "same-brand-line",
-            "same-family",
-            "same-audience",
-            "same-brand",
-            "same-concentration",
-            "similar-price"
-          ],
-          "sharedNotes": []
-        },
-        {
-          "productId": "22858c43-33e7-461f-bf0f-6a247e500594",
-          "wixProductId": "392d1fd8-9528-4846-8889-0a0054d189c0",
-          "slug": "paco-rabbane-men-s-phantom-edt-spray-3-4-oz-22858c",
-          "displayName": "Aurum Privée Edit Paco Rabbane Men's Phantom",
-          "score": 118,
           "primaryReason": "Another Paco fragrance from Aurum Privée Edit",
           "reasons": [
             "Another Paco fragrance from Aurum Privée Edit",
@@ -26565,6 +26515,52 @@
             "same-family",
             "same-audience",
             "same-brand",
+            "similar-price"
+          ],
+          "sharedNotes": []
+        },
+        {
+          "productId": "f2b0a27a-db19-44eb-944c-bf80d0c3d00d",
+          "wixProductId": "f913b069-78f8-4102-a5e4-1a6eefee8858",
+          "slug": "john-varvatos-men-s-dark-rebel-edt-spray-2-5-oz-f2b0a2",
+          "displayName": "Aurum Privée Edit John Varvatos Men's Dark Rebel",
+          "score": 90,
+          "primaryReason": "Same woody scent family",
+          "reasons": [
+            "Same woody scent family",
+            "Selected for men",
+            "More from Aurum Privée Edit",
+            "Same eau de toilette format",
+            "Comparable price point"
+          ],
+          "signals": [
+            "same-family",
+            "same-audience",
+            "same-brand",
+            "same-concentration",
+            "similar-price"
+          ],
+          "sharedNotes": []
+        },
+        {
+          "productId": "6b74bf01-4ebe-4ccc-b3d2-a7a83cdcc906",
+          "wixProductId": "150a6bba-db66-4c97-b792-34f1bd8f2518",
+          "slug": "nautica-classic-men-3-4-edt-sp-6b74bf",
+          "displayName": "Aurum Privée Edit Nautica Classic",
+          "score": 90,
+          "primaryReason": "Same woody scent family",
+          "reasons": [
+            "Same woody scent family",
+            "Selected for men",
+            "More from Aurum Privée Edit",
+            "Same eau de toilette format",
+            "Comparable price point"
+          ],
+          "signals": [
+            "same-family",
+            "same-audience",
+            "same-brand",
+            "same-concentration",
             "similar-price"
           ],
           "sharedNotes": []
@@ -26612,61 +26608,55 @@
           "sharedNotes": []
         },
         {
-          "productId": "22858c43-33e7-461f-bf0f-6a247e500594",
-          "wixProductId": "392d1fd8-9528-4846-8889-0a0054d189c0",
-          "slug": "paco-rabbane-men-s-phantom-edt-spray-3-4-oz-22858c",
-          "displayName": "Aurum Privée Edit Paco Rabbane Men's Phantom",
-          "score": 122,
-          "primaryReason": "Another Paco fragrance from Aurum Privée Edit",
-          "reasons": [
-            "Another Paco fragrance from Aurum Privée Edit",
-            "Same woody scent family",
-            "Selected for men",
-            "More from Aurum Privée Edit",
-            "Same eau de toilette format",
-            "Comparable price point"
-          ],
-          "signals": [
-            "same-brand-line",
-            "same-family",
-            "same-audience",
-            "same-brand",
-            "same-concentration",
-            "similar-price"
-          ],
-          "sharedNotes": []
-        },
-        {
-          "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
-          "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
-          "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
-          "displayName": "Aurum Privée Edit Paco Robanne Phantom",
-          "score": 122,
-          "primaryReason": "Another Paco fragrance from Aurum Privée Edit",
-          "reasons": [
-            "Another Paco fragrance from Aurum Privée Edit",
-            "Same woody scent family",
-            "Selected for men",
-            "More from Aurum Privée Edit",
-            "Same eau de toilette format",
-            "Comparable price point"
-          ],
-          "signals": [
-            "same-brand-line",
-            "same-family",
-            "same-audience",
-            "same-brand",
-            "same-concentration",
-            "similar-price"
-          ],
-          "sharedNotes": []
-        },
-        {
           "productId": "9ae86ef1-a9ea-4d03-b9bd-89c2ceebef1f",
           "wixProductId": "bded7029-1da1-4323-9a85-fef30a07533e",
           "slug": "tom-eau-de-soleil-blanc-1-7-edt-sp-9ae86e",
           "displayName": "Aurum Privée Edit Tom Eau De Soleil Blanc",
           "score": 94,
+          "primaryReason": "Same woody scent family",
+          "reasons": [
+            "Same woody scent family",
+            "Selected for men",
+            "More from Aurum Privée Edit",
+            "Same eau de toilette format",
+            "Comparable price point"
+          ],
+          "signals": [
+            "same-family",
+            "same-audience",
+            "same-brand",
+            "same-concentration",
+            "similar-price"
+          ],
+          "sharedNotes": []
+        },
+        {
+          "productId": "29199911-9ce6-4602-9551-629013ecee3f",
+          "wixProductId": "fcd14f54-66cf-48dc-82c0-308bb6ccce28",
+          "slug": "jean-paul-gautlier-le-male-travel-exclusive-1-4oz-291999",
+          "displayName": "Aurum Privée Edit Jean Paul Gautlier Le Male Travel Exclusive",
+          "score": 86,
+          "primaryReason": "Same woody scent family",
+          "reasons": [
+            "Same woody scent family",
+            "Selected for men",
+            "More from Aurum Privée Edit",
+            "Comparable price point"
+          ],
+          "signals": [
+            "same-family",
+            "same-audience",
+            "same-brand",
+            "similar-price"
+          ],
+          "sharedNotes": []
+        },
+        {
+          "productId": "f2b0a27a-db19-44eb-944c-bf80d0c3d00d",
+          "wixProductId": "f913b069-78f8-4102-a5e4-1a6eefee8858",
+          "slug": "john-varvatos-men-s-dark-rebel-edt-spray-2-5-oz-f2b0a2",
+          "displayName": "Aurum Privée Edit John Varvatos Men's Dark Rebel",
+          "score": 86,
           "primaryReason": "Same woody scent family",
           "reasons": [
             "Same woody scent family",
@@ -26889,11 +26879,11 @@
           "sharedNotes": []
         },
         {
-          "productId": "2c242fd2-a5e1-40e1-b4bb-ae5997f64e70",
-          "wixProductId": "1e501a8e-0c51-49ac-817e-a59bc5d68ec5",
-          "slug": "paco-rabanne-edt-spray-3-3-oz-2c242f",
-          "displayName": "Paco Rabanne EDT Spray",
-          "score": 90,
+          "productId": "22858c43-33e7-461f-bf0f-6a247e500594",
+          "wixProductId": "392d1fd8-9528-4846-8889-0a0054d189c0",
+          "slug": "paco-rabbane-men-s-phantom-edt-spray-3-4-oz-22858c",
+          "displayName": "Paco Rabanne Phantom",
+          "score": 98,
           "primaryReason": "Same woody scent family",
           "reasons": [
             "Same woody scent family",
@@ -27623,8 +27613,8 @@
       "wixProductId": "392d1fd8-9528-4846-8889-0a0054d189c0",
       "wixVariantId": "55e373d0-132d-4d6e-aa6d-87874a1f91ff",
       "slug": "paco-rabbane-men-s-phantom-edt-spray-3-4-oz-22858c",
-      "brand": "Aurum Privée Edit",
-      "name": "Paco Rabbane Men's Phantom",
+      "brand": "Paco Rabanne",
+      "name": "Phantom",
       "audience": "Men",
       "scentFamily": "Woody",
       "concentration": "Eau de Toilette",
@@ -27633,67 +27623,17 @@
       "variantFamily": null,
       "related": [
         {
-          "productId": "184d0e82-e8c8-497a-9895-9d71921256ba",
-          "wixProductId": "97ac127c-3d75-4b01-b7ac-10e2ae44a553",
-          "slug": "paco-invictus-aqua-men-3-4-edt-sp-184d0e",
-          "displayName": "Aurum Privée Edit Paco Invictus Aqua",
-          "score": 122,
-          "primaryReason": "Another Paco fragrance from Aurum Privée Edit",
-          "reasons": [
-            "Another Paco fragrance from Aurum Privée Edit",
-            "Same woody scent family",
-            "Selected for men",
-            "More from Aurum Privée Edit",
-            "Same eau de toilette format",
-            "Comparable price point"
-          ],
-          "signals": [
-            "same-brand-line",
-            "same-family",
-            "same-audience",
-            "same-brand",
-            "same-concentration",
-            "similar-price"
-          ],
-          "sharedNotes": []
-        },
-        {
           "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
           "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
           "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
-          "displayName": "Aurum Privée Edit Paco Robanne Phantom",
-          "score": 122,
-          "primaryReason": "Another Paco Phantom fragrance from Aurum Privée Edit",
-          "reasons": [
-            "Another Paco Phantom fragrance from Aurum Privée Edit",
-            "Same woody scent family",
-            "Selected for men",
-            "More from Aurum Privée Edit",
-            "Same eau de toilette format",
-            "Comparable price point"
-          ],
-          "signals": [
-            "same-brand-line",
-            "same-family",
-            "same-audience",
-            "same-brand",
-            "same-concentration",
-            "similar-price"
-          ],
-          "sharedNotes": []
-        },
-        {
-          "productId": "bd3c6b75-1aba-49ca-aee3-3eb27682bfbf",
-          "wixProductId": "d3f98d25-9dd7-4c98-9d18-6943df29ce69",
-          "slug": "paco-black-xs-edt-sp-3-4oz-bd3c6b",
-          "displayName": "Aurum Privée Edit Paco Black XS",
+          "displayName": "Paco Rabanne Phantom",
           "score": 118,
-          "primaryReason": "Another Paco fragrance from Aurum Privée Edit",
+          "primaryReason": "Another Phantom fragrance from Paco Rabanne",
           "reasons": [
-            "Another Paco fragrance from Aurum Privée Edit",
+            "Another Phantom fragrance from Paco Rabanne",
             "Same woody scent family",
             "Selected for men",
-            "More from Aurum Privée Edit",
+            "More from Paco Rabanne",
             "Same eau de toilette format",
             "Comparable price point"
           ],
@@ -27708,24 +27648,70 @@
           "sharedNotes": []
         },
         {
-          "productId": "9ae86ef1-a9ea-4d03-b9bd-89c2ceebef1f",
-          "wixProductId": "bded7029-1da1-4323-9a85-fef30a07533e",
-          "slug": "tom-eau-de-soleil-blanc-1-7-edt-sp-9ae86e",
-          "displayName": "Aurum Privée Edit Tom Eau De Soleil Blanc",
-          "score": 98,
-          "primaryReason": "Same woody scent family",
+          "productId": "eb570b43-b950-4dd8-bdc4-bfdaa1dbdee7",
+          "wixProductId": "a9ee8f24-68c9-4256-9a16-84e15199fded",
+          "slug": "paco-rabanne-phantom-intense-elixir-3-4oz-edp-sp-eb570b",
+          "displayName": "Paco Rabanne Phantom Intense Elixir",
+          "score": 118,
+          "primaryReason": "Another Phantom fragrance from Paco Rabanne",
           "reasons": [
+            "Another Phantom fragrance from Paco Rabanne",
             "Same woody scent family",
             "Selected for men",
-            "More from Aurum Privée Edit",
-            "Same eau de toilette format",
+            "More from Paco Rabanne",
             "Comparable price point"
           ],
           "signals": [
+            "same-brand-line",
             "same-family",
             "same-audience",
             "same-brand",
-            "same-concentration",
+            "similar-price"
+          ],
+          "sharedNotes": []
+        },
+        {
+          "productId": "45fc502d-ec9a-4a77-b4fe-0ab760849341",
+          "wixProductId": "9538ac64-363c-4b92-a976-1f0d663a6d06",
+          "slug": "paco-rabanne-phantom-parfum-edp-45fc50",
+          "displayName": "Paco Rabanne Phantom Parfum",
+          "score": 118,
+          "primaryReason": "Another Phantom fragrance from Paco Rabanne",
+          "reasons": [
+            "Another Phantom fragrance from Paco Rabanne",
+            "Same woody scent family",
+            "Selected for men",
+            "More from Paco Rabanne",
+            "Comparable price point"
+          ],
+          "signals": [
+            "same-brand-line",
+            "same-family",
+            "same-audience",
+            "same-brand",
+            "similar-price"
+          ],
+          "sharedNotes": []
+        },
+        {
+          "productId": "52488167-5897-4056-97a1-da5846124d0d",
+          "wixProductId": "b80b35a6-e3d7-412d-88fc-aa5c6204f71c",
+          "slug": "paco-rabanne-phantom-intense-3-4-edp-sp-524881",
+          "displayName": "Paco Rabanne Phantom Intense",
+          "score": 114,
+          "primaryReason": "Another Phantom fragrance from Paco Rabanne",
+          "reasons": [
+            "Another Phantom fragrance from Paco Rabanne",
+            "Same woody scent family",
+            "Selected for men",
+            "More from Paco Rabanne",
+            "Comparable price point"
+          ],
+          "signals": [
+            "same-brand-line",
+            "same-family",
+            "same-audience",
+            "same-brand",
             "similar-price"
           ],
           "sharedNotes": []
@@ -27738,77 +27724,27 @@
       "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
       "wixVariantId": "aaf075a3-d25d-4620-8094-fc1bc85240f5",
       "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
-      "brand": "Aurum Privée Edit",
-      "name": "Paco Robanne Phantom",
+      "brand": "Paco Rabanne",
+      "name": "Phantom",
       "audience": "Men",
       "scentFamily": "Woody",
       "concentration": "Eau de Toilette",
-      "size": "17 oz",
+      "size": "1.7 oz",
       "price": 95,
       "variantFamily": null,
       "related": [
         {
-          "productId": "bd3c6b75-1aba-49ca-aee3-3eb27682bfbf",
-          "wixProductId": "d3f98d25-9dd7-4c98-9d18-6943df29ce69",
-          "slug": "paco-black-xs-edt-sp-3-4oz-bd3c6b",
-          "displayName": "Aurum Privée Edit Paco Black XS",
-          "score": 126,
-          "primaryReason": "Another Paco fragrance from Aurum Privée Edit",
-          "reasons": [
-            "Another Paco fragrance from Aurum Privée Edit",
-            "Same woody scent family",
-            "Selected for men",
-            "More from Aurum Privée Edit",
-            "Same eau de toilette format",
-            "Comparable price point"
-          ],
-          "signals": [
-            "same-brand-line",
-            "same-family",
-            "same-audience",
-            "same-brand",
-            "same-concentration",
-            "similar-price"
-          ],
-          "sharedNotes": []
-        },
-        {
-          "productId": "184d0e82-e8c8-497a-9895-9d71921256ba",
-          "wixProductId": "97ac127c-3d75-4b01-b7ac-10e2ae44a553",
-          "slug": "paco-invictus-aqua-men-3-4-edt-sp-184d0e",
-          "displayName": "Aurum Privée Edit Paco Invictus Aqua",
-          "score": 122,
-          "primaryReason": "Another Paco fragrance from Aurum Privée Edit",
-          "reasons": [
-            "Another Paco fragrance from Aurum Privée Edit",
-            "Same woody scent family",
-            "Selected for men",
-            "More from Aurum Privée Edit",
-            "Same eau de toilette format",
-            "Comparable price point"
-          ],
-          "signals": [
-            "same-brand-line",
-            "same-family",
-            "same-audience",
-            "same-brand",
-            "same-concentration",
-            "similar-price"
-          ],
-          "sharedNotes": []
-        },
-        {
           "productId": "22858c43-33e7-461f-bf0f-6a247e500594",
           "wixProductId": "392d1fd8-9528-4846-8889-0a0054d189c0",
           "slug": "paco-rabbane-men-s-phantom-edt-spray-3-4-oz-22858c",
-          "displayName": "Aurum Privée Edit Paco Rabbane Men's Phantom",
-          "score": 122,
-          "primaryReason": "Another Paco Phantom fragrance from Aurum Privée Edit",
+          "displayName": "Paco Rabanne Phantom",
+          "score": 118,
+          "primaryReason": "Another Phantom fragrance from Paco Rabanne",
           "reasons": [
-            "Another Paco Phantom fragrance from Aurum Privée Edit",
+            "Another Phantom fragrance from Paco Rabanne",
             "Same woody scent family",
             "Selected for men",
-            "More from Aurum Privée Edit",
+            "More from Paco Rabanne",
             "Same eau de toilette format",
             "Comparable price point"
           ],
@@ -27823,19 +27759,67 @@
           "sharedNotes": []
         },
         {
-          "productId": "29199911-9ce6-4602-9551-629013ecee3f",
-          "wixProductId": "fcd14f54-66cf-48dc-82c0-308bb6ccce28",
-          "slug": "jean-paul-gautlier-le-male-travel-exclusive-1-4oz-291999",
-          "displayName": "Aurum Privée Edit Jean Paul Gautlier Le Male Travel Exclusive",
-          "score": 90,
-          "primaryReason": "Same woody scent family",
+          "productId": "52488167-5897-4056-97a1-da5846124d0d",
+          "wixProductId": "b80b35a6-e3d7-412d-88fc-aa5c6204f71c",
+          "slug": "paco-rabanne-phantom-intense-3-4-edp-sp-524881",
+          "displayName": "Paco Rabanne Phantom Intense",
+          "score": 114,
+          "primaryReason": "Another Phantom fragrance from Paco Rabanne",
           "reasons": [
+            "Another Phantom fragrance from Paco Rabanne",
             "Same woody scent family",
             "Selected for men",
-            "More from Aurum Privée Edit",
+            "More from Paco Rabanne",
             "Comparable price point"
           ],
           "signals": [
+            "same-brand-line",
+            "same-family",
+            "same-audience",
+            "same-brand",
+            "similar-price"
+          ],
+          "sharedNotes": []
+        },
+        {
+          "productId": "09de25d0-df98-43dc-9284-c2ff18e2acf3",
+          "wixProductId": "a9ee8f24-68c9-4256-9a16-84e15199fded",
+          "slug": "paco-rabanne-phantom-intense-elixir-1-7-edp-sp-09de25",
+          "displayName": "Paco Rabanne Phantom Intense Elixir",
+          "score": 114,
+          "primaryReason": "Another Phantom fragrance from Paco Rabanne",
+          "reasons": [
+            "Another Phantom fragrance from Paco Rabanne",
+            "Same woody scent family",
+            "Selected for men",
+            "More from Paco Rabanne",
+            "Comparable price point"
+          ],
+          "signals": [
+            "same-brand-line",
+            "same-family",
+            "same-audience",
+            "same-brand",
+            "similar-price"
+          ],
+          "sharedNotes": []
+        },
+        {
+          "productId": "45fc502d-ec9a-4a77-b4fe-0ab760849341",
+          "wixProductId": "9538ac64-363c-4b92-a976-1f0d663a6d06",
+          "slug": "paco-rabanne-phantom-parfum-edp-45fc50",
+          "displayName": "Paco Rabanne Phantom Parfum",
+          "score": 110,
+          "primaryReason": "Another Phantom fragrance from Paco Rabanne",
+          "reasons": [
+            "Another Phantom fragrance from Paco Rabanne",
+            "Same woody scent family",
+            "Selected for men",
+            "More from Paco Rabanne",
+            "Comparable price point"
+          ],
+          "signals": [
+            "same-brand-line",
             "same-family",
             "same-audience",
             "same-brand",
@@ -29320,10 +29304,10 @@
           "sharedNotes": []
         },
         {
-          "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
-          "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
-          "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
-          "displayName": "Aurum Privée Edit Paco Robanne Phantom",
+          "productId": "0d3d921d-63b2-480a-9085-7308897d58bf",
+          "wixProductId": "9c986c95-0e83-41ed-92c8-5bd8d687ef3c",
+          "slug": "azzaro-wanted-edt-3-4-0d3d92",
+          "displayName": "Azzaro Wanted EDT 3.4",
           "score": 80,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -29341,10 +29325,10 @@
           "sharedNotes": []
         },
         {
-          "productId": "0d3d921d-63b2-480a-9085-7308897d58bf",
-          "wixProductId": "9c986c95-0e83-41ed-92c8-5bd8d687ef3c",
-          "slug": "azzaro-wanted-edt-3-4-0d3d92",
-          "displayName": "Azzaro Wanted EDT 3.4",
+          "productId": "2d3a8739-213a-47d7-9ace-23d3ff2d2203",
+          "wixProductId": "fedf4b07-6ba4-4285-8507-a2626647a520",
+          "slug": "burberry-touch-eau-de-toilette-3-3-2d3a87",
+          "displayName": "Burberry Touch Eau De Toilette 3.3",
           "score": 80,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -29933,29 +29917,6 @@
           "sharedNotes": []
         },
         {
-          "productId": "22858c43-33e7-461f-bf0f-6a247e500594",
-          "wixProductId": "392d1fd8-9528-4846-8889-0a0054d189c0",
-          "slug": "paco-rabbane-men-s-phantom-edt-spray-3-4-oz-22858c",
-          "displayName": "Aurum Privée Edit Paco Rabbane Men's Phantom",
-          "score": 98,
-          "primaryReason": "Same woody scent family",
-          "reasons": [
-            "Same woody scent family",
-            "Selected for men",
-            "More from Aurum Privée Edit",
-            "Same eau de toilette format",
-            "Comparable price point"
-          ],
-          "signals": [
-            "same-family",
-            "same-audience",
-            "same-brand",
-            "same-concentration",
-            "similar-price"
-          ],
-          "sharedNotes": []
-        },
-        {
           "productId": "184d0e82-e8c8-497a-9895-9d71921256ba",
           "wixProductId": "97ac127c-3d75-4b01-b7ac-10e2ae44a553",
           "slug": "paco-invictus-aqua-men-3-4-edt-sp-184d0e",
@@ -29984,6 +29945,29 @@
           "slug": "paco-black-xs-edt-sp-3-4oz-bd3c6b",
           "displayName": "Aurum Privée Edit Paco Black XS",
           "score": 90,
+          "primaryReason": "Same woody scent family",
+          "reasons": [
+            "Same woody scent family",
+            "Selected for men",
+            "More from Aurum Privée Edit",
+            "Same eau de toilette format",
+            "Comparable price point"
+          ],
+          "signals": [
+            "same-family",
+            "same-audience",
+            "same-brand",
+            "same-concentration",
+            "similar-price"
+          ],
+          "sharedNotes": []
+        },
+        {
+          "productId": "f2b0a27a-db19-44eb-944c-bf80d0c3d00d",
+          "wixProductId": "f913b069-78f8-4102-a5e4-1a6eefee8858",
+          "slug": "john-varvatos-men-s-dark-rebel-edt-spray-2-5-oz-f2b0a2",
+          "displayName": "Aurum Privée Edit John Varvatos Men's Dark Rebel",
+          "score": 86,
           "primaryReason": "Same woody scent family",
           "reasons": [
             "Same woody scent family",
@@ -56965,11 +56949,11 @@
       "wixVariantId": "b23c4256-c722-4a76-9805-5835dac7b2f5",
       "slug": "maison-francis-kurkdjian-baccarat-rouge-540-edp-2-4-540-a5076e",
       "brand": "Maison Francis Kurkdjian",
-      "name": "Baccarat Rouge",
+      "name": "Baccarat Rouge 540",
       "audience": "Unisex",
       "scentFamily": "Fresh",
-      "concentration": "Eau de Parfum",
-      "size": "540 oz",
+      "concentration": "Extrait de Parfum",
+      "size": "2.4 oz",
       "price": 495,
       "variantFamily": null,
       "related": [
@@ -56983,7 +56967,7 @@
           "reasons": [
             "Same fresh scent family",
             "Another unisex selection",
-            "Same eau de parfum format",
+            "Same extrait de parfum format",
             "Comparable price point"
           ],
           "signals": [
@@ -57004,7 +56988,7 @@
           "reasons": [
             "Same fresh scent family",
             "Another unisex selection",
-            "Same eau de parfum format",
+            "Same extrait de parfum format",
             "Comparable price point"
           ],
           "signals": [
@@ -57025,7 +57009,7 @@
           "reasons": [
             "Same fresh scent family",
             "Another unisex selection",
-            "Same eau de parfum format",
+            "Same extrait de parfum format",
             "Comparable price point"
           ],
           "signals": [
@@ -57046,7 +57030,7 @@
           "reasons": [
             "Same fresh scent family",
             "Another unisex selection",
-            "Same eau de parfum format",
+            "Same extrait de parfum format",
             "Comparable price point"
           ],
           "signals": [
@@ -61353,6 +61337,29 @@
       "variantFamily": null,
       "related": [
         {
+          "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
+          "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
+          "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
+          "displayName": "Paco Rabanne Phantom",
+          "score": 98,
+          "primaryReason": "Same woody scent family",
+          "reasons": [
+            "Same woody scent family",
+            "Selected for men",
+            "More from Paco Rabanne",
+            "Same eau de toilette format",
+            "Comparable price point"
+          ],
+          "signals": [
+            "same-family",
+            "same-audience",
+            "same-brand",
+            "same-concentration",
+            "similar-price"
+          ],
+          "sharedNotes": []
+        },
+        {
           "productId": "875e6072-e57a-435a-ad0c-78dc42b4b7a8",
           "wixProductId": "edba5bce-3dd6-4243-880d-396352d74147",
           "slug": "paco-rabanne-pour-homme-edt-3-4-oz-875e60",
@@ -61403,27 +61410,6 @@
           "wixProductId": "61a36a39-ea3e-455d-a019-eca514340a55",
           "slug": "paco-rabanne-fabulous-me-2-1-edp-sp-adef4a",
           "displayName": "Paco Rabanne Fabulous Me",
-          "score": 90,
-          "primaryReason": "Same woody scent family",
-          "reasons": [
-            "Same woody scent family",
-            "Selected for men",
-            "More from Paco Rabanne",
-            "Comparable price point"
-          ],
-          "signals": [
-            "same-family",
-            "same-audience",
-            "same-brand",
-            "similar-price"
-          ],
-          "sharedNotes": []
-        },
-        {
-          "productId": "31389a6a-a5d6-4491-a251-519274d69f73",
-          "wixProductId": "f84a40e5-e3a5-4c6a-a909-475e13d3e413",
-          "slug": "paco-rabanne-genius-me-edp-sp-2-1-31389a",
-          "displayName": "Paco Rabanne Genius Me EDP SP 2.1",
           "score": 90,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -62832,47 +62818,47 @@
           "sharedNotes": []
         },
         {
-          "productId": "9d302bb5-98f0-461c-bae9-f20bd458c612",
-          "wixProductId": "34fbdbbf-bffd-4c20-b543-fef755c6e980",
-          "slug": "paco-rabanne-invictus-platinum-edp-spray-3-4-9d302b",
-          "displayName": "Paco Rabanne Invictus Platinum EDP Spray 3.4",
-          "score": 98,
-          "primaryReason": "Same woody scent family",
+          "productId": "22858c43-33e7-461f-bf0f-6a247e500594",
+          "wixProductId": "392d1fd8-9528-4846-8889-0a0054d189c0",
+          "slug": "paco-rabbane-men-s-phantom-edt-spray-3-4-oz-22858c",
+          "displayName": "Paco Rabanne Phantom",
+          "score": 114,
+          "primaryReason": "Another Phantom fragrance from Paco Rabanne",
           "reasons": [
+            "Another Phantom fragrance from Paco Rabanne",
             "Same woody scent family",
             "Selected for men",
             "More from Paco Rabanne",
-            "Same eau de parfum format",
             "Comparable price point"
           ],
           "signals": [
+            "same-brand-line",
             "same-family",
             "same-audience",
             "same-brand",
-            "same-concentration",
             "similar-price"
           ],
           "sharedNotes": []
         },
         {
-          "productId": "5118c4ae-117b-42f9-b1df-fde7c4ee503c",
-          "wixProductId": "4ce50d78-77b3-475b-8426-1ae38ff35b02",
-          "slug": "paco-rabanne-1-million-parfum-spray-1-7-edp-5118c4",
-          "displayName": "Paco Rabanne 1 Million",
-          "score": 94,
-          "primaryReason": "Same woody scent family",
+          "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
+          "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
+          "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
+          "displayName": "Paco Rabanne Phantom",
+          "score": 114,
+          "primaryReason": "Another Phantom fragrance from Paco Rabanne",
           "reasons": [
+            "Another Phantom fragrance from Paco Rabanne",
             "Same woody scent family",
             "Selected for men",
             "More from Paco Rabanne",
-            "Same eau de parfum format",
             "Comparable price point"
           ],
           "signals": [
+            "same-brand-line",
             "same-family",
             "same-audience",
             "same-brand",
-            "same-concentration",
             "similar-price"
           ],
           "sharedNotes": []
@@ -62951,47 +62937,47 @@
           "sharedNotes": []
         },
         {
-          "productId": "9d302bb5-98f0-461c-bae9-f20bd458c612",
-          "wixProductId": "34fbdbbf-bffd-4c20-b543-fef755c6e980",
-          "slug": "paco-rabanne-invictus-platinum-edp-spray-3-4-9d302b",
-          "displayName": "Paco Rabanne Invictus Platinum EDP Spray 3.4",
-          "score": 98,
-          "primaryReason": "Same woody scent family",
+          "productId": "22858c43-33e7-461f-bf0f-6a247e500594",
+          "wixProductId": "392d1fd8-9528-4846-8889-0a0054d189c0",
+          "slug": "paco-rabbane-men-s-phantom-edt-spray-3-4-oz-22858c",
+          "displayName": "Paco Rabanne Phantom",
+          "score": 114,
+          "primaryReason": "Another Phantom fragrance from Paco Rabanne",
           "reasons": [
+            "Another Phantom fragrance from Paco Rabanne",
             "Same woody scent family",
             "Selected for men",
             "More from Paco Rabanne",
-            "Same eau de parfum format",
             "Comparable price point"
           ],
           "signals": [
+            "same-brand-line",
             "same-family",
             "same-audience",
             "same-brand",
-            "same-concentration",
             "similar-price"
           ],
           "sharedNotes": []
         },
         {
-          "productId": "5118c4ae-117b-42f9-b1df-fde7c4ee503c",
-          "wixProductId": "4ce50d78-77b3-475b-8426-1ae38ff35b02",
-          "slug": "paco-rabanne-1-million-parfum-spray-1-7-edp-5118c4",
-          "displayName": "Paco Rabanne 1 Million",
-          "score": 94,
-          "primaryReason": "Same woody scent family",
+          "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
+          "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
+          "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
+          "displayName": "Paco Rabanne Phantom",
+          "score": 114,
+          "primaryReason": "Another Phantom fragrance from Paco Rabanne",
           "reasons": [
+            "Another Phantom fragrance from Paco Rabanne",
             "Same woody scent family",
             "Selected for men",
             "More from Paco Rabanne",
-            "Same eau de parfum format",
             "Comparable price point"
           ],
           "signals": [
+            "same-brand-line",
             "same-family",
             "same-audience",
             "same-brand",
-            "same-concentration",
             "similar-price"
           ],
           "sharedNotes": []
@@ -63070,47 +63056,47 @@
           "sharedNotes": []
         },
         {
-          "productId": "c5e0572f-eadc-43ee-b759-b43863719270",
-          "wixProductId": "a826e0eb-f551-456f-884d-8509e4cfaa9d",
-          "slug": "paco-rabanne-men-s-invictus-victory-edp-spray-3-4-oz-c5e057",
-          "displayName": "Paco Rabanne Men's Invictus Victory",
-          "score": 98,
-          "primaryReason": "Same woody scent family",
+          "productId": "22858c43-33e7-461f-bf0f-6a247e500594",
+          "wixProductId": "392d1fd8-9528-4846-8889-0a0054d189c0",
+          "slug": "paco-rabbane-men-s-phantom-edt-spray-3-4-oz-22858c",
+          "displayName": "Paco Rabanne Phantom",
+          "score": 118,
+          "primaryReason": "Another Phantom fragrance from Paco Rabanne",
           "reasons": [
+            "Another Phantom fragrance from Paco Rabanne",
             "Same woody scent family",
             "Selected for men",
             "More from Paco Rabanne",
-            "Same eau de parfum format",
             "Comparable price point"
           ],
           "signals": [
+            "same-brand-line",
             "same-family",
             "same-audience",
             "same-brand",
-            "same-concentration",
             "similar-price"
           ],
           "sharedNotes": []
         },
         {
-          "productId": "9d302bb5-98f0-461c-bae9-f20bd458c612",
-          "wixProductId": "34fbdbbf-bffd-4c20-b543-fef755c6e980",
-          "slug": "paco-rabanne-invictus-platinum-edp-spray-3-4-9d302b",
-          "displayName": "Paco Rabanne Invictus Platinum EDP Spray 3.4",
-          "score": 94,
-          "primaryReason": "Same woody scent family",
+          "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
+          "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
+          "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
+          "displayName": "Paco Rabanne Phantom",
+          "score": 110,
+          "primaryReason": "Another Phantom fragrance from Paco Rabanne",
           "reasons": [
+            "Another Phantom fragrance from Paco Rabanne",
             "Same woody scent family",
             "Selected for men",
             "More from Paco Rabanne",
-            "Same eau de parfum format",
             "Comparable price point"
           ],
           "signals": [
+            "same-brand-line",
             "same-family",
             "same-audience",
             "same-brand",
-            "same-concentration",
             "similar-price"
           ],
           "sharedNotes": []
@@ -64752,10 +64738,10 @@
           "sharedNotes": []
         },
         {
-          "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
-          "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
-          "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
-          "displayName": "Aurum Privée Edit Paco Robanne Phantom",
+          "productId": "0d3d921d-63b2-480a-9085-7308897d58bf",
+          "wixProductId": "9c986c95-0e83-41ed-92c8-5bd8d687ef3c",
+          "slug": "azzaro-wanted-edt-3-4-0d3d92",
+          "displayName": "Azzaro Wanted EDT 3.4",
           "score": 80,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -64773,10 +64759,10 @@
           "sharedNotes": []
         },
         {
-          "productId": "0d3d921d-63b2-480a-9085-7308897d58bf",
-          "wixProductId": "9c986c95-0e83-41ed-92c8-5bd8d687ef3c",
-          "slug": "azzaro-wanted-edt-3-4-0d3d92",
-          "displayName": "Azzaro Wanted EDT 3.4",
+          "productId": "2d3a8739-213a-47d7-9ace-23d3ff2d2203",
+          "wixProductId": "fedf4b07-6ba4-4285-8507-a2626647a520",
+          "slug": "burberry-touch-eau-de-toilette-3-3-2d3a87",
+          "displayName": "Burberry Touch Eau De Toilette 3.3",
           "score": 80,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -69302,7 +69288,7 @@
           "productId": "a5076e9f-f3b7-477a-b32d-154aba74f514",
           "wixProductId": "60220fb0-db99-4d65-a008-169e8c1e3c87",
           "slug": "maison-francis-kurkdjian-baccarat-rouge-540-edp-2-4-540-a5076e",
-          "displayName": "Maison Francis Kurkdjian Baccarat Rouge",
+          "displayName": "Maison Francis Kurkdjian Baccarat Rouge 540",
           "score": 72,
           "primaryReason": "Same fresh scent family",
           "reasons": [
@@ -72656,27 +72642,6 @@
           "sharedNotes": []
         },
         {
-          "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
-          "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
-          "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
-          "displayName": "Aurum Privée Edit Paco Robanne Phantom",
-          "score": 90,
-          "primaryReason": "Same woody scent family",
-          "reasons": [
-            "Same woody scent family",
-            "Selected for men",
-            "More from Aurum Privée Edit",
-            "Comparable price point"
-          ],
-          "signals": [
-            "same-family",
-            "same-audience",
-            "same-brand",
-            "similar-price"
-          ],
-          "sharedNotes": []
-        },
-        {
           "productId": "184d0e82-e8c8-497a-9895-9d71921256ba",
           "wixProductId": "97ac127c-3d75-4b01-b7ac-10e2ae44a553",
           "slug": "paco-invictus-aqua-men-3-4-edt-sp-184d0e",
@@ -72702,6 +72667,27 @@
           "wixProductId": "f913b069-78f8-4102-a5e4-1a6eefee8858",
           "slug": "john-varvatos-men-s-dark-rebel-edt-spray-2-5-oz-f2b0a2",
           "displayName": "Aurum Privée Edit John Varvatos Men's Dark Rebel",
+          "score": 82,
+          "primaryReason": "Same woody scent family",
+          "reasons": [
+            "Same woody scent family",
+            "Selected for men",
+            "More from Aurum Privée Edit",
+            "Comparable price point"
+          ],
+          "signals": [
+            "same-family",
+            "same-audience",
+            "same-brand",
+            "similar-price"
+          ],
+          "sharedNotes": []
+        },
+        {
+          "productId": "6b74bf01-4ebe-4ccc-b3d2-a7a83cdcc906",
+          "wixProductId": "150a6bba-db66-4c97-b792-34f1bd8f2518",
+          "slug": "nautica-classic-men-3-4-edt-sp-6b74bf",
+          "displayName": "Aurum Privée Edit Nautica Classic",
           "score": 82,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -76298,10 +76284,10 @@
           "sharedNotes": []
         },
         {
-          "productId": "22858c43-33e7-461f-bf0f-6a247e500594",
-          "wixProductId": "392d1fd8-9528-4846-8889-0a0054d189c0",
-          "slug": "paco-rabbane-men-s-phantom-edt-spray-3-4-oz-22858c",
-          "displayName": "Aurum Privée Edit Paco Rabbane Men's Phantom",
+          "productId": "9ae86ef1-a9ea-4d03-b9bd-89c2ceebef1f",
+          "wixProductId": "bded7029-1da1-4323-9a85-fef30a07533e",
+          "slug": "tom-eau-de-soleil-blanc-1-7-edt-sp-9ae86e",
+          "displayName": "Aurum Privée Edit Tom Eau De Soleil Blanc",
           "score": 80,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -76319,10 +76305,10 @@
           "sharedNotes": []
         },
         {
-          "productId": "9ae86ef1-a9ea-4d03-b9bd-89c2ceebef1f",
-          "wixProductId": "bded7029-1da1-4323-9a85-fef30a07533e",
-          "slug": "tom-eau-de-soleil-blanc-1-7-edt-sp-9ae86e",
-          "displayName": "Aurum Privée Edit Tom Eau De Soleil Blanc",
+          "productId": "52ef1d66-bbc2-4cfa-8101-c27ddca2408e",
+          "wixProductId": "1340a084-9440-4411-b187-69f79a3c2daa",
+          "slug": "chanel-allure-homme-sport-5-0-edt-52ef1d",
+          "displayName": "Chanel Allure Homme Sport",
           "score": 80,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -78388,47 +78374,47 @@
           "sharedNotes": []
         },
         {
-          "productId": "9d302bb5-98f0-461c-bae9-f20bd458c612",
-          "wixProductId": "34fbdbbf-bffd-4c20-b543-fef755c6e980",
-          "slug": "paco-rabanne-invictus-platinum-edp-spray-3-4-9d302b",
-          "displayName": "Paco Rabanne Invictus Platinum EDP Spray 3.4",
-          "score": 98,
-          "primaryReason": "Same woody scent family",
+          "productId": "22858c43-33e7-461f-bf0f-6a247e500594",
+          "wixProductId": "392d1fd8-9528-4846-8889-0a0054d189c0",
+          "slug": "paco-rabbane-men-s-phantom-edt-spray-3-4-oz-22858c",
+          "displayName": "Paco Rabanne Phantom",
+          "score": 118,
+          "primaryReason": "Another Phantom fragrance from Paco Rabanne",
           "reasons": [
+            "Another Phantom fragrance from Paco Rabanne",
             "Same woody scent family",
             "Selected for men",
             "More from Paco Rabanne",
-            "Same parfum format",
             "Comparable price point"
           ],
           "signals": [
+            "same-brand-line",
             "same-family",
             "same-audience",
             "same-brand",
-            "same-concentration",
             "similar-price"
           ],
           "sharedNotes": []
         },
         {
-          "productId": "c5e0572f-eadc-43ee-b759-b43863719270",
-          "wixProductId": "a826e0eb-f551-456f-884d-8509e4cfaa9d",
-          "slug": "paco-rabanne-men-s-invictus-victory-edp-spray-3-4-oz-c5e057",
-          "displayName": "Paco Rabanne Men's Invictus Victory",
-          "score": 98,
-          "primaryReason": "Same woody scent family",
+          "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
+          "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
+          "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
+          "displayName": "Paco Rabanne Phantom",
+          "score": 110,
+          "primaryReason": "Another Phantom fragrance from Paco Rabanne",
           "reasons": [
+            "Another Phantom fragrance from Paco Rabanne",
             "Same woody scent family",
             "Selected for men",
             "More from Paco Rabanne",
-            "Same parfum format",
             "Comparable price point"
           ],
           "signals": [
+            "same-brand-line",
             "same-family",
             "same-audience",
             "same-brand",
-            "same-concentration",
             "similar-price"
           ],
           "sharedNotes": []
@@ -78455,6 +78441,29 @@
           "wixProductId": "1e501a8e-0c51-49ac-817e-a59bc5d68ec5",
           "slug": "paco-rabanne-edt-spray-3-3-oz-2c242f",
           "displayName": "Paco Rabanne EDT Spray",
+          "score": 98,
+          "primaryReason": "Same woody scent family",
+          "reasons": [
+            "Same woody scent family",
+            "Selected for men",
+            "More from Paco Rabanne",
+            "Same eau de toilette format",
+            "Comparable price point"
+          ],
+          "signals": [
+            "same-family",
+            "same-audience",
+            "same-brand",
+            "same-concentration",
+            "similar-price"
+          ],
+          "sharedNotes": []
+        },
+        {
+          "productId": "ce91b419-57c8-4d0e-91ad-1eac9a6c6fec",
+          "wixProductId": "0037b778-6f1d-456a-8e7c-0807bffdbd9f",
+          "slug": "paco-robanne-phantom-men-17-edt-sp-ce91b4",
+          "displayName": "Paco Rabanne Phantom",
           "score": 98,
           "primaryReason": "Same woody scent family",
           "reasons": [
@@ -78501,27 +78510,6 @@
           "wixProductId": "61a36a39-ea3e-455d-a019-eca514340a55",
           "slug": "paco-rabanne-fabulous-me-2-1-edp-sp-adef4a",
           "displayName": "Paco Rabanne Fabulous Me",
-          "score": 90,
-          "primaryReason": "Same woody scent family",
-          "reasons": [
-            "Same woody scent family",
-            "Selected for men",
-            "More from Paco Rabanne",
-            "Comparable price point"
-          ],
-          "signals": [
-            "same-family",
-            "same-audience",
-            "same-brand",
-            "similar-price"
-          ],
-          "sharedNotes": []
-        },
-        {
-          "productId": "31389a6a-a5d6-4491-a251-519274d69f73",
-          "wixProductId": "f84a40e5-e3a5-4c6a-a909-475e13d3e413",
-          "slug": "paco-rabanne-genius-me-edp-sp-2-1-31389a",
-          "displayName": "Paco Rabanne Genius Me EDP SP 2.1",
           "score": 90,
           "primaryReason": "Same woody scent family",
           "reasons": [

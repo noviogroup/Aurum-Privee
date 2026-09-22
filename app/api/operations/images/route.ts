@@ -5,6 +5,7 @@ import { hasOperatorSession } from "@/lib/operator-session";
 import { maximumProductImageBytes, ProductImageValidationError, publishProductImage } from "@/lib/product-image-upload";
 import { consumeRateLimit } from "@/lib/request-security";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { legacyOperationsWritesEnabled } from "@/lib/provider-operations";
 
 export const runtime = "nodejs";
 
@@ -21,6 +22,7 @@ export async function GET() {
 export async function POST(request: Request) {
   if (!await hasOperatorSession()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!isSameOriginRequest(request)) return NextResponse.json({ error: "Invalid request origin" }, { status: 403 });
+  if (!legacyOperationsWritesEnabled()) return NextResponse.json({ error: "Publish catalog photography through Wix or the repository intake workflow while Wix commerce is active." }, { status: 409 });
   const declaredLength = Number(request.headers.get("content-length"));
   if (!Number.isFinite(declaredLength) || declaredLength <= 0) return NextResponse.json({ error: "Upload size is required." }, { status: 411 });
   if (declaredLength > maximumProductImageBytes + 100_000) {

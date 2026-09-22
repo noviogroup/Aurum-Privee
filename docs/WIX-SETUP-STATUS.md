@@ -1,6 +1,6 @@
 # Wix headless setup status
 
-Last verified: 13 September 2026
+Last verified: 18 September 2026
 
 This document records the live Wix configuration for the existing Aurum Privée site and the remaining gates for the headless-commerce cutover. It contains no credentials.
 
@@ -23,6 +23,8 @@ This document records the live Wix configuration for the existing Aurum Privée 
 - Local Wix SDK dependencies and separate visitor/admin client factories
 - Hosted-checkout adapter using the Wix cart → checkout → redirect sequence
 - Manual cash payment connected and active, with instructions requiring customers to wait for pickup confirmation before travelling
+- The standard Wix customer email for an eligible order is active, but shows zero triggers and no previous run
+- The Wix merchant automation for a newly eligible order is active and also shows zero triggers and no previous run; it has unpublished changes that require recipient/content approval before publication
 - Wix-aware order confirmation and fail-closed 733-SKU mapping check
 - Wix catalogue overlay for client-managed names, brands, descriptions, prices, visibility, stock status and media
 - Controlled Wix import completed cleanly for 707 products and 733 sellable variants
@@ -30,18 +32,16 @@ This document records the live Wix configuration for the existing Aurum Privée 
 - Wix product list verified at 716 total products: 707 controlled records plus nine inherited placeholders
 - Reviewed Dior Sauvage family spot-checked in Wix with six variants, separate from Dior Eau Sauvage
 - Complete product-relationship register for all 733 SKUs, with 2,932 deterministic recommendation links and sibling-variant exclusions
-- Matching non-secret Wix configuration stored in Netlify's production context and applied by the current production release.
+- Matching non-secret Wix configuration stored in Netlify production and deploy-preview contexts and applied to the hardened preview.
+- Site-restricted `WIX_API_KEY` generated with only Wix eCommerce permission and stored as a non-readable Netlify secret for production and deploy previews.
+- Protected deploy-preview health verification passed with `status: ok`, catalogue reachability, server-side order verification and all 733 mapped variants. A second read-only live check on preview `6aadb9a9329918fc5595117b` independently reported that both the Wix catalogue and order APIs were reachable with 733/733 approved SKUs. The probes used the real runtime credential without revealing or replacing it.
 - Production catalogue provider set to `wix`; checkout remains disabled until fulfillment acceptance is complete.
 
 ## Verified incomplete
 
-### Protected credential — optional for future automation
-
-The administrative API key has not been generated. It is not required for visitor browsing or Wix-hosted checkout. It will be needed only if Novio later automates server-side catalogue, inventory or order administration. Store it in encrypted Netlify environment settings and never commit it.
-
 ### Business and inventory location
 
-Wix Business Info has no address, email or phone. Its default location is not marked as a store inventory location. The available Loyverse data does not provide a complete address:
+Wix Business Info has Bahamas selected but no address, city, region, postal code, email or phone. Its default location is not marked as a store inventory location. The available Loyverse data does not provide a complete address:
 
 - The intended Loyverse store named `Nassau` contains only `Prince Charles, Nassau`.
 - The store ID currently configured locally points to a second legacy location with no address.
@@ -58,6 +58,20 @@ The inherited Wix shipping profile is not launch-safe:
 - No confirmed New Providence delivery policy exists.
 
 Do not enable Wix checkout until the owner confirms the delivery area, delivery fee, pickup address, opening hours, cutoff time and tax treatment. Remove or replace the inherited regions during acceptance setup.
+
+### Tax
+
+Wix has no tax locations, so tax collection is disabled. The dormant default is to add tax at checkout, but no rate can be applied until an approved location and treatment are configured. Obtain owner or accountant approval for whether Bahamian VAT is included in displayed prices or added at checkout before enabling checkout.
+
+### Checkout policies and contact
+
+Terms and conditions, privacy, return, digital-product and custom checkout policies are all disabled. The required policy-agreement checkbox and the checkout `Contact us` link are also disabled. Approve and enable the applicable policies before a controlled order; do not infer policy text from the storefront summaries.
+
+The storefront therefore treats its shipping/returns, privacy and terms pages as interim client-care notices: they are reachable from the footer, marked `noindex,follow` and excluded from the sitemap. Restore indexing only after the corresponding merchant-approved text is published.
+
+### Manual payment and notifications
+
+Manual Payments is the only connected payment method. It is configured as `Cash payment` with the customer instruction: pay in cash when collecting, wait for email or phone confirmation, and do not travel before collection is confirmed. The eligible-order customer email and merchant new-order automation are active, but neither has ever triggered. The merchant automation has unpublished changes and its email action currently previews a generic Wix no-reply sender. Approve its recipient/content before publishing those changes, then verify both customer and merchant delivery during the controlled orders. Approve the cash-only launch path; connect another payment provider only through a separate reviewed acceptance pass.
 
 ### Wix-hosted pages domain
 
@@ -81,4 +95,4 @@ Run:
 npm run preflight:wix
 ```
 
-The command now verifies all 733 approved SKUs are mapped and the Wix provider is selected. It is expected to remain fail-closed only on the two checkout launch controls until fulfillment and order acceptance testing pass. A private administrative credential is not required for hosted checkout.
+The command verifies all 733 approved SKUs are mapped, the Wix provider is selected and server-side order verification is configured. It is expected to remain fail-closed on the two checkout launch controls until fulfillment and controlled-order acceptance testing pass.

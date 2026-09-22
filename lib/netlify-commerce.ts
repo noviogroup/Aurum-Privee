@@ -1,7 +1,9 @@
 import crypto from "node:crypto";
 import { getStore } from "@netlify/blobs";
+import { updateJsonAtomically } from "@/lib/blob-atomic";
 import type { OrderSyncLine } from "@/lib/loyverse-order-sync";
 import { requestFingerprint } from "@/lib/request-security";
+import type { InquiryReply, InquiryStatus, OperationsInquiry } from "@/lib/operations-inquiry-types";
 
 export type CommerceOrderStatus = "paid" | "partially_refunded" | "refunded";
 export type CommerceFulfillmentStatus = "unfulfilled" | "ready" | "fulfilled" | "cancelled";
@@ -48,6 +50,19 @@ type StoredEvent = {
 
 type RateLimitWindow = { count: number; resetsAt: number };
 
+type StoredContactInquiry = Partial<OperationsInquiry> & {
+  id: string;
+  reference: string;
+  name?: string;
+  email?: string;
+  phone?: string | null;
+  topic: string;
+  orderNumber?: string | null;
+  message: string;
+  createdAt: string;
+  status: InquiryStatus;
+};
+
 function commerceStore() {
   return getStore({ name: "aurum-privee-commerce", consistency: "strong" });
 }
@@ -62,6 +77,18 @@ function sessionKey(sessionId: string) {
 
 function paymentIntentKey(paymentIntentId: string) {
   return `indexes/payment-intent/${paymentIntentId}.json`;
+}
+
+function contactInquiryIndexKey(id: string) {
+  return `indexes/contact-inquiry/${id}.json`;
+}
+
+async function saveContactInquiryIndex(id: string, key: string) {
+  try {
+    await commerceStore().setJSON(contactInquiryIndexKey(id), { key });
+  } catch (error) {
+    console.error("Contact inquiry index update failed", { inquiryId: id, error });
+  }
 }
 
 async function readJSON<T>(key: string) {
@@ -112,19 +139,19 @@ export async function listCommerceOrders(limit = 250) {
 
 export async function claimCommerceEvent(id: string, type: string) {
   const key = `events/${id}.json`;
-  const existing = await readJSON<StoredEvent>(key);
-  const processingIsFresh = existing?.status === "processing"
-    && Number.isFinite(Date.parse(existing.updatedAt))
-    && Date.parse(existing.updatedAt) > Date.now() - 15 * 60 * 1000;
-  if (existing?.status === "processed" || processingIsFresh) return false;
-  await commerceStore().setJSON(key, {
-    id,
-    type,
-    status: "processing",
-    error: null,
-    updatedAt: new Date().toISOString(),
-  } satisfies StoredEvent);
-  return true;
+  const store = commerceStore();
+  const claimed = await updateJsonAtomically<StoredEvent>({
+    read: async () => await store.getWithMetadata(key, { type: "json" }) as { data: StoredEvent; etag?: string } | null,
+    write: async (value, condition) => await store.setJSON(key, value, condition),
+    update: (existing) => {
+      const processingIsFresh = existing?.status === "processing"
+        && Number.isFinite(Date.parse(existing.updatedAt))
+        && Date.parse(existing.updatedAt) > Date.now() - 15 * 60 * 1000;
+      if (existing?.status === "processed" || processingIsFresh) return undefined;
+      return { id, type, status: "processing", error: null, updatedAt: new Date().toISOString() };
+    },
+  });
+  return claimed.modified;
 }
 
 export async function completeCommerceEvent(id: string, type: string, error?: string) {
@@ -150,11 +177,15 @@ export async function consumeBlobRateLimit(input: {
   if (!fingerprint) return { configured: false, allowed: false, remaining: 0, retryAfter: input.windowSeconds };
   const key = `rate-limits/${input.scope}/${fingerprint}.json`;
   const now = Date.now();
-  const current = await readJSON<RateLimitWindow>(key);
-  const window = !current || current.resetsAt <= now
-    ? { count: 1, resetsAt: now + input.windowSeconds * 1000 }
-    : { count: current.count + 1, resetsAt: current.resetsAt };
-  await commerceStore().setJSON(key, window);
+  const store = commerceStore();
+  const { value: window } = await updateJsonAtomically<RateLimitWindow>({
+    read: async () => await store.getWithMetadata(key, { type: "json" }) as { data: RateLimitWindow; etag?: string } | null,
+    write: async (value, condition) => await store.setJSON(key, value, condition),
+    update: (current) => !current || current.resetsAt <= now
+      ? { count: 1, resetsAt: now + input.windowSeconds * 1000 }
+      : { count: current.count + 1, resetsAt: current.resetsAt },
+  });
+  if (!window) throw new Error("Rate-limit state could not be persisted");
   return {
     configured: true,
     allowed: window.count <= input.limit,
@@ -174,8 +205,113 @@ export async function saveContactInquiry(input: {
 }) {
   const id = crypto.randomUUID();
   const createdAt = new Date().toISOString();
-  await commerceStore().setJSON(`inquiries/${createdAt}/${id}.json`, { id, ...input, createdAt, status: "new" });
+  const key = `inquiries/${createdAt}/${id}.json`;
+  const store = commerceStore();
+  await store.setJSON(key, {
+    id,
+    reference: input.reference,
+    customerName: input.name,
+    customerEmail: input.email,
+    customerPhone: input.phone || null,
+    topic: input.topic,
+    orderNumber: input.orderNumber || null,
+    message: input.message,
+    status: "new",
+    notificationStatus: "pending",
+    createdAt,
+    updatedAt: createdAt,
+    replies: [],
+  } satisfies OperationsInquiry);
+  await saveContactInquiryIndex(id, key);
   return { id, reference: input.reference };
+}
+
+function normalizeContactInquiry(value: StoredContactInquiry): OperationsInquiry {
+  return {
+    id: value.id,
+    reference: value.reference,
+    customerName: value.customerName || value.name || "Client",
+    customerEmail: value.customerEmail || value.email || "",
+    customerPhone: value.customerPhone ?? value.phone ?? null,
+    topic: value.topic,
+    orderNumber: value.orderNumber || null,
+    message: value.message,
+    status: value.status,
+    notificationStatus: value.notificationStatus || "pending",
+    createdAt: value.createdAt,
+    updatedAt: value.updatedAt || value.createdAt,
+    replies: Array.isArray(value.replies) ? value.replies : [],
+  };
+}
+
+async function findContactInquiry(id: string) {
+  const store = commerceStore();
+  const index = await readJSON<{ key: string }>(contactInquiryIndexKey(id));
+  if (index?.key) {
+    const stored = await readJSON<StoredContactInquiry>(index.key);
+    if (stored) return { key: index.key, inquiry: normalizeContactInquiry(stored) };
+  }
+  const { blobs } = await store.list({ prefix: "inquiries/" });
+  for (const { key } of blobs) {
+    if (!key.endsWith(`/${id}.json`)) continue;
+    const stored = await readJSON<StoredContactInquiry>(key);
+    if (stored) {
+      await saveContactInquiryIndex(id, key);
+      return { key, inquiry: normalizeContactInquiry(stored) };
+    }
+  }
+  return null;
+}
+
+export async function listContactInquiries(limit = 500) {
+  const { blobs } = await commerceStore().list({ prefix: "inquiries/" });
+  const inquiries = (await Promise.all(blobs.slice(-limit).map(({ key }) => readJSON<StoredContactInquiry>(key))))
+    .filter((value): value is StoredContactInquiry => Boolean(value))
+    .map(normalizeContactInquiry)
+    .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
+  return inquiries.slice(0, limit);
+}
+
+export async function getContactInquiry(id: string) {
+  return (await findContactInquiry(id))?.inquiry || null;
+}
+
+export async function updateContactInquiry(id: string, patch: Partial<Pick<OperationsInquiry, "status" | "notificationStatus">>) {
+  const stored = await findContactInquiry(id);
+  if (!stored) return null;
+  const store = commerceStore();
+  const result = await updateJsonAtomically<StoredContactInquiry>({
+    read: async () => await store.getWithMetadata(stored.key, { type: "json" }) as { data: StoredContactInquiry; etag?: string } | null,
+    write: async (value, condition) => await store.setJSON(stored.key, value, condition),
+    update: (current) => current
+      ? { ...normalizeContactInquiry(current), ...patch, updatedAt: new Date().toISOString() }
+      : undefined,
+  });
+  return result.value ? normalizeContactInquiry(result.value) : null;
+}
+
+export async function recordContactInquiryReply(id: string, reply: InquiryReply) {
+  const stored = await findContactInquiry(id);
+  if (!stored) return null;
+  const store = commerceStore();
+  let duplicate = false;
+  const result = await updateJsonAtomically<StoredContactInquiry>({
+    read: async () => await store.getWithMetadata(stored.key, { type: "json" }) as { data: StoredContactInquiry; etag?: string } | null,
+    write: async (value, condition) => await store.setJSON(stored.key, value, condition),
+    update: (current) => {
+      if (!current) return undefined;
+      const inquiry = normalizeContactInquiry(current);
+      duplicate = inquiry.replies.some((item) => item.id === reply.id);
+      if (duplicate) return undefined;
+      return {
+        ...inquiry,
+        status: "replied",
+        replies: [...inquiry.replies, reply],
+        updatedAt: reply.sentAt,
+      };
+    },
+  });
+  return result.value ? { inquiry: normalizeContactInquiry(result.value), duplicate } : null;
 }
 
 export async function saveNewsletterConfirmation(input: { email: string; tokenHash: string; expiresAt: string }) {

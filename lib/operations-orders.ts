@@ -2,6 +2,7 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 import type { OperationsLineItem, OperationsOrder } from "@/lib/operations-types";
 import { listCommerceOrders, type CommerceOrder } from "@/lib/netlify-commerce";
 import { getCatalogProductsByIds } from "@/lib/catalog";
+import { activeCommerceProvider, localOperationsDemoEnabled } from "@/lib/provider-operations";
 
 type OrderRow = {
   id: string;
@@ -111,14 +112,12 @@ function normalizeBlobOrder(order: CommerceOrder, images: Map<string, string>): 
 }
 
 export async function getOperationsOrders(limit = 250) {
+  if (activeCommerceProvider() === "wix") {
+    return { configured: true as const, preview: false as const, provider: "wix" as const, orders: [] as OperationsOrder[] };
+  }
   const supabase = getSupabaseAdmin();
   if (!supabase) {
-    const configuredHost = (() => {
-      try { return new URL(process.env.NEXT_PUBLIC_SITE_URL || "").hostname; } catch { return ""; }
-    })();
-    const localPreview = process.env.OPERATIONS_DEMO_MODE === "true"
-      && ["localhost", "127.0.0.1", "::1"].includes(configuredHost);
-    if (localPreview) {
+    if (localOperationsDemoEnabled()) {
       const now = Date.now();
       const demo = (input: Partial<OperationsOrder> & Pick<OperationsOrder, "id" | "orderNumber" | "customerName" | "total">): OperationsOrder => ({
         paymentStatus: "paid",
@@ -146,6 +145,7 @@ export async function getOperationsOrders(limit = 250) {
       return {
         configured: false as const,
         preview: true as const,
+        provider: "legacy" as const,
         orders: [
           demo({ id: "10000000-0000-0000-0000-000000000001", orderNumber: "AP-1048", customerName: "Amara Clarke", total: 126 }),
           demo({ id: "10000000-0000-0000-0000-000000000002", orderNumber: "AP-1047", customerName: "Marcus Rolle", total: 184.5, shippingAmount: 10, deliveryDetails: { address: { line1: "West Bay Street", city: "Nassau", country: "BS" } }, createdAt: new Date(now - 42 * 60_000).toISOString() }),
@@ -160,9 +160,9 @@ export async function getOperationsOrders(limit = 250) {
       const productIds = [...new Set(orders.flatMap((order) => order.lineItems.map((line) => line.productId).filter((id): id is string => Boolean(id))))];
       const products = productIds.length ? await getCatalogProductsByIds(productIds) : [];
       const images = new Map(products.map((product) => [product.id, product.image]));
-      return { configured: true as const, preview: false as const, storage: "netlify-blobs" as const, orders: orders.map((order) => normalizeBlobOrder(order, images)) };
+      return { configured: true as const, preview: false as const, provider: "legacy" as const, storage: "netlify-blobs" as const, orders: orders.map((order) => normalizeBlobOrder(order, images)) };
     } catch {
-      return { configured: false as const, preview: false as const, orders: [] as OperationsOrder[] };
+      return { configured: false as const, preview: false as const, provider: "legacy" as const, orders: [] as OperationsOrder[] };
     }
   }
   const { data, error } = await supabase.from("orders")
@@ -181,5 +181,5 @@ export async function getOperationsOrders(limit = 250) {
       if (product.image_url) images.set(product.id, product.image_url);
     });
   }
-  return { configured: true as const, preview: false as const, orders: rows.map((row) => normalizeOrder(row, images)) };
+  return { configured: true as const, preview: false as const, provider: "legacy" as const, orders: rows.map((row) => normalizeOrder(row, images)) };
 }

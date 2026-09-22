@@ -1,6 +1,6 @@
 # Resend setup for Aurum Privée
 
-The storefront email code is complete. Resend will deliver order confirmations, merchant order alerts, pickup/delivery updates, cancellation notices, contact-form notifications and newsletter confirmation emails. Supabase Auth uses a separate Resend connection for account sign-in links.
+The storefront email code is complete. On the active Wix path, Wix owns standard order messages while Resend delivers contact-form notifications, staff replies and newsletter confirmation emails. The retained legacy commerce path also contains order and fulfillment messages. Supabase Auth email is needed only if customer accounts are explicitly introduced later or the legacy provider is restored.
 
 ## Production identities
 
@@ -9,7 +9,7 @@ The storefront email code is complete. Resend will deliver order confirmations, 
 - Public origin: `https://aurumprivee.com`
 - Merchant recipient: a real inbox monitored by the store owner (still to be confirmed)
 
-The nameservers for `aurumprivee.com` currently point to Wix, so the Resend DNS records must be entered in Wix DNS.
+The nameservers for `aurumprivee.com` currently point to Wix. The required Resend DNS records are present there and the root domain is verified in Resend.
 
 ## 1. Verify the sending domain
 
@@ -18,11 +18,13 @@ The nameservers for `aurumprivee.com` currently point to Wix, so the Resend DNS 
 3. Start verification in Resend and wait until the status is **Verified**.
 4. Add the optional DMARC record after SPF and DKIM verify.
 
-The production Resend account currently verifies the root domain, so the From address must use that exact domain.
+Completed on 17 September 2026. The production Resend account verifies the root domain, so the From address must use that exact domain.
 
 ## 2. Create the production key
 
-Create a key named `Aurum Privee Netlify Production` with **Sending access**, restricted to `aurumprivee.com`. Copy it immediately; Resend only displays a new key once.
+Two Aurum Privée keys with **Sending access** restricted to `aurumprivee.com` exist as of 18 September 2026. Both showed zero recorded uses during the dashboard audit. Netlify stores `RESEND_API_KEY` as a non-readable secret for Production and Deploy Previews, so its saved value cannot be matched to a key name from the dashboard. A read-only live check on deploy preview `6aadb9a9329918fc5595117b` confirmed that its runtime uses a domain-restricted Sending key and recognizes the dashboard-verified domain. Acceptance messages must still prove delivery. Resend displayed each key value only once; no copy is stored in this repository or documentation.
+
+After the new key has passed the preview runtime check and the acceptance messages have been delivered, revoke the older unused Aurum Privée keys in Resend. Do not remove them before that verification or without owner approval.
 
 Never commit this key, paste it into a browser-visible `NEXT_PUBLIC_*` variable, or place it in `netlify.toml`.
 
@@ -44,25 +46,27 @@ Then run the non-sending check:
 npm run preflight:email
 ```
 
-The preflight checks configuration, key acceptance and domain status. It never sends an email.
+The preflight checks configuration, key acceptance and domain status. It never sends an email. In production, deploy-preview and branch-deploy contexts it also refuses any key with account-wide domain access; the runtime key must be restricted to Sending access for `aurumprivee.com`.
+
+`netlify dev:exec` is not authoritative for this check when `.env.local` exists: the CLI gives the local file precedence over matching project variables. Run the final preflight inside the actual deploy or CI environment, where the saved Netlify secret is used.
 
 ## 4. Configure Netlify without deploying
 
-In Netlify, open **Aurum Privée → Project configuration → Environment variables** and add the following for the Production context:
+In Netlify, open **Aurum Privée → Project configuration → Environment variables** and add the following. The key is intentionally available to both Production and Deploy Previews so the preview acceptance run can exercise the real integration while checkout remains closed.
 
-| Variable | Value | Secret |
-| --- | --- | --- |
-| `RESEND_API_KEY` | production Sending-access key | Yes |
-| `RESEND_FROM_EMAIL` | `Aurum Privée <orders@aurumprivee.com>` | No |
-| `RESEND_DOMAIN_VERIFIED` | `true` | No |
-| `STORE_NOTIFICATION_EMAIL` | confirmed monitored inbox | No |
-| `NEXT_PUBLIC_SITE_URL` | `https://aurumprivee.com` | No |
+| Variable | Value | Secret | Status on 18 September 2026 |
+| --- | --- | --- | --- |
+| `RESEND_API_KEY` | production Sending-access key | Yes | Configured for Production and Deploy Previews |
+| `RESEND_FROM_EMAIL` | `Aurum Privée <orders@aurumprivee.com>` | No | Configured for Production |
+| `RESEND_DOMAIN_VERIFIED` | `true` | No | Configured for Production |
+| `STORE_NOTIFICATION_EMAIL` | `noviogroup@gmail.com` | No | Configured for Production and Deploy Previews; active monitoring still requires owner confirmation |
+| `NEXT_PUBLIC_SITE_URL` | `https://aurumprivee.com` | No | Configured separately in Netlify |
 
 Saving variables does not require a manual deploy now. The values will be used by the next approved build.
 
-## 5. Route account emails through Resend
+## 5. Optional future account email
 
-The website's Resend key covers storefront transactional messages, but Supabase sends account magic links and recovery messages. In Resend, open Integrations, connect the Aurum Privée Supabase project, select `aurumprivee.com`, and configure the sender as `Aurum Privée` / `accounts@aurumprivee.com`.
+Skip this section for the current Wix guest-checkout release. If the business later approves Supabase-backed accounts or restores the legacy provider, Supabase can send account magic links and recovery messages through a separate Resend connection. In Resend, open Integrations, connect the Aurum Privée Supabase project, select `aurumprivee.com`, and configure the sender as `Aurum Privée` / `accounts@aurumprivee.com`.
 
 If configured manually in Supabase Auth SMTP settings, use:
 
@@ -75,11 +79,12 @@ Use a separate Resend key for Supabase Auth so it can be rotated independently f
 
 ## 6. Acceptance test after approval
 
-1. Send a test order to an address controlled by the team.
-2. Confirm the customer confirmation and merchant alert both arrive.
-3. Mark the test order ready and confirm the fulfillment email.
-4. Request an account magic link and confirm it returns to `/auth/callback`.
+1. In the actual deploy environment, run `npm run preflight:email` and confirm the domain-scoped Sending key passes.
+2. Submit the contact form from an address controlled by the team and confirm the merchant notification arrives.
+3. Reply from the protected client-care workspace and confirm the customer receives one message.
+4. Join the private list and complete the newsletter confirmation link.
 5. Confirm SPF, DKIM and DMARC pass in the received message headers.
 6. Check Resend logs for delivery, bounce and complaint events.
+7. Test Wix order notifications separately during the controlled Wix checkout acceptance run.
 
 Do not enable live checkout until these checks pass.

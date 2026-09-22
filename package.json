@@ -9,6 +9,11 @@
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
+    "test:e2e": "npm run build && playwright test",
+    "test:e2e:headed": "npm run build && playwright test --headed",
+    "verify:build": "npm run lint && npm run typecheck && npm test && npm run build",
+    "verify": "npm run verify:build && playwright test",
+    "verify:hosted": "tsx scripts/verify-hosted.ts",
     "test:migrations": "bash scripts/test-migrations.sh",
     "preflight:email": "tsx --env-file-if-exists=.env.local scripts/resend-preflight.ts",
     "preflight:wix": "tsx --env-file-if-exists=.env.local scripts/wix-preflight.ts",
@@ -40,7 +45,9 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/eslintrc": "^3.3.1",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^20.17.24",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",

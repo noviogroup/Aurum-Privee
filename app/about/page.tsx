@@ -5,7 +5,7 @@ import { ArrowRight, MapPin, Sparkle } from "@phosphor-icons/react/dist/ssr";
 
 export const metadata: Metadata = {
   title: "About Aurum Privée",
-  description: "Discover Aurum Privée’s considered approach to designer, niche and Arabian fragrance in The Bahamas and Ghana.",
+  description: "Discover Aurum Privée’s considered approach to designer, niche and Arabian fragrance in The Bahamas.",
   alternates: { canonical: "/about" },
 };
 
@@ -20,18 +20,18 @@ const principles = [
   },
   {
     title: "Make discovery human",
-    body: "We help narrow the collection through conversation—what you already love, what you want to feel and where the fragrance will be worn.",
+    body: "We help narrow the collection through conversation: what you already love, what you want to feel and where the fragrance will be worn.",
   },
 ];
 
 export default function AboutPage() {
   return (
-    <main className="about-page page-top">
+    <div className="about-page page-top">
       <section className="about-hero section-shell">
         <div className="about-hero-copy entrance">
           <h1>Fragrance,<br />chosen with <em>feeling.</em></h1>
           <p>
-            Aurum Privée brings designer, niche and Arabian fragrance into one considered edit—made for the deeply personal way scent becomes memory.
+            Aurum Privée brings designer, niche and Arabian fragrance into one considered edit, made for the deeply personal way scent becomes memory.
           </p>
           <Link href="/shop" className="button button-primary">Explore the collection <ArrowRight size={17} /></Link>
         </div>
@@ -49,7 +49,7 @@ export default function AboutPage() {
 
       <section className="about-manifesto section-shell" aria-label="Aurum Privée point of view">
         <Sparkle size={24} weight="thin" aria-hidden="true" />
-        <p>We believe a fragrance wardrobe should move with the person wearing it—not the label someone else chose for them.</p>
+        <h2>We believe a fragrance wardrobe should move with the person wearing it, not the label someone else chose for them.</h2>
       </section>
 
       <section className="about-editorial section-shell">
@@ -96,7 +96,6 @@ export default function AboutPage() {
         <div className="about-presence-locations">
           <p><strong>Nassau</strong><span>New Providence, The Bahamas</span></p>
           <p><strong>Harbour Island</strong><span>Eleuthera, The Bahamas</span></p>
-          <p><strong>Ghana</strong><span>Service details to be confirmed</span></p>
         </div>
       </section>
 
@@ -111,6 +110,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

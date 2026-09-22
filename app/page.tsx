@@ -3,9 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChatCircleDots, Gift, MapPin, SealCheck, WhatsappLogo } from "@phosphor-icons/react/dist/ssr";
 import { ProductBrowser } from "@/components/product-browser";
-import { getCatalogProducts } from "@/lib/catalog";
+import { getHomepageCatalogProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
+export const revalidate = 60;
 
 const homepageProductIds = [
   "460426e4-f854-40f4-9217-7fac41fe75bf", // Dior Sauvage
@@ -37,8 +38,17 @@ const carriedBrands = [
   ["Carolina Herrera", "Carolina Herrera", "/images/brand-logos/carolina-herrera.svg"],
 ] as const;
 
+function ResponsiveFillImage({ src, mobileSrc, alt, sizes, className }: { src: string; mobileSrc: string; alt: string; sizes: string; className: string }) {
+  return (
+    <picture className={className}>
+      <source media="(max-width: 767px)" srcSet={mobileSrc} />
+      <Image src={src} alt={alt} fill sizes={sizes} />
+    </picture>
+  );
+}
+
 export default async function HomePage() {
-  const products = await getCatalogProducts();
+  const products = await getHomepageCatalogProducts();
   const curatedHomepageProducts = homepageProductIds
     .map((id) => products.find((product) => product.id === id || product.loyverseVariantId === id))
     .filter((product) => product !== undefined)
@@ -51,22 +61,31 @@ export default async function HomePage() {
     <div className="home-page">
       <section className="home-campaign-hero">
         <div className="home-campaign-copy entrance">
-          <p className="utility-label">Exceptional fragrance.</p>
           <h1>Without<br />{" "}boundaries.</h1>
-          <p>A considered wardrobe of designer, niche and Arabian fragrance—selected in Nassau, worn everywhere.</p>
+          <p>A considered wardrobe of designer, niche and Arabian fragrance, selected in Nassau and worn everywhere.</p>
           <div className="hero-actions">
             <Link className="button button-primary" href="/shop">Shop the collection</Link>
             <Link className="campaign-text-link" href="#scent-finder">Find your scent <ArrowRight size={16} /></Link>
           </div>
         </div>
         <div className="home-campaign-visual">
-          <Image src="/images/campaign/hero-popular-fragrances-v2.webp" alt="Dior Sauvage, Carolina Herrera Good Girl Blush, Baccarat Rouge 540 and Tom Ford Black Orchid fragrances" fill priority sizes="(max-width: 767px) 100vw, 64vw" />
-          <div className="home-campaign-caption"><strong>Four icons. One considered edit.</strong><span>Dior · Carolina Herrera · MFK · Tom Ford</span></div>
+          <picture className="home-campaign-picture">
+            <source media="(max-width: 767px)" srcSet="/images/campaign/hero-popular-fragrances-v2-mobile.webp" />
+            <Image
+              src="/images/campaign/hero-popular-fragrances-v2.webp"
+              alt="Dior Sauvage, Carolina Herrera Good Girl Blush, Baccarat Rouge 540 and Tom Ford Black Orchid fragrances"
+              fill
+              loading="eager"
+              fetchPriority="high"
+              sizes="(max-width: 767px) 100vw, 64vw"
+            />
+          </picture>
+          <div className="home-campaign-caption"><strong>Four icons. One considered edit.</strong><span>Dior, Carolina Herrera, MFK, Tom Ford</span></div>
         </div>
       </section>
 
       <section className="home-assurance-bar" aria-label="Aurum Privée services">
-        <article><MapPin size={25} weight="light" /><div><strong>Private client service</strong><span>Nassau &amp; Harbour Island</span></div></article>
+        <article><MapPin size={25} weight="light" /><div><strong>Private client service</strong><span>Personal sourcing &amp; guidance</span></div></article>
         <article><Gift size={25} weight="light" /><div><strong>Luxury packaging</strong><span>Every order beautifully wrapped</span></div></article>
         <article><SealCheck size={25} weight="light" /><div><strong>Authentic &amp; curated</strong><span>100% authentic guarantee</span></div></article>
         <article><ChatCircleDots size={25} weight="light" /><div><strong>Personal service</strong><span>We&apos;re here to help</span></div></article>
@@ -75,11 +94,11 @@ export default async function HomePage() {
       <section className="home-collections section-shell" id="collections">
         <div className="home-section-title home-section-title-centered collection-heading"><h2>Shop by collection</h2><Link href="/shop">View all fragrance <ArrowRight size={16} /></Link></div>
         <div className="collection-cabinet">
-          <Link className="collection-tile" href="/shop?audience=Women"><Image src="/images/collections/for-her-brands-v3.webp" alt="Carolina Herrera Good Girl Blush and Yves Saint Laurent Libre fragrances" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Carolina Herrera · YSL</small><strong>For her</strong><b>Shop now</b></span></Link>
-          <Link className="collection-tile" href="/shop?audience=Men"><Image src="/images/collections/for-him-brands-v3.webp" alt="Dior Sauvage and Montblanc Explorer Platinum fragrances" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Dior · Montblanc</small><strong>For him</strong><b>Shop now</b></span></Link>
-          <Link className="collection-tile" href="/shop?audience=Unisex"><Image src="/images/collections/unisex-brands-v3.webp" alt="Maison Francis Kurkdjian Baccarat Rouge 540 and Xerjoff Erba Pura fragrances" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><small>MFK · Xerjoff</small><strong>Unisex</strong><b>Shop now</b></span></Link>
-          <Link className="collection-tile" href="/shop?query=oud"><Image src="/images/collections/arabian-brands-v3.webp" alt="Al Haramain Amber Oud Gold and Afnan Supremacy Noir fragrances" fill sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Al Haramain · Afnan</small><strong>Arabian collection</strong><b>Shop now</b></span></Link>
-          <Link className="collection-tile" href="/shop?query=gift%20set"><Image src="/images/collections/discovery-brands-v3.webp" alt="Carolina Herrera Good Girl and Versace Crystal Noir gift sets" fill sizes="(max-width: 760px) 100vw, 20vw" /><span><small>Carolina Herrera · Versace</small><strong>Discovery sets</strong><b>Shop now</b></span></Link>
+          <Link className="collection-tile" href="/shop?audience=Women"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/for-her-brands-v3.webp" mobileSrc="/images/collections/for-her-brands-v3-mobile.webp" alt="Carolina Herrera Good Girl Blush and Yves Saint Laurent Libre fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Carolina Herrera · YSL</small><strong>For her</strong><b>Shop now</b></span></Link>
+          <Link className="collection-tile" href="/shop?audience=Men"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/for-him-brands-v3.webp" mobileSrc="/images/collections/for-him-brands-v3-mobile.webp" alt="Dior Sauvage and Montblanc Explorer Platinum fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Dior · Montblanc</small><strong>For him</strong><b>Shop now</b></span></Link>
+          <Link className="collection-tile" href="/shop?audience=Unisex"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/unisex-brands-v3.webp" mobileSrc="/images/collections/unisex-brands-v3-mobile.webp" alt="Maison Francis Kurkdjian Baccarat Rouge 540 and Xerjoff Erba Pura fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>MFK · Xerjoff</small><strong>Unisex</strong><b>Shop now</b></span></Link>
+          <Link className="collection-tile" href="/shop?query=oud"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/arabian-brands-v3.webp" mobileSrc="/images/collections/arabian-brands-v3-mobile.webp" alt="Al Haramain Amber Oud Gold and Afnan Supremacy Noir fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Al Haramain · Afnan</small><strong>Arabian collection</strong><b>Shop now</b></span></Link>
+          <Link className="collection-tile" href="/shop?query=gift%20set"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/discovery-brands-v3.webp" mobileSrc="/images/collections/discovery-brands-v3-mobile.webp" alt="Carolina Herrera Good Girl and Versace Crystal Noir gift sets" sizes="(max-width: 760px) 100vw, 20vw" /><span><small>Carolina Herrera · Versace</small><strong>Gift sets</strong><b>Shop now</b></span></Link>
         </div>
       </section>
 
@@ -90,7 +109,7 @@ export default async function HomePage() {
 
       <section className="brand-rail" aria-label="Brands carried by Aurum Privée">
         {carriedBrands.map(([label, query, image]) => (
-          <Link href={`/shop?query=${encodeURIComponent(query)}`} className={label === "Montblanc" ? "brand-wordmark brand-wordmark-compact" : "brand-wordmark"} aria-label={`Shop ${label}`} key={query}>
+          <Link href={`/shop?query=${encodeURIComponent(query)}`} className={label === "Montblanc" ? "brand-wordmark brand-wordmark-compact" : label === "Dior" || label === "Creed" ? "brand-wordmark brand-wordmark-restrained" : "brand-wordmark"} aria-label={`Shop ${label}`} key={query}>
             <Image src={image} alt={label} width={170} height={54} unoptimized />
           </Link>
         ))}
@@ -103,12 +122,12 @@ export default async function HomePage() {
         </div>
         <div className="campaign-journal-grid">
           <Link className="campaign-story campaign-story-baccarat" href="/shop/maison-francis-kurkdjian-baccarat-rouge-540-edp-2-4-540-a5076e">
-            <Image src="/images/campaign/baccarat-gifting.webp" alt="Baccarat Rouge 540 presented with Aurum Privée gift packaging" fill sizes="(max-width: 767px) 100vw, 42vw" />
+            <ResponsiveFillImage className="campaign-story-picture" src="/images/campaign/baccarat-gifting.webp" mobileSrc="/images/campaign/baccarat-gifting-mobile.webp" alt="Baccarat Rouge 540 presented with Aurum Privée gift packaging" sizes="(max-width: 767px) 100vw, 42vw" />
             <span><small>Gift-worthy signatures</small><strong>Baccarat Rouge 540</strong><b>Discover the fragrance <ArrowRight size={15} /></b></span>
           </Link>
           <div className="campaign-journal-side">
             <Link className="campaign-story campaign-story-amber-gold" href="/shop/al-haramain-amber-oud-gold-edp-spray-3-4-oz-e36239">
-              <Image src="/images/campaign/amber-oud-gold.webp" alt="Al Haramain Amber Oud Gold Edition in warm daylight" fill sizes="(max-width: 767px) 100vw, 58vw" />
+              <ResponsiveFillImage className="campaign-story-picture" src="/images/campaign/amber-oud-gold.webp" mobileSrc="/images/campaign/amber-oud-gold-mobile.webp" alt="Al Haramain Amber Oud Gold Edition in warm daylight" sizes="(max-width: 767px) 100vw, 58vw" />
               <span><small>Golden and enveloping</small><strong>Amber Oud Gold</strong><b>Shop the fragrance <ArrowRight size={15} /></b></span>
             </Link>
             <div className="campaign-journal-pair">

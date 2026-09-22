@@ -5,6 +5,8 @@ import type { Product } from "@/lib/types";
 import type { OperationsImageCatalog, OperationsImageProduct } from "@/lib/operations-image-types";
 import { customerFacingBrand } from "@/lib/brand";
 import { isMirroredLoyverseAsset } from "@/lib/loyverse-images";
+import { activeCommerceProvider } from "@/lib/provider-operations";
+import { getCatalogProducts } from "@/lib/catalog";
 
 const placeholderImage = "/images/product-awaiting-photography.webp";
 
@@ -63,7 +65,26 @@ async function localImageCatalog(): Promise<OperationsImageCatalog> {
   return { products: rows, configured: false, preview: true, totals: totals(rows) };
 }
 
+async function wixImageCatalog(): Promise<OperationsImageCatalog> {
+  const products = (await getCatalogProducts()).map((product): OperationsImageProduct => ({
+    id: product.id,
+    name: product.name,
+    brand: product.brand,
+    sku: product.loyverseVariantId || null,
+    barcode: null,
+    category: product.family,
+    imageUrl: product.image,
+    loyverseImageUrl: null,
+    stock: product.stock,
+    missing: isMissingImage(product.image),
+    curated: !isMissingImage(product.image),
+    updatedAt: new Date().toISOString(),
+  }));
+  return { products, configured: true, preview: true, totals: totals(products) };
+}
+
 export async function getOperationsImageCatalog(): Promise<OperationsImageCatalog> {
+  if (activeCommerceProvider() === "wix") return wixImageCatalog();
   const supabase = getSupabaseAdmin();
   if (!supabase) return localImageCatalog();
   const rows: OperationsImageProduct[] = [];

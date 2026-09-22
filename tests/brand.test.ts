@@ -29,5 +29,6 @@ test("preserves legitimate product wording", () => {
 test("creates concise customer-facing names when brand and format are displayed separately", () => {
   assert.equal(customerFacingProductName("Dior Sauvage 3.4 EDP SP", "Christian Dior"), "Sauvage");
   assert.equal(customerFacingProductName("Christian Dior- Sauvage EDP 6.8 oz", "Dior"), "Sauvage");
+  assert.equal(customerFacingProductName("Al Haramain - Azlan Oud Amber Extrait De Parfum 3.3oz", "Al Haramain"), "Azlan Oud Amber");
   assert.equal(customerFacingProductName("Supremecy Incense 3.4 oz EDP SP", "Afnan"), "Supremacy Incense");
 });

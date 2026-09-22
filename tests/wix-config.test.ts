@@ -9,6 +9,7 @@ function completeEnvironment() {
     NEXT_PUBLIC_SITE_URL: "https://aurumprivee.com/",
     WIX_STOREFRONT_ORIGIN: "https://aurumprivee.com/",
     NEXT_PUBLIC_WIX_CLIENT_ID: "wix-headless-client-id",
+    WIX_API_KEY: "wix-server-api-key",
     WIX_SITE_ID: "123e4567-e89b-42d3-a456-426614174000",
     WIX_CATALOG_VERSION: "v3",
     WIX_EXPECTED_SKU_COUNT: "733",
@@ -56,4 +57,13 @@ test("checkout stays closed unless both launch controls and Wix are enabled", ()
   assert.equal(result.requirements.some((item) => item.includes("COMMERCE_PROVIDER=wix")), true);
   assert.equal(result.requirements.some((item) => item.includes("WIX_CHECKOUT_ENABLED=true")), true);
   assert.equal(result.requirements.some((item) => item.includes("NEXT_PUBLIC_CHECKOUT_ENABLED=true")), true);
+});
+
+test("checkout stays closed until returned Wix orders can be verified server-side", () => {
+  const environment: Record<string, string | undefined> = completeEnvironment();
+  delete environment.WIX_API_KEY;
+  const result = evaluateWixReadiness(environment, 733);
+
+  assert.equal(result.checkoutReady, false);
+  assert.equal(result.requirements.some((item) => item.includes("returned orders can be verified")), true);
 });

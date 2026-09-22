@@ -7,6 +7,7 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 import { netFromGross, parseCommerceTaxes, roundMoney } from "@/lib/tax";
 import { isConfiguredSecret } from "@/lib/env";
 import { readRequestText, RequestBodyTooLargeError } from "@/lib/request-security";
+import { legacyCommerceEnabled } from "@/lib/provider-operations";
 import { deliverOrderConfirmation } from "@/lib/transactional-email";
 import { sendOrderEmails } from "@/lib/email";
 import {
@@ -276,6 +277,9 @@ async function handleDatabaseFreeEvent(event: Stripe.Event, stripe: Stripe) {
 }
 
 export async function POST(request: Request) {
+  if (!legacyCommerceEnabled()) {
+    return NextResponse.json({ received: true, skipped: "wix-commerce-active" });
+  }
   const key = process.env.STRIPE_SECRET_KEY;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!isConfiguredSecret(key) || !isConfiguredSecret(webhookSecret)) return NextResponse.json({ error: "Stripe webhook is not configured" }, { status: 503 });

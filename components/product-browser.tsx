@@ -6,6 +6,8 @@ import { MagnifyingGlass, SlidersHorizontal, X } from "@phosphor-icons/react";
 import { Product, ProductAudience, ScentFamily } from "@/lib/types";
 import { ProductCard } from "@/components/product-card";
 import { matchesCatalogSearch } from "@/lib/catalog-search";
+import { parseClientCatalogResponse } from "@/lib/client-catalog-response";
+import { requestJson } from "@/lib/client-json-request";
 
 type CatalogFilter = ScentFamily | "All" | "New";
 const families: CatalogFilter[] = ["All", "New", "Floral", "Fresh", "Woody", "Amber", "Gourmand"];
@@ -24,12 +26,23 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const skipInitialRemoteRequest = useRef(true);
+  const loadMoreController = useRef<AbortController | null>(null);
+  const loadMorePending = useRef(false);
+  const cancelPendingLoadMore = () => {
+    if (loadMorePending.current) setLoading(false);
+    loadMoreController.current?.abort();
+    loadMoreController.current = null;
+    loadMorePending.current = false;
+  };
   const filtered = useMemo(() => (remote ? remoteProducts : products.filter((product) => {
     const familyMatch = family === "All" || (family === "New" ? product.newArrival : product.family === family);
     return familyMatch && matchesCatalogSearch(product, query);
   }).sort((left, right) => sort === "price-asc" ? left.price - right.price : sort === "price-desc" ? right.price - left.price : sort === "name" ? `${left.brand} ${left.name}`.localeCompare(`${right.brand} ${right.name}`) : 0)), [family, products, query, remote, remoteProducts, sort]);
 
   useEffect(() => {
+    loadMoreController.current?.abort();
+    loadMoreController.current = null;
+    loadMorePending.current = false;
     if (!remote) return;
     if (skipInitialRemoteRequest.current) {
       skipInitialRemoteRequest.current = false;
@@ -41,13 +54,13 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
       setError("");
       try {
         const parameters = new URLSearchParams({ family, audience, query, sort, offset: "0", limit: "24" });
-        const response = await fetch(`/api/catalog?${parameters}`, { signal: controller.signal });
+        const { response, data } = await requestJson<unknown>(`/api/catalog?${parameters}`, { signal: controller.signal });
         if (!response.ok) throw new Error("Catalog request failed");
-        const result = await response.json();
+        const result = parseClientCatalogResponse(data);
         setRemoteProducts(result.products);
         setRemoteTotal(result.total);
-      } catch (error) {
-        if (!(error instanceof DOMException && error.name === "AbortError")) {
+      } catch {
+        if (!controller.signal.aborted) {
           setError("We could not refresh the collection. Your current selection is still available.");
         }
       } finally {
@@ -56,6 +69,8 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
     }, query ? 250 : 0);
     return () => { window.clearTimeout(timer); controller.abort(); };
   }, [audience, family, query, remote, sort]);
+
+  useEffect(() => () => loadMoreController.current?.abort(), []);
 
   useEffect(() => {
     if (!searchable) return;
@@ -73,21 +88,34 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
       setVisibleCount((count) => count + 24);
       return;
     }
+    if (loadMorePending.current) return;
+    loadMorePending.current = true;
+    const controller = new AbortController();
+    loadMoreController.current?.abort();
+    loadMoreController.current = controller;
     setLoading(true);
     setError("");
     try {
       const parameters = new URLSearchParams({ family, audience, query, sort, offset: remoteProducts.length.toString(), limit: "24" });
-      const response = await fetch(`/api/catalog?${parameters}`);
+      const { response, data } = await requestJson<unknown>(`/api/catalog?${parameters}`, { signal: controller.signal });
       if (!response.ok) throw new Error("Catalog request failed");
-      const result = await response.json();
+      const result = parseClientCatalogResponse(data);
       setRemoteProducts((current) => [...current, ...result.products]);
       setRemoteTotal(result.total);
     } catch {
-      setError("More fragrances could not be loaded. Please try again.");
+      if (!controller.signal.aborted) {
+        setError("More fragrances could not be loaded. Please try again.");
+      }
     } finally {
-      setLoading(false);
+      if (loadMoreController.current === controller) {
+        loadMoreController.current = null;
+        loadMorePending.current = false;
+        if (!controller.signal.aborted) setLoading(false);
+      }
     }
   };
+
+  const resultCount = remote ? remoteTotal : filtered.length;
 
   if (!products.length && !remote) {
     return <div className="catalog-empty"><h2>The collection is being prepared.</h2><p>Please check back shortly or contact Aurum Privée for assistance.</p></div>;
@@ -99,51 +127,62 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
         <section className="shop-editorial-intro" aria-labelledby="shop-title">
           <div className="shop-editorial-copy">
             <h1 id="shop-title">Find the one that stays with you.</h1>
-            <p>Explore designer, niche and Arabian fragrance, selected in Nassau for the way it wears—not simply the name on the bottle.</p>
+            <p>Explore designer, niche and Arabian fragrance, selected in Nassau for the way it wears, not simply the name on the bottle.</p>
             <div className="catalog-search-wrap" id="catalog-search">
               <div className="catalog-search">
                 <MagnifyingGlass size={22} weight="light" />
                 <label htmlFor="catalog-query">Search the collection</label>
-                <input id="catalog-query" value={query} onChange={(event) => { setQuery(event.target.value); setVisibleCount(24); }} placeholder="Brand, fragrance, note or size" autoComplete="off" />
-                {query && <button type="button" aria-label="Clear search" onClick={() => setQuery("")}><X size={17} /></button>}
+                <input id="catalog-query" value={query} onChange={(event) => { cancelPendingLoadMore(); setQuery(event.target.value); setVisibleCount(24); }} placeholder="Brand, fragrance, note or size" autoComplete="off" />
+                {query && <button type="button" aria-label="Clear search" onClick={() => { cancelPendingLoadMore(); setQuery(""); }}><X size={17} /></button>}
               </div>
               <p>Try “Dior,” “vanilla,” “oud,” or “EDP.”</p>
             </div>
           </div>
           <aside className="shop-editorial-stage" aria-label="Featured fragrances">
-            <Image
-              className="shop-stage-image"
-              src="/images/campaign/shop-editorial-popular-v4.webp"
-              alt="Dior Sauvage, Tom Ford Black Orchid, Baccarat Rouge 540 and Carolina Herrera Good Girl arranged on sunlit travertine"
-              fill
-              sizes="(max-width: 900px) calc(100vw - 32px), 54vw"
-              priority
-            />
-            <span className="shop-stage-location" aria-hidden="true">Nassau · The Bahamas</span>
+            <picture className="shop-stage-picture">
+              <source media="(max-width: 900px)" srcSet="/images/campaign/shop-editorial-popular-v4-mobile.webp" />
+              <Image
+                className="shop-stage-image"
+                src="/images/campaign/shop-editorial-popular-v4.webp"
+                alt="Dior Sauvage, Tom Ford Black Orchid, Baccarat Rouge 540 and Carolina Herrera Good Girl arranged on sunlit travertine"
+                fill
+                sizes="(max-width: 900px) calc(100vw - 32px), 54vw"
+                loading="eager"
+                fetchPriority="high"
+              />
+            </picture>
           </aside>
         </section>
       )}
       {!compact && <div className="catalog-tools">
         <div className="audience-row" role="group" aria-label="Shop by recipient">
           {(["All", "Women", "Men", "Unisex"] as CatalogAudience[]).map((item) => (
-            <button className={audience === item ? "is-active" : ""} aria-pressed={audience === item} onClick={() => { setAudience(item); setQuery(""); setVisibleCount(24); }} key={item}>{item === "Women" ? "For her" : item === "Men" ? "For him" : item === "Unisex" ? "For everyone" : "Everyone"}</button>
+            <button className={audience === item ? "is-active" : ""} aria-pressed={audience === item} onClick={() => { cancelPendingLoadMore(); setAudience(item); setQuery(""); setVisibleCount(24); }} key={item}>{item === "Women" ? "For her" : item === "Men" ? "For him" : item === "Unisex" ? "Unisex" : "All fragrances"}</button>
           ))}
         </div>
         <div className="filter-row" role="group" aria-label="Filter by scent family">
           {families.map((item) => (
-            <button className={family === item ? "is-active" : ""} aria-pressed={family === item} onClick={() => { setFamily(item); setVisibleCount(24); }} key={item}>{item}</button>
+            <button className={family === item ? "is-active" : ""} aria-pressed={family === item} onClick={() => { cancelPendingLoadMore(); setFamily(item); setVisibleCount(24); }} key={item}>{item}</button>
           ))}
         </div>
-        <label className="catalog-sort"><SlidersHorizontal size={16} /><span>Sort</span><select value={sort} onChange={(event) => setSort(event.target.value as CatalogSort)}><option value="featured">Featured</option><option value="price-asc">Price, low to high</option><option value="price-desc">Price, high to low</option><option value="name">Brand &amp; name</option></select></label>
+        <label className="catalog-sort"><SlidersHorizontal size={16} /><span>Sort</span><select value={sort} onChange={(event) => { cancelPendingLoadMore(); setSort(event.target.value as CatalogSort); }}><option value="featured">Featured</option><option value="price-asc">Price, low to high</option><option value="price-desc">Price, high to low</option><option value="name">Brand &amp; name</option></select></label>
       </div>}
-      {!compact && <div className="catalog-status" aria-live="polite"><p><strong>{remote ? remoteTotal : filtered.length}</strong> {remoteTotal === 1 ? "fragrance" : "fragrances"}{audience !== "All" ? <> · {audience === "Women" ? "for her" : audience === "Men" ? "for him" : "for everyone"}</> : ""}{query.trim() ? <> matching “{query.trim()}”</> : ""}{loading ? <span> Updating…</span> : ""}</p>{(query || audience !== "All" || family !== "All" || sort !== "featured") && <button type="button" onClick={() => { setQuery(""); setAudience("All"); setFamily("All"); setSort("featured"); }}>Clear all <X size={14} /></button>}</div>}
-      {error && <div className="catalog-error" role="status"><span>{error}</span><button type="button" onClick={() => setError("")}>Dismiss</button></div>}
+      {!compact && <div className="catalog-status" aria-live="polite"><p><strong>{resultCount}</strong> {resultCount === 1 ? "fragrance" : "fragrances"}{audience !== "All" ? <> · {audience === "Women" ? "for her" : audience === "Men" ? "for him" : "unisex"}</> : ""}{query.trim() ? <> matching “{query.trim()}”</> : ""}{loading ? <span> Updating…</span> : ""}</p>{(query || audience !== "All" || family !== "All" || sort !== "featured") && <button type="button" onClick={() => { cancelPendingLoadMore(); setQuery(""); setAudience("All"); setFamily("All"); setSort("featured"); }}>Clear all <X size={14} /></button>}</div>}
+      {error && <div className="catalog-error" role="alert"><span>{error}</span><button type="button" onClick={() => setError("")}>Dismiss</button></div>}
       {filtered.length ? (
         <div className={`product-grid ${compact ? "product-grid-compact" : ""}`}>
-          {(remote ? filtered : filtered.slice(0, visibleCount)).map((product, index) => <ProductCard product={product} key={product.id} priority={index < 2} headingLevel={compact ? 3 : 2} />)}
+          {(remote ? filtered : filtered.slice(0, visibleCount)).map((product, index) => (
+            <ProductCard
+              product={product}
+              key={product.id}
+              priority={!compact && index < 2}
+              headingLevel={compact ? 3 : 2}
+              mobileImage={compact && product.image.startsWith("/images/hero-products/") ? product.image.replace(/\.webp$/, "-mobile.webp") : undefined}
+            />
+          ))}
         </div>
       ) : (
-        <div className="catalog-empty"><h2>No fragrances found.</h2><p>Check the spelling, search only the brand, or clear the collection filters.</p><button className="button button-secondary" type="button" onClick={() => { setQuery(""); setAudience("All"); setFamily("All"); }}>Clear search</button></div>
+        <div className="catalog-empty"><h2>No fragrances found.</h2><p>Check the spelling, search only the brand, or clear the collection filters.</p><button className="button button-secondary" type="button" onClick={() => { cancelPendingLoadMore(); setQuery(""); setAudience("All"); setFamily("All"); }}>Clear search</button></div>
       )}
       {!compact && ((remote && remoteTotal > remoteProducts.length) || (!remote && filtered.length > visibleCount)) && (
         <div className="catalog-load-more">

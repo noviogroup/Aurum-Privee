@@ -31,3 +31,12 @@ export function createWixAdminClient() {
     },
   });
 }
+
+export async function wixOrderApiIsReachable() {
+  try {
+    await createWixAdminClient().orders.searchOrders({ cursorPaging: { limit: 1 } });
+    return true;
+  } catch {
+    return false;
+  }
+}

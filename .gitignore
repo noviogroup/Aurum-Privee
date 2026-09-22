@@ -8,5 +8,7 @@ supabase/.temp
 *.log
 .DS_Store
 tsconfig.tsbuildinfo
+playwright-report
+test-results
 product-image-intake/*
 !product-image-intake/README.md

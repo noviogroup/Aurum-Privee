@@ -47,6 +47,11 @@ export default async function ProductPage({ params }: Props) {
   const variants = getProductVariants(product.id, products);
   const related = rankRelatedProducts(product, products);
   const hasNotes = [...product.notes.top, ...product.notes.heart, ...product.notes.base].length > 0;
+  const productFormat = [
+    product.family,
+    product.concentration !== "Fine fragrance" ? product.concentration : "",
+    product.size !== "Size not specified" ? product.size : "",
+  ].filter(Boolean);
   const noteSections = [
     { label: product.notes.heart.length || product.notes.base.length ? "Top notes" : "Key notes", notes: product.notes.top },
     { label: "Middle notes", notes: product.notes.heart },
@@ -65,21 +70,20 @@ export default async function ProductPage({ params }: Props) {
           <Image src={product.image} alt={product.imageAlt} fill priority sizes="(max-width: 900px) calc(100vw - 48px), 660px" />
         </div>
         <div className="product-summary">
-          <p className="product-brand">{product.wixProductId ? product.brand : variantFamily?.brand || product.brand}</p>
-          <h1>{product.wixProductId ? product.name : variantFamily?.name || product.name}</h1>
+          <h1><span className="product-brand">{product.wixProductId ? product.brand : variantFamily?.brand || product.brand}</span>{product.wixProductId ? product.name : variantFamily?.name || product.name}</h1>
           <p className="product-format">
-            <span>{product.family}</span>
-            <span>{product.concentration}</span>
-            <span>{product.size}</span>
+            {productFormat.map((detail) => <span key={detail}>{detail}</span>)}
           </p>
-          <ProductVariantOptions current={product} variants={variants} />
-          <strong className="detail-price">{formatMoney(product.price)}</strong>
-          <p className="detail-description">{product.description}</p>
-          <div className="product-purchase-actions">
-            <AddToBag product={product} />
-            <SaveButton productId={product.id} productName={product.name} detail />
+          <div className="product-primary-purchase">
+            <strong className="detail-price">{formatMoney(product.price)}</strong>
+            <div className="product-purchase-actions">
+              <AddToBag product={product} />
+              <SaveButton productId={product.id} productName={product.name} detail />
+            </div>
+            <div className="availability"><Check size={18} /><span>{product.stock > 0 ? "Available for order" : "Currently unavailable"}</span></div>
           </div>
-          <div className="availability"><Check size={18} /><span>{product.stock > 0 ? "Available for order" : "Currently unavailable"}</span></div>
+          <ProductVariantOptions current={product} variants={variants} />
+          <p className="detail-description">{product.description}</p>
           <div className="delivery-note"><Package size={21} weight="light" /><p><strong>Pickup or delivery</strong><br />Choose your preference during secure checkout.</p></div>
         </div>
       </div>
@@ -103,7 +107,6 @@ export default async function ProductPage({ params }: Props) {
         <section className="related section-shell" aria-labelledby="related-title">
           <header className="related-heading">
             <div>
-              <p className="utility-label">Curated connections</p>
               <h2 id="related-title">You may also like</h2>
             </div>
             <p>Thoughtfully connected through fragrance profile, audience, house, format and price.</p>

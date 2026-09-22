@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Prove the complete custom-storefront-to-Wix-to-Loyverse flow on 5–10 controlled fragrances before moving the 733-variant catalogue or changing the public website. This is an isolated pilot, not a production cutover.
+This began as an isolated 5–10 fragrance pilot. The full 733-SKU catalogue is now imported and the storefront reads Wix in production, while checkout remains closed pending the same fulfillment and order acceptance checks.
 
 ## Pilot catalogue
 
@@ -85,12 +85,11 @@ Wix allows only one connected credit-card processor at a time. Provider selectio
 
 ## Environment contract
 
-Copy the Wix section from `.env.example` into `.env.local`. Keep these values false during setup:
+Copy the Wix section from `.env.example` into `.env.local`. Keep the active catalogue provider selected while both checkout controls remain false during setup:
 
 ```dotenv
-COMMERCE_PROVIDER=legacy
-WIX_CATALOG_SYNC_ENABLED=false
-WIX_ORDER_SYNC_ENABLED=false
+COMMERCE_PROVIDER=wix
+NEXT_PUBLIC_CHECKOUT_ENABLED=false
 WIX_CHECKOUT_ENABLED=false
 ```
 
@@ -109,7 +108,7 @@ The check reports missing settings and switch state without printing credential 
 1. Create or nominate the client-owned Wix project.
 2. Confirm Catalog V3 before importing anything.
 3. Create the Headless client and allow the local callback plus `https://aurumprivee.com`.
-4. Configure the server-side client credential and webhook verification key.
+4. Configure a server-side API key or Headless client secret so the returned order can be verified before the success page confirms it.
 5. Create a hidden pilot category and ensure it is not included in production navigation.
 
 ### 2. Mapping and catalogue import

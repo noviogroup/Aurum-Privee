@@ -1,35 +1,54 @@
 "use client";
 
 import { ArrowRight, CheckCircle } from "@phosphor-icons/react";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { inquiryTopics } from "@/lib/contact-inquiry";
+import { ClientRequestTimeoutError, ClientResponseFormatError, requestJson } from "@/lib/client-json-request";
 
 export function ContactForm() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
   const [reference, setReference] = useState("");
+  const requestPending = useRef(false);
+  const requestController = useRef<AbortController | null>(null);
+
+  useEffect(() => () => requestController.current?.abort(), []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (requestPending.current) return;
+    requestPending.current = true;
+    const controller = new AbortController();
+    requestController.current = controller;
     const formElement = event.currentTarget;
     const form = new FormData(formElement);
     setStatus("loading");
     setMessage("");
     setReference("");
     try {
-      const response = await fetch("/api/contact", {
+      const { response, data } = await requestJson<{ message?: string; reference?: string }>("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(Object.fromEntries(form.entries())),
+        signal: controller.signal,
       });
-      const data = await response.json() as { message?: string; reference?: string };
       setMessage(data.message || (response.ok ? "Your note has been received." : "We could not send your note."));
       setReference(data.reference || "");
       setStatus(response.ok ? "success" : "error");
       if (response.ok) formElement.reset();
-    } catch {
+    } catch (error) {
+      if (controller.signal.aborted) return;
       setStatus("error");
-      setMessage("We could not send your note. Please try again.");
+      setMessage(error instanceof ClientRequestTimeoutError
+        ? "Sending took too long. Check your connection and try again."
+        : error instanceof ClientResponseFormatError
+          ? "Client care returned an unexpected response. Your note is still here, so please try again."
+          : "We could not send your note. Check your connection and try again.");
+    } finally {
+      if (requestController.current === controller) {
+        requestController.current = null;
+        requestPending.current = false;
+      }
     }
   }
 
@@ -45,7 +64,7 @@ export function ContactForm() {
   );
 
   return (
-    <form className="contact-form" onSubmit={submit} noValidate>
+    <form className="contact-form" onSubmit={submit} aria-busy={status === "loading"}>
       <div className="contact-field contact-field-wide is-honeypot" aria-hidden="true">
         <label htmlFor="website">Website</label>
         <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />

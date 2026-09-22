@@ -4,6 +4,7 @@ import { hasBearerSecret } from "@/lib/env";
 import { readJsonBody, RequestBodyTooLargeError } from "@/lib/request-security";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { deliverFulfillmentUpdate } from "@/lib/transactional-email";
+import { legacyCommerceEnabled } from "@/lib/provider-operations";
 
 const schema = z.object({
   orderId: z.string().uuid(),
@@ -12,6 +13,7 @@ const schema = z.object({
 
 export async function POST(request: Request) {
   if (!hasBearerSecret(request, process.env.SYNC_SECRET)) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!legacyCommerceEnabled()) return NextResponse.json({ error: "Wix owns order fulfillment while Wix commerce is active." }, { status: 409 });
   const supabase = getSupabaseAdmin();
   if (!supabase) return NextResponse.json({ error: "Supabase is not configured" }, { status: 503 });
   try {

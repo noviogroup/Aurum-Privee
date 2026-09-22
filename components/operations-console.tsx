@@ -19,6 +19,7 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { orderNeedsAttention, type OperationsOrder } from "@/lib/operations-types";
+import type { CommerceProvider } from "@/lib/wix-config";
 
 type Filter = "attention" | "unfulfilled" | "ready" | "fulfilled";
 
@@ -60,7 +61,8 @@ function statusLabel(order: OperationsOrder) {
   return order.fulfillmentStatus.charAt(0).toUpperCase() + order.fulfillmentStatus.slice(1);
 }
 
-export function OperationsConsole({ initialOrders, preview = false, initialOrder }: { initialOrders: OperationsOrder[]; preview?: boolean; initialOrder?: string }) {
+export function OperationsConsole({ commerceProvider, initialOrders, preview = false, initialOrder }: { commerceProvider: CommerceProvider; initialOrders: OperationsOrder[]; preview?: boolean; initialOrder?: string }) {
+  const wixManaged = commerceProvider === "wix";
   const [orders, setOrders] = useState(initialOrders);
   const [filter, setFilter] = useState<Filter>("unfulfilled");
   const [query, setQuery] = useState("");
@@ -157,15 +159,28 @@ export function OperationsConsole({ initialOrders, preview = false, initialOrder
       <section className="operations-workspace">
         <header className="operations-topbar">
           <div><Storefront size={18} weight="light" /><span>Nassau store</span></div>
-          <div className="operations-sync"><span>Loyverse</span>{preview ? <WarningCircle size={18} weight="fill" /> : <CheckCircle size={18} weight="fill" />}{preview ? "Preview" : "Synced"}</div>
+          <div className="operations-sync"><span>{wixManaged ? "Wix" : "Loyverse"}</span>{preview ? <WarningCircle size={18} weight="fill" /> : <CheckCircle size={18} weight="fill" />}{wixManaged ? "Provider managed" : preview ? "Preview" : "Synced"}</div>
         </header>
         <div className="operations-page-head">
           <h1>Orders</h1>
-          <p>{new Intl.DateTimeFormat("en-BS", { weekday: "long", month: "long", day: "numeric" }).format(new Date())}</p>
+          <p>{wixManaged ? "Payment and fulfillment are managed in Wix." : new Intl.DateTimeFormat("en-BS", { weekday: "long", month: "long", day: "numeric" }).format(new Date())}</p>
         </div>
-        {preview && <div className="operations-preview-banner"><WarningCircle size={17} weight="fill" />Local preview data. Deployed orders are stored privately in Netlify Blobs.</div>}
+        {wixManaged ? (
+          <div className="operations-frame operations-provider-frame">
+            <section className="operations-empty">
+              <Storefront size={34} weight="thin" />
+              <h2>Continue in Wix.</h2>
+              <p>Wix owns the active order record, payment status and fulfillment workflow. Legacy order actions are locked here to prevent split state.</p>
+              <div className="operations-provider-actions">
+                <a className="operations-primary-button" href="https://manage.wix.com/" target="_blank" rel="noreferrer">Open Wix dashboard <ArrowSquareOut size={16} /></a>
+                <Link href="/operations/integrations">Review integration status</Link>
+              </div>
+            </section>
+          </div>
+        ) : <>
+          {preview && <div className="operations-preview-banner"><WarningCircle size={17} weight="fill" />Local preview data. Deployed orders are stored privately in Netlify Blobs.</div>}
 
-        <div className="operations-frame">
+          <div className="operations-frame">
           <section className="operations-queue">
             <div className="operations-summary" aria-label="Order summary">
               <button type="button" onClick={() => chooseFilter("attention")}><span>Needs attention</span><strong>{counts.attention}</strong></button>
@@ -259,10 +274,11 @@ export function OperationsConsole({ initialOrders, preview = false, initialOrder
               </>
             ) : <div className="operations-empty"><Package size={30} weight="thin" /><h2>Select an order.</h2></div>}
           </aside>
-        </div>
+          </div>
+        </>}
       </section>
 
-      {confirmation && (
+      {!wixManaged && confirmation && (
         <div className="operations-modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setConfirmation(null)}>
           <div className="operations-modal" role="alertdialog" aria-modal="true" aria-labelledby="operations-confirm-title">
             <button type="button" className="operations-modal-close" onClick={() => setConfirmation(null)} aria-label="Close"><X size={18} /></button>

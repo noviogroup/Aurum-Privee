@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import {
   isRestrictedResendKeyError,
+  resendKeyMustBeRestricted,
   validateResendConfiguration,
 } from "../lib/resend-config";
 
@@ -31,6 +32,12 @@ async function main() {
       return;
     }
     throw new Error(`${response.error.name}: ${response.error.message}`);
+  }
+
+  if (resendKeyMustBeRestricted(process.env)) {
+    process.stderr.write("FAIL: The deployed Resend key has broader than Sending access. Replace it with the domain-scoped Aurum Privée sending key.\n");
+    process.exitCode = 1;
+    return;
   }
 
   const domain = response.data?.data?.find((entry) => entry.name.toLowerCase() === configuration.senderDomain);

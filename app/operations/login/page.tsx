@@ -18,7 +18,7 @@ export default async function OperationsLoginPage() {
         <div className="operations-login-card">
           <LockKey size={30} weight="thin" />
           <h1>Welcome back.</h1>
-          <p>Sign in to manage online orders, customer updates and Loyverse handoff.</p>
+          <p>Sign in to review storefront readiness, client care and commerce-provider handoff.</p>
           <OperationsLoginForm />
           <Link href="/">Return to storefront</Link>
         </div>

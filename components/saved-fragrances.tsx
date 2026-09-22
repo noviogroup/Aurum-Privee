@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { ProductCard } from "@/components/product-card";
 import { useWishlist } from "@/components/wishlist-provider";
 import type { Product } from "@/lib/types";
+import { parseClientCatalogResponse } from "@/lib/client-catalog-response";
+import { requestJson } from "@/lib/client-json-request";
 
 export function SavedFragrances() {
   const { savedIds, hydrated } = useWishlist();
@@ -16,26 +18,28 @@ export function SavedFragrances() {
   useEffect(() => {
     if (!hydrated || savedIds.length === 0) {
       setProducts([]);
+      setLoading(false);
+      setError("");
       return;
     }
 
     const controller = new AbortController();
     setLoading(true);
     setError("");
-    fetch(`/api/catalog?ids=${encodeURIComponent(savedIds.join(","))}`, { signal: controller.signal })
-      .then(async (response) => {
+    void (async () => {
+      try {
+        const { response, data } = await requestJson<unknown>(`/api/catalog?ids=${encodeURIComponent(savedIds.join(","))}`, { signal: controller.signal });
         if (!response.ok) throw new Error("Saved fragrances could not be loaded.");
-        return response.json() as Promise<{ products: Product[] }>;
-      })
-      .then((result) => {
+        const result = parseClientCatalogResponse(data);
         const byId = new Map(result.products.map((product) => [product.id, product]));
         setProducts(savedIds.map((id) => byId.get(id)).filter((product): product is Product => Boolean(product)));
-      })
-      .catch((requestError: unknown) => {
-        if (requestError instanceof DOMException && requestError.name === "AbortError") return;
+      } catch {
+        if (controller.signal.aborted) return;
         setError("We could not load your saved fragrances. Please try again.");
-      })
-      .finally(() => setLoading(false));
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    })();
 
     return () => controller.abort();
   }, [hydrated, savedIds]);
@@ -43,7 +47,6 @@ export function SavedFragrances() {
   return (
     <div className="saved-page page-top">
       <section className="saved-heading section-shell entrance">
-        <p className="utility-label">Your private edit</p>
         <h1>Saved fragrances</h1>
         <p>Keep a considered shortlist while you explore. Your edit stays on this device.</p>
       </section>
@@ -65,7 +68,6 @@ export function SavedFragrances() {
       ) : (
         <section className="saved-empty section-shell">
           <span className="saved-empty-icon"><Heart size={29} weight="light" /></span>
-          <p className="utility-label">A quiet place to decide</p>
           <h2>Your fragrance edit<br />starts here.</h2>
           <p>Tap the heart on any perfume to keep it close while you compare notes, concentrations and moods.</p>
           <Link className="button button-primary" href="/shop">Explore the collection</Link>

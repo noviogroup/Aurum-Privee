@@ -9,6 +9,7 @@ import {
 } from "@/lib/brand";
 import { applyProductEnrichment } from "@/lib/product-enrichment";
 import { audienceForProduct } from "@/lib/product-normalization";
+import { applyProductRetailCorrection } from "@/lib/product-retail-corrections";
 import { getProductVariantFamily } from "@/lib/product-variants";
 
 function inferredBrand(product: Product, knownBrands: string[]) {
@@ -31,7 +32,7 @@ export function normalizeLocalCatalogProduct(product: Product, knownBrands: stri
   const family = getProductVariantFamily(product.id);
   const brand = inferredBrand(product, knownBrands);
   const description = customerFacingCopy(product.description);
-  return applyProductEnrichment({
+  return applyProductEnrichment(applyProductRetailCorrection({
     ...product,
     brand,
     name: family?.name || customerFacingProductName(product.name, brand),
@@ -40,7 +41,7 @@ export function normalizeLocalCatalogProduct(product: Product, knownBrands: stri
     audience: product.audience || audienceForProduct(null, product.name, description),
     description,
     imageAlt: customerFacingCopy(product.imageAlt),
-  });
+  }));
 }
 
 export function normalizeLocalCatalogProducts(products: Product[]): Product[] {

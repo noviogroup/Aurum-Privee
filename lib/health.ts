@@ -1,6 +1,9 @@
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { getWixCatalogOverrides } from "@/lib/wix-catalog";
+import { evaluateWixReadiness, getCommerceProvider } from "@/lib/wix-config";
+import { buildWixHealthStatus, type WixHealthStatus } from "@/lib/wix-health";
 
-export type HealthStatus = {
+export type LegacyHealthStatus = {
   status: "ok" | "degraded" | "unavailable";
   checkedAt: string;
   database: "ok" | "unavailable";
@@ -20,8 +23,25 @@ export type HealthStatus = {
   overdueReservations: number;
 };
 
+export type HealthStatus = LegacyHealthStatus | WixHealthStatus;
+
 export async function getHealthStatus(now = new Date()): Promise<HealthStatus> {
   const checkedAt = now.toISOString();
+  if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix") {
+    const { wixOrderApiIsReachable } = await import("@/lib/wix-admin");
+    const [catalog, wix, orderApiReachable] = await Promise.all([
+      getWixCatalogOverrides(),
+      Promise.resolve(evaluateWixReadiness(process.env)),
+      wixOrderApiIsReachable(),
+    ]);
+    return buildWixHealthStatus({
+      checkedAt,
+      mappedSkuCount: wix.mappedSkuCount,
+      expectedSkuCount: wix.expectedSkuCount,
+      availableMappedVariants: catalog.size,
+      orderApiReachable,
+    });
+  }
   const supabase = getSupabaseAdmin();
   if (!supabase) return { status: "unavailable", checkedAt, database: "unavailable", catalogProducts: 0, lastCatalogSyncAt: null, catalogSyncFresh: false, failedOrderSyncs: 0, failedRefundSyncs: 0, stuckOrderSyncs: 0, stuckRefundSyncs: 0, exhaustedOrderSyncs: 0, exhaustedRefundSyncs: 0, failedTransactionalEmails: 0, stuckTransactionalEmails: 0, failedContactNotifications: 0, failedWebhookEvents: 0, overdueReservations: 0 };
   const staleEmailAt = new Date(now.getTime() - 20 * 60 * 1000).toISOString();

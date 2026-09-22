@@ -10,6 +10,7 @@ import { customerFacingBrand, customerFacingConcentration, customerFacingCopy, c
 import { applyProductEnrichment } from "@/lib/product-enrichment";
 import { audienceForProduct } from "@/lib/product-normalization";
 import { normalizeLocalCatalogProducts } from "@/lib/local-catalog-product";
+import { applyProductRetailCorrection } from "@/lib/product-retail-corrections";
 import { getCommerceProvider } from "@/lib/wix-config";
 import { applyWixCatalog } from "@/lib/wix-catalog";
 import { getProductVariantFamily } from "@/lib/product-variants";
@@ -44,7 +45,7 @@ function fromRow(row: ProductRow): Product {
   const description = customerFacingCopy(row.description || "Selected by Aurum Privée.");
   const name = customerFacingProductName(row.name, brand);
   const imageAlt = customerFacingCopy(row.image_alt || `${row.name} fragrance`);
-  return applyProductEnrichment({
+  return applyProductEnrichment(applyProductRetailCorrection({
     id: row.id,
     loyverseItemId: row.loyverse_item_id || undefined,
     loyverseVariantId: row.loyverse_variant_id || undefined,
@@ -66,7 +67,7 @@ function fromRow(row: ProductRow): Product {
     featured: row.featured,
     newArrival: row.new_arrival,
     stock: Number(row.available_stock ?? row.stock),
-  });
+  }));
 }
 
 async function getLocalLoyverseProducts() {
@@ -103,6 +104,11 @@ export async function getCatalogProducts() {
   if (error) throw new Error(`The live product catalog is unavailable: ${error.message}`);
   if (!data?.length) return [];
   return (data as ProductRow[]).map(fromRow);
+}
+
+export async function getHomepageCatalogProducts() {
+  if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix") return getWixManagedProducts();
+  return getCatalogProducts();
 }
 
 export async function getCatalogProductBySlug(slug: string) {

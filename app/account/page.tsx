@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Package, UserCircle } from "@phosphor-icons/react/dist/ssr";
+import { Heart, Package, ShieldCheck, UserCircle } from "@phosphor-icons/react/dist/ssr";
 import { AccountSignIn } from "@/components/account-sign-in";
 import { AccountSignOut } from "@/components/account-sign-out";
 import { formatMoney } from "@/lib/config";
 import { listCommerceOrders } from "@/lib/netlify-commerce";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { createSupabaseServerClient, getSupabaseAuthConfig } from "@/lib/supabase-auth-server";
+import { getCommerceProvider } from "@/lib/wix-config";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "My account",
-  description: "View Aurum Privée orders and account details.",
+  description: "Aurum Privée customer account services.",
+  robots: { index: false, follow: false },
 };
 
 type AccountOrder = {
@@ -52,6 +54,29 @@ async function ordersForEmail(email: string): Promise<AccountOrder[]> {
 }
 
 export default async function AccountPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+  const commerceProvider = getCommerceProvider(process.env.COMMERCE_PROVIDER);
+
+  if (commerceProvider === "wix") {
+    return (
+      <div className="account-page section-shell page-top">
+        <section className="account-intro">
+          <UserCircle size={34} weight="thin" />
+          <h1>Accounts are being prepared.</h1>
+          <p>Customer sign-in is not active yet. Saved fragrances stay on this device, and client care can help with any order.</p>
+          <div className="account-availability-actions">
+            <Link href="/saved" className="button button-primary">View saved fragrances</Link>
+            <Link href="/contact" className="text-link">Contact client care</Link>
+          </div>
+        </section>
+        <aside className="account-benefits">
+          <div><Heart size={22} weight="light" /><h2>Saved fragrances</h2><p>Keep a private edit on this device without creating an account.</p></div>
+          <div><Package size={22} weight="light" /><h2>Order support</h2><p>Use your confirmation email or contact client care for help with an order.</p></div>
+          <div><ShieldCheck size={22} weight="light" /><h2>Secure checkout</h2><p>Payment and order confirmation stay with the hosted checkout provider.</p></div>
+        </aside>
+      </div>
+    );
+  }
+
   const authConfig = getSupabaseAuthConfig();
   const supabase = await createSupabaseServerClient();
   const { data } = supabase ? await supabase.auth.getClaims() : { data: null };

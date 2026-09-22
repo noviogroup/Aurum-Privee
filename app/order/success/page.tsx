@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckCircle, ClockCountdown, Storefront, Truck } from "@phosphor-icons/react/dist/ssr";
 import Stripe from "stripe";
@@ -6,8 +7,14 @@ import { isConfiguredSecret } from "@/lib/env";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { OrderSuccessCartClear } from "@/components/order-success-cart-clear";
 import { getCommerceOrderBySession } from "@/lib/netlify-commerce";
+import { getConfirmedWixOrder } from "@/lib/wix-order";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Order confirmation",
+  robots: { index: false, follow: false },
+};
 
 type OrderLine = { name?: string; quantity?: number; amount?: number };
 
@@ -45,21 +52,21 @@ async function getVerifiedOrder(sessionId: string) {
 export default async function OrderSuccessPage({ searchParams }: { searchParams: Promise<{ session_id?: string; provider?: string; orderId?: string }> }) {
   const { session_id: sessionId, provider, orderId } = await searchParams;
   const isWixOrder = provider === "wix";
-  const validWixOrderId = Boolean(orderId && /^[0-9a-f-]{20,64}$/i.test(orderId));
 
   if (isWixOrder) {
+    const wixOrder = await getConfirmedWixOrder(orderId);
     return (
       <div className="status-page order-receipt-page section-shell page-top">
-        <OrderSuccessCartClear completed={validWixOrderId} />
-        {validWixOrderId ? <CheckCircle size={48} weight="thin" /> : <ClockCountdown size={48} weight="thin" />}
-        <p className="utility-label">{validWixOrderId ? "Order received" : "Order confirmation"}</p>
-        <h1>{validWixOrderId ? "Your fragrance is reserved." : "We are confirming your order."}</h1>
+        <OrderSuccessCartClear completed={Boolean(wixOrder)} />
+        {wixOrder ? <CheckCircle size={48} weight="thin" /> : <ClockCountdown size={48} weight="thin" />}
+        <p className="utility-label">{wixOrder ? `Order received${wixOrder.number ? ` · ${wixOrder.number}` : ""}` : "Order confirmation"}</p>
+        <h1>{wixOrder ? "Your fragrance is reserved." : "We are confirming your order."}</h1>
         <p>
-          {validWixOrderId
+          {wixOrder
             ? "Your order is now in the Aurum Privée order system. A member of our team will confirm collection or delivery details by email."
             : "If you completed checkout, please check your email before placing another order. Contact client care if your confirmation does not arrive."}
         </p>
-        {validWixOrderId && (
+        {wixOrder && (
           <div className="order-receipt-card">
             <div className="order-receipt-method">
               <Storefront size={24} weight="light" />

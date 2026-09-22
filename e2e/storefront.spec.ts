@@ -1,0 +1,383 @@
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test, type Locator, type Page } from "@playwright/test";
+
+async function expectNoWcagViolations(page: Page) {
+  const accessibility = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+  expect(accessibility.violations).toEqual([]);
+}
+
+async function expectMinimumTapTarget(locator: Locator) {
+  const box = await locator.boundingBox();
+  expect(box, "tap target should be rendered").not.toBeNull();
+  expect(box!.width).toBeGreaterThanOrEqual(44);
+  expect(box!.height).toBeGreaterThanOrEqual(44);
+}
+
+async function navigate(page: Page, path: string) {
+  const response = await page.goto(path, { waitUntil: "domcontentloaded", timeout: 30_000 });
+  await page.locator('html[data-hydrated="true"]').waitFor({ state: "attached", timeout: 20_000 });
+  return response;
+}
+
+test("homepage presents the primary action without layout overflow", async ({ page }) => {
+  await navigate(page, "/");
+
+  await expect(page.getByRole("heading", { level: 1, name: "Without boundaries." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Shop the collection" })).toBeInViewport();
+  if (page.viewportSize()!.width >= 981) {
+    await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeVisible();
+  } else {
+    await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeHidden();
+  }
+
+  const layout = await page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+  }));
+  expect(layout.scrollWidth).toBeLessThanOrEqual(layout.clientWidth + 1);
+
+  await expectNoWcagViolations(page);
+});
+
+test("catalog search returns useful results and preserves a stable layout", async ({ page }) => {
+  await navigate(page, "/shop");
+  const main = page.getByRole("main");
+  const shopEditorialImage = main.locator(".shop-stage-picture img");
+  await expect(shopEditorialImage).toBeVisible();
+  const expectedEditorialSource = page.viewportSize()!.width <= 900
+    ? "shop-editorial-popular-v4-mobile.webp"
+    : "shop-editorial-popular-v4.webp";
+  await expect.poll(
+    () => shopEditorialImage.evaluate((image) => (image as HTMLImageElement).currentSrc),
+    { timeout: 20_000 },
+  ).toContain(expectedEditorialSource);
+  await expect(main.getByRole("button", { name: "All fragrances" })).toBeVisible();
+  await expect(main.getByRole("button", { name: "Unisex" })).toBeVisible();
+  if (page.viewportSize()!.width >= 981) {
+    const firstProduct = await main.locator(".product-card").first().boundingBox();
+    expect(firstProduct, "first product row should be rendered").not.toBeNull();
+    expect(firstProduct!.y).toBeLessThan(page.viewportSize()!.height);
+  }
+  await page.getByLabel("Search the collection").fill("Dior Sauvage");
+
+  const status = main.locator(".catalog-status");
+  await expect(status).toContainText("3 fragrances matching “Dior Sauvage”", { timeout: 20_000 });
+  await expect(main.getByRole("link", { name: "View Sauvage", exact: true })).toBeVisible();
+  await expect(main.getByRole("link", { name: "View Eau Sauvage", exact: true })).toBeVisible();
+
+  const hasOverflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
+  expect(hasOverflow).toBe(false);
+
+  if (page.viewportSize()!.width <= 430) {
+    const menuToggle = page.getByRole("button", { name: "Open menu" });
+    await expectMinimumTapTarget(menuToggle);
+    await expectMinimumTapTarget(page.getByRole("button", { name: "Search fragrances" }));
+    await expectMinimumTapTarget(main.locator(".wish-button").first());
+    await expectMinimumTapTarget(main.locator(".quick-add").first());
+    await menuToggle.click();
+    const fragranceMenu = page.locator("#fragrance-menu");
+    await expect(fragranceMenu).toHaveAttribute("aria-hidden", "false");
+    await expectMinimumTapTarget(fragranceMenu.getByRole("link", { name: "Saved fragrances" }));
+    await expectMinimumTapTarget(fragranceMenu.getByRole("link", { name: "My account" }));
+    await page.getByRole("button", { name: "Close menu" }).click();
+  }
+});
+
+test("catalog controls recover immediately when pagination is cancelled", async ({ page }) => {
+  let markPaginationStarted = () => {};
+  let releasePagination = () => {};
+  const paginationStarted = new Promise<void>((resolve) => { markPaginationStarted = resolve; });
+  const paginationReleased = new Promise<void>((resolve) => { releasePagination = resolve; });
+
+  await page.route("**/api/catalog?*", async (route) => {
+    const url = new URL(route.request().url());
+    if (url.searchParams.get("offset") !== "24") {
+      await route.continue();
+      return;
+    }
+    markPaginationStarted();
+    await paginationReleased;
+    await route.abort("aborted").catch(() => {});
+  });
+
+  await navigate(page, "/shop");
+  const showMore = page.getByRole("button", { name: "Show more fragrances" });
+  await showMore.click();
+  await paginationStarted;
+  await page.getByRole("group", { name: "Filter by scent family" }).getByRole("button", { name: "All", exact: true }).click();
+  await expect(showMore).toBeEnabled();
+  await expect(showMore).toHaveText("Show more fragrances");
+  releasePagination();
+});
+
+test("reviewed retail corrections survive the live Wix catalogue overlay", async ({ page }) => {
+  await navigate(page, "/shop/maison-francis-kurkdjian-baccarat-rouge-540-edp-2-4-540-a5076e");
+  await expect(page.getByRole("heading", { level: 1, name: "Baccarat Rouge 540" })).toBeVisible();
+  await expect(page.getByRole("main").locator(".product-format")).toContainText("Extrait de Parfum");
+  await expect(page.getByRole("main").locator(".product-format")).toContainText("2.4 oz");
+
+  await navigate(page, "/shop/paco-robanne-phantom-men-17-edt-sp-ce91b4");
+  await expect(page.getByRole("heading", { level: 1, name: "Phantom" })).toBeVisible();
+  await expect(page.getByRole("main").locator(".product-format")).toContainText("Eau de Toilette");
+  await expect(page.getByRole("main").locator(".product-format")).toContainText("1.7 oz");
+});
+
+test("saved fragrance, bag and closed-checkout flow behave coherently", async ({ page }) => {
+  await navigate(page, "/shop/christian-dior-sauvage-edp-6-8-oz-bb4bf3");
+
+  await expect(page.getByRole("heading", { level: 1, name: "Sauvage" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "Choose your edition" })).toContainText("6 options");
+  await expect.poll(
+    () => page.locator(".product-gallery img").first().evaluate((image) => (image as HTMLImageElement).currentSrc),
+    { timeout: 20_000 },
+  ).toContain("dior-sauvage");
+  if (page.viewportSize()!.width <= 430) {
+    await expectMinimumTapTarget(page.locator(".related .quick-add").first());
+  }
+
+  await page.getByRole("button", { name: "Save Sauvage", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Remove Sauvage from saved fragrances" })).toHaveAttribute("aria-pressed", "true");
+
+  const addToBag = page.getByRole("button", { name: "Add Sauvage to bag", exact: true });
+  if (page.viewportSize()!.width >= 981) await expect(addToBag).toBeInViewport();
+  await addToBag.click();
+  const bag = page.getByRole("dialog", { name: "Shopping bag" });
+  await expect(bag).toBeVisible();
+  await expect(bag).toContainText("Sauvage");
+  await expect(bag).toContainText("$250.00");
+
+  await page.keyboard.press("Escape");
+  await expect(bag).toBeHidden();
+  await expect(addToBag).toBeFocused();
+  await page.route("**/api/catalog?ids=*", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: "{}" });
+  });
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await page.getByRole("button", { name: "Open bag with 1 items" }).first().click();
+  await expect(bag).toContainText("Sauvage");
+
+  await bag.getByRole("button", { name: "Checkout" }).click();
+  await expect(page).toHaveURL(/\/checkout$/);
+  await expect(page.getByText("Checkout is currently closed while the catalog, locations and order confirmations complete acceptance testing.")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Checkout opening after testing/ })).toBeDisabled();
+  await expect(page.getByText(/Ghana/i)).toHaveCount(0);
+
+  await navigate(page, "/checkout?cancelled=1");
+  await expect(page.locator(".checkout-return-notice")).toContainText("Checkout wasn’t completed.");
+  await expect(page.getByText("Your shopping bag is still saved.", { exact: false })).toBeVisible();
+  await expect(page.locator(".checkout-summary")).toContainText("Sauvage");
+});
+
+test("search dialog rejects malformed catalogue data and restores focus when dismissed", async ({ page }) => {
+  await page.route("**/api/catalog?query=*&limit=5&offset=0", async (route) => {
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ products: "invalid", total: 1 }) });
+  });
+  await navigate(page, "/");
+  const trigger = page.getByRole("button", { name: "Search fragrances" });
+  await trigger.click();
+
+  const dialog = page.getByRole("dialog", { name: "Search Aurum Privée fragrances" });
+  await expect(dialog).toBeVisible();
+  await expect(page.getByLabel("Search by fragrance, brand, note or type")).toBeFocused();
+  await page.getByLabel("Search by fragrance, brand, note or type").fill("Dior");
+  await expect(dialog.getByRole("alert")).toContainText("Search is temporarily unavailable");
+
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(trigger).toBeFocused();
+});
+
+test("reduced-motion mode keeps state feedback without spatial animation", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await navigate(page, "/");
+  const primaryAction = page.getByRole("link", { name: "Shop the collection" });
+  const primaryActionMotion = await primaryAction.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { animationName: style.animationName, transitionProperty: style.transitionProperty, transitionDuration: style.transitionDuration };
+  });
+  expect(primaryActionMotion.animationName).toBe("none");
+  expect(primaryActionMotion.transitionProperty).toContain("background-color");
+  expect(primaryActionMotion.transitionDuration).not.toContain("0.01ms");
+
+  await page.getByRole("button", { name: "Search fragrances" }).click();
+  await expect(page.getByRole("dialog", { name: "Search Aurum Privée fragrances" })).toBeVisible();
+  await expect(page.locator(".store-search-panel")).toHaveCSS("animation-name", "none");
+});
+
+test("an unverified Wix return cannot confirm an order or clear the saved bag", async ({ page }) => {
+  await navigate(page, "/shop/christian-dior-sauvage-edp-6-8-oz-bb4bf3");
+  await page.getByRole("button", { name: "Add Sauvage to bag", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Open bag with 1 items" }).first()).toBeVisible();
+
+  await navigate(page, "/order/success?provider=wix&orderId=123e4567-e89b-42d3-a456-426614174000");
+  await expect(page.getByRole("heading", { level: 1, name: "We are confirming your order." })).toBeVisible();
+  await expect(page.getByText("Your fragrance is reserved.")).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Open bag with 1 items" }).first().click();
+  await expect(page.getByRole("dialog", { name: "Shopping bag" })).toContainText("Sauvage");
+});
+
+test("core public pages pass automated WCAG A and AA checks", async ({ page }) => {
+  test.slow();
+  for (const path of [
+    "/shop",
+    "/shop/christian-dior-sauvage-edp-6-8-oz-bb4bf3",
+    "/contact",
+  ]) {
+    await navigate(page, path);
+    await page.getByRole("heading", { level: 1 }).waitFor({ state: "visible" });
+    await expectNoWcagViolations(page);
+  }
+});
+
+test("public support routes, redirects and private-page metadata are coherent", async ({ page }) => {
+  test.slow();
+  for (const path of [
+    "/about",
+    "/pages/aurum-room",
+    "/saved",
+    "/account",
+    "/pages/shipping-returns",
+    "/pages/authenticity",
+    "/pages/privacy",
+    "/pages/terms",
+  ]) {
+    await navigate(page, path);
+    await page.getByRole("heading", { level: 1 }).waitFor({ state: "visible" });
+    const hasOverflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
+    expect(hasOverflow).toBe(false);
+    await expectNoWcagViolations(page);
+  }
+
+  await navigate(page, "/pages/aurum-room");
+  await expect(page.getByRole("link", { name: "Request a consultation" }).first()).toBeVisible();
+
+  await navigate(page, "/pages/about");
+  await expect(page).toHaveURL(/\/about$/);
+  await navigate(page, "/pages/contact");
+  await expect(page).toHaveURL(/\/contact$/);
+
+  await navigate(page, "/account");
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+  await navigate(page, "/checkout");
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+
+  for (const path of ["/pages/shipping-returns", "/pages/privacy", "/pages/terms"]) {
+    await navigate(page, path);
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+  }
+});
+
+test("unexpected routes keep a branded and accessible recovery path", async ({ page }) => {
+  const response = await navigate(page, "/this-page-does-not-exist");
+  expect(response?.status()).toBe(404);
+  await expect(page.getByRole("heading", { level: 1, name: "That page is out of view." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Browse fragrance" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Return home" })).toBeVisible();
+  const hasOverflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
+  expect(hasOverflow).toBe(false);
+  await expectNoWcagViolations(page);
+});
+
+test("contact and newsletter forms complete their browser-side workflows", async ({ page }) => {
+  let contactAttempts = 0;
+  let releaseFirstContact = () => {};
+  const holdFirstContact = new Promise<void>((resolve) => { releaseFirstContact = resolve; });
+  await page.route("**/api/contact", async (route) => {
+    const request = route.request();
+    expect(request.method()).toBe("POST");
+    expect(request.postDataJSON()).toMatchObject({
+      name: "Amara Clarke",
+      email: "amara@example.com",
+      topic: "Fragrance guidance",
+    });
+    contactAttempts += 1;
+    if (contactAttempts === 1) {
+      await holdFirstContact;
+      await route.fulfill({ status: 504, contentType: "text/html", body: "Gateway timeout" });
+      return;
+    }
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ message: "Your note has been received.", reference: "AP-TEST1234" }) });
+  });
+  await navigate(page, "/contact");
+  await page.getByLabel("Name").fill("Amara Clarke");
+  await page.getByLabel("Email", { exact: true }).fill("amara@example.com");
+  await page.getByLabel("Your note").fill("I would like help choosing a fresh evening fragrance.");
+  await page.evaluate(() => {
+    const form = document.querySelector<HTMLFormElement>(".contact-form");
+    form?.requestSubmit();
+    form?.requestSubmit();
+  });
+  await expect.poll(() => contactAttempts).toBe(1);
+  await page.waitForTimeout(50);
+  const sameTickContactAttempts = contactAttempts;
+  releaseFirstContact();
+  expect(sameTickContactAttempts).toBe(1);
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("Your note is still here");
+  await expect(page.getByLabel("Your note")).toHaveValue("I would like help choosing a fresh evening fragrance.");
+  await expect(page.getByRole("button", { name: "Send your note" })).toBeEnabled();
+  await page.getByRole("button", { name: "Send your note" }).click();
+  await expect(page.getByRole("status")).toContainText("Reference AP-TEST1234");
+
+  let newsletterAttempts = 0;
+  await page.route("**/api/newsletter", async (route) => {
+    expect(route.request().postDataJSON()).toEqual({ email: "amara@example.com" });
+    newsletterAttempts += 1;
+    if (newsletterAttempts === 1) {
+      await route.fulfill({ status: 502, contentType: "text/html", body: "Bad gateway" });
+      return;
+    }
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ message: "Check your inbox to confirm your subscription." }) });
+  });
+  await navigate(page, "/");
+  await page.getByLabel("Email address").fill("amara@example.com");
+  await page.getByRole("button", { name: "Join the list" }).click();
+  await expect(page.locator(".newsletter-form").getByRole("alert")).toContainText("Your email is still here");
+  await expect(page.getByLabel("Email address")).toHaveValue("amara@example.com");
+  await expect(page.getByRole("button", { name: "Join the list" })).toBeEnabled();
+  await page.getByRole("button", { name: "Join the list" }).click();
+  await expect(page.getByRole("status")).toContainText("Check your inbox");
+});
+
+test("Wix mode safely acknowledges retired commerce webhooks", async ({ request }) => {
+  for (const path of ["/api/stripe/webhook", "/api/loyverse/webhook"]) {
+    const response = await request.post(path, { data: {} });
+    expect(response.status()).toBe(200);
+    expect(await response.json()).toEqual({ received: true, skipped: "wix-commerce-active" });
+  }
+});
+
+test("hosted releases apply the production security policy", async ({ request }) => {
+  test.skip(!process.env.PLAYWRIGHT_BASE_URL, "Security headers are added by the Netlify edge on hosted releases.");
+  const response = await request.get("/");
+  expect(response.status()).toBe(200);
+  const headers = response.headers();
+  expect.soft(headers["x-frame-options"], "X-Frame-Options").toBe("DENY");
+  expect.soft(headers["x-content-type-options"], "X-Content-Type-Options").toBe("nosniff");
+  expect.soft(headers["referrer-policy"], "Referrer-Policy").toBe("strict-origin-when-cross-origin");
+  expect.soft(headers["permissions-policy"], "Permissions-Policy").toContain("camera=()");
+  expect.soft(headers["permissions-policy"], "Permissions-Policy").toContain("microphone=()");
+  expect.soft(headers["permissions-policy"], "Permissions-Policy").toContain("geolocation=()");
+  expect.soft(headers["strict-transport-security"], "Strict-Transport-Security").toContain("max-age=31536000");
+
+  const contentSecurityPolicy = headers["content-security-policy"];
+  for (const directive of [
+    "default-src 'self'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+    "upgrade-insecure-requests",
+  ]) {
+    expect.soft(contentSecurityPolicy, `Content-Security-Policy: ${directive}`).toContain(directive);
+  }
+
+  const health = await request.get("/api/health");
+  expect(health.status()).toBe(200);
+  expect(await health.json()).toEqual({ status: "ok" });
+  expect.soft(health.headers()["cache-control"], "Public health cache policy").toContain("max-age=30");
+  expect.soft(health.headers()["x-robots-tag"], "Public health indexing policy").toContain("noindex");
+  expect.soft(health.headers()["x-robots-tag"], "Public health indexing policy").toContain("nofollow");
+});

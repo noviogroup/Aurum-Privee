@@ -7,6 +7,7 @@ import { hasOperatorSession } from "@/lib/operator-session";
 import { getOperationsInquiries } from "@/lib/operations-inquiries";
 import { readJsonBody, RequestBodyTooLargeError } from "@/lib/request-security";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { getContactInquiry, recordContactInquiryReply, updateContactInquiry } from "@/lib/netlify-commerce";
 
 const schema = z.discriminatedUnion("action", [
   z.object({ action: z.literal("status"), inquiryId: z.string().uuid(), status: z.enum(["new", "in_progress", "closed"]) }).strict(),
@@ -22,10 +23,26 @@ export async function GET() {
 export async function POST(request: Request) {
   if (!await hasOperatorSession()) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   if (!isSameOriginRequest(request)) return NextResponse.json({ error: "Invalid request origin" }, { status: 403 });
-  const supabase = getSupabaseAdmin();
-  if (!supabase) return NextResponse.json({ error: "Supabase is not configured" }, { status: 503 });
   try {
     const input = schema.parse(await readJsonBody<unknown>(request, 8_192));
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      if (input.action === "status") {
+        const inquiry = await updateContactInquiry(input.inquiryId, { status: input.status });
+        if (!inquiry) return NextResponse.json({ error: "Inquiry was not found" }, { status: 404 });
+        return NextResponse.json({ inquiryId: inquiry.id, status: inquiry.status });
+      }
+      const inquiry = await getContactInquiry(input.inquiryId);
+      if (!inquiry) return NextResponse.json({ error: "Inquiry was not found" }, { status: 404 });
+      if (inquiry.replies.some((reply) => reply.id === input.replyId)) {
+        return NextResponse.json({ inquiryId: inquiry.id, status: "replied", duplicate: true });
+      }
+      const delivery = await sendContactInquiryReply({ replyId: input.replyId, reference: inquiry.reference, customerName: inquiry.customerName, customerEmail: inquiry.customerEmail, message: input.message });
+      const providerId = delivery.data?.id || crypto.createHash("sha256").update(input.replyId).digest("hex");
+      const recorded = await recordContactInquiryReply(inquiry.id, { id: input.replyId, message: input.message, providerMessageId: providerId, sentAt: new Date().toISOString() });
+      if (!recorded) return NextResponse.json({ error: "Reply could not be recorded" }, { status: 500 });
+      return NextResponse.json({ inquiryId: inquiry.id, status: "replied", emailSent: true, duplicate: recorded.duplicate });
+    }
     if (input.action === "status") {
       const { data, error } = await supabase.rpc("transition_contact_inquiry", { p_inquiry_id: input.inquiryId, p_status: input.status });
       if (error) throw error;

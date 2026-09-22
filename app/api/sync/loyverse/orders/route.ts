@@ -6,6 +6,7 @@ import { syncFullRefundToLoyverse } from "@/lib/loyverse-refund-sync";
 import { isLoyverseSyncEligible, LOYVERSE_SYNC_MAX_ATTEMPTS, LOYVERSE_SYNC_STALE_AFTER_MS } from "@/lib/loyverse-sync-recovery";
 import { readRequestText, RequestBodyTooLargeError } from "@/lib/request-security";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { legacyCommerceEnabled } from "@/lib/provider-operations";
 
 const requestSchema = z.object({ orderId: z.string().uuid().optional(), limit: z.number().int().min(1).max(50).default(20) }).default({ limit: 20 });
 const selection = "id,order_number,customer_name,customer_email,customer_phone,shipping_amount,total,delivery_details,line_items,status,loyverse_receipt_id,loyverse_sync_status,loyverse_sync_attempts,loyverse_sync_claimed_at,loyverse_refund_sync_status,loyverse_refund_sync_attempts,loyverse_refund_sync_claimed_at,created_at";
@@ -35,6 +36,7 @@ export async function POST(request: Request) {
   if (!hasBearerSecret(request, process.env.SYNC_SECRET)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  if (!legacyCommerceEnabled()) return NextResponse.json({ processed: 0, succeeded: 0, failed: 0, results: [], skipped: "wix-commerce-active" });
   const supabase = getSupabaseAdmin();
   if (!supabase) return NextResponse.json({ error: "Supabase is not configured" }, { status: 503 });
 

@@ -14,7 +14,7 @@ export default async function ConfirmNewsletterPage({ searchParams }: { searchPa
         ? { title: "Confirmation is briefly unavailable.", body: "Please try the same link again shortly." }
         : { title: "Confirm your place.", body: "One final click confirms that this address belongs to you." };
   return (
-    <main className="section-shell page-top" style={{ minHeight: "65vh", maxWidth: 760 }}>
+    <div className="section-shell page-top" style={{ minHeight: "65vh", maxWidth: 760 }}>
       <p className="utility-label">A note from Aurum Privée</p>
       <h1>{copy.title}</h1>
       <p>{copy.body}</p>
@@ -24,6 +24,6 @@ export default async function ConfirmNewsletterPage({ searchParams }: { searchPa
           <button className="button button-primary" type="submit">Confirm subscription</button>
         </form>
       ) : <Link className="button button-primary" href="/">Return home</Link>}
-    </main>
+    </div>
   );
 }
