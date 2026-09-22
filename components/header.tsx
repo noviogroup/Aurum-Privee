@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Heart, List, MagnifyingGlass, ShoppingBag, UserCircle, X } from "@phosphor-icons/react";
+import { Heart, List, MagnifyingGlass, UserCircle, X } from "@phosphor-icons/react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useCart } from "@/components/cart-provider";
 import { useWishlist } from "@/components/wishlist-provider";
 import { StoreSearch } from "@/components/store-search";
 import { BrandMark } from "@/components/brand-mark";
@@ -14,7 +13,6 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const searchReturnFocusRef = useRef<HTMLElement | null>(null);
   const pathname = usePathname();
-  const { count, openCart } = useCart();
   const { count: savedCount, hydrated } = useWishlist();
 
   const closeSearch = useCallback(() => setSearchOpen(false), []);
@@ -57,10 +55,6 @@ export function Header() {
             <Heart size={20} weight={savedCount > 0 ? "fill" : "light"} />
             {hydrated && savedCount > 0 && <span>{savedCount}</span>}
           </Link>
-          <button aria-label={`Open bag with ${count} items`} onClick={(event) => openCart(event.currentTarget)}>
-            <ShoppingBag size={20} weight="light" />
-            {count > 0 && <span>{count}</span>}
-          </button>
         </div>
       </div>
       <div id="fragrance-menu" className={`fragrance-menu ${menuOpen ? "is-open" : ""}`} aria-hidden={!menuOpen}>

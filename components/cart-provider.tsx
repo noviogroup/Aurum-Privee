@@ -38,7 +38,7 @@ function readSavedCart(value: string | null): CartItem[] {
   }).slice(0, 20);
 }
 
-export function CartProvider({ children, commerceProvider }: { children: React.ReactNode; commerceProvider: CommerceProvider }) {
+export function CartProvider({ children, commerceProvider, showCart = true }: { children: React.ReactNode; commerceProvider: CommerceProvider; showCart?: boolean }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [open, setOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
@@ -191,12 +191,13 @@ export function CartProvider({ children, commerceProvider }: { children: React.R
   return (
     <CartContext.Provider value={value}>
       {children}
-      <button className="cart-fab" aria-label={`Open bag with ${count} items`} onClick={(event) => openCart(event.currentTarget)}>
-        <ShoppingBag size={20} weight="light" />
-        {count > 0 && <span>{count}</span>}
-      </button>
-      {open && <button className="drawer-scrim" aria-label="Close bag" onClick={() => setOpen(false)} />}
-      <aside ref={drawerRef} className={`cart-drawer ${open ? "is-open" : ""}`} aria-hidden={!open} inert={!open} aria-label="Shopping bag" role="dialog" aria-modal={open} onKeyDown={handleDrawerKeyDown}>
+      {showCart && <>
+        <button className="cart-fab" aria-label={`Open bag with ${count} items`} onClick={(event) => openCart(event.currentTarget)}>
+          <ShoppingBag size={20} weight="light" />
+          {count > 0 && <span>{count}</span>}
+        </button>
+        {open && <button className="drawer-scrim" aria-label="Close bag" onClick={() => setOpen(false)} />}
+        <aside ref={drawerRef} className={`cart-drawer ${open ? "is-open" : ""}`} aria-hidden={!open} inert={!open} aria-label="Shopping bag" role="dialog" aria-modal={open} onKeyDown={handleDrawerKeyDown}>
         <div className="drawer-head">
           <div>
             <p className="utility-label">Your selection</p>
@@ -244,7 +245,8 @@ export function CartProvider({ children, commerceProvider }: { children: React.R
             </button>
           </div>
         )}
-      </aside>
+        </aside>
+      </>}
     </CartContext.Provider>
   );
 }

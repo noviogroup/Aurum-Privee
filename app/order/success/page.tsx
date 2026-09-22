@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CheckCircle, ClockCountdown, Storefront, Truck } from "@phosphor-icons/react/dist/ssr";
+import { CheckCircle, ClockCountdown, Storefront } from "@phosphor-icons/react/dist/ssr";
 import Stripe from "stripe";
-import { formatMoney, siteConfig } from "@/lib/config";
 import { isConfiguredSecret } from "@/lib/env";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { OrderSuccessCartClear } from "@/components/order-success-cart-clear";
@@ -16,7 +15,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-type OrderLine = { name?: string; quantity?: number; amount?: number };
+type OrderLine = { name?: string; quantity?: number };
 
 async function getVerifiedOrder(sessionId: string) {
   if (!/^cs_[A-Za-z0-9_]+$/.test(sessionId) || sessionId.length > 255) return null;
@@ -63,16 +62,16 @@ export default async function OrderSuccessPage({ searchParams }: { searchParams:
         <h1>{wixOrder ? "Your fragrance is reserved." : "We are confirming your order."}</h1>
         <p>
           {wixOrder
-            ? "Your order is now in the Aurum Privée order system. A member of our team will confirm collection or delivery details by email."
-            : "If you completed checkout, please check your email before placing another order. Contact client care if your confirmation does not arrive."}
+            ? "Your order is now in the Aurum Privée order system. A member of our team will confirm the next steps by email."
+            : "If you recently placed an order, please check your email before trying again. Contact client care if your confirmation does not arrive."}
         </p>
         {wixOrder && (
           <div className="order-receipt-card">
             <div className="order-receipt-method">
               <Storefront size={24} weight="light" />
               <div>
-                <strong>Payment and fulfillment confirmation</strong>
-                <span>Payment will be collected using the manual method selected at checkout. Please wait for collection or delivery confirmation before travelling.</span>
+                <strong>Order confirmation</strong>
+                <span>Client care will confirm the next steps directly by email.</span>
               </div>
             </div>
           </div>
@@ -93,16 +92,15 @@ export default async function OrderSuccessPage({ searchParams }: { searchParams:
     return (
       <div className="status-page section-shell page-top">
         <ClockCountdown size={48} weight="thin" />
-        <p className="utility-label">Payment confirmation</p>
+        <p className="utility-label">Order confirmation</p>
         <h1>We are confirming your order.</h1>
-        <p>If you completed payment, keep this page open briefly and check your email. Do not submit a second payment. Contact client care if confirmation does not arrive.</p>
+        <p>If you recently placed an order, keep this page open briefly and check your email. Contact client care if confirmation does not arrive.</p>
         <Link href="/shop" className="button button-primary">Return to the collection</Link>
       </div>
     );
   }
 
   const { session, order } = verified;
-  const isDelivery = Number(order?.shipping_amount || 0) > 0;
   const orderNumber = order?.order_number || `AP-${session.id.slice(-8).toUpperCase()}`;
   const lines = (order?.line_items || []) as OrderLine[];
   const rawEmail = order?.customer_email || session.customer_details?.email;
@@ -112,16 +110,15 @@ export default async function OrderSuccessPage({ searchParams }: { searchParams:
     <div className="status-page order-receipt-page section-shell page-top">
       <OrderSuccessCartClear completed />
       <CheckCircle size={48} weight="thin" />
-      <p className="utility-label">Payment confirmed · {orderNumber}</p>
+      <p className="utility-label">Order confirmed · {orderNumber}</p>
       <h1>Your fragrance is reserved.</h1>
-      <p>{email && confirmationSent ? `A confirmation has been sent to ${email}.` : email ? `Your receipt is being delivered to ${email}.` : "Your payment is confirmed."} We will send the next update when your order is ready.</p>
+      <p>{email && confirmationSent ? `A confirmation has been sent to ${email}.` : email ? `Your confirmation is being delivered to ${email}.` : "Your order is confirmed."} We will send the next update when it is ready.</p>
       <div className="order-receipt-card">
         <div className="order-receipt-method">
-          {isDelivery ? <Truck size={24} weight="light" /> : <Storefront size={24} weight="light" />}
-          <div><strong>{isDelivery ? "New Providence delivery" : siteConfig.pickupLabel}</strong><span>{isDelivery ? "Delivery details will be confirmed by email." : "We will email as soon as pickup is ready."}</span></div>
+          <Storefront size={24} weight="light" />
+          <div><strong>Order service</strong><span>Client care will confirm the next steps by email.</span></div>
         </div>
-        {lines.length > 0 && <div className="order-receipt-lines">{lines.map((line, index) => <div key={`${line.name}-${index}`}><span>{line.name || "Fragrance"} × {line.quantity || 1}</span><strong>{formatMoney(Number(line.amount || 0))}</strong></div>)}</div>}
-        <div className="order-receipt-total"><span>Total paid</span><strong>{formatMoney(Number(order?.total ?? (session.amount_total || 0) / 100))}</strong></div>
+        {lines.length > 0 && <div className="order-receipt-lines">{lines.map((line, index) => <div key={`${line.name}-${index}`}><span>{line.name || "Fragrance"} × {line.quantity || 1}</span></div>)}</div>}
       </div>
       <div className="order-next-actions"><Link href="/shop" className="button button-primary">Keep browsing</Link><Link href="/contact" className="text-link">Questions about this order</Link></div>
     </div>

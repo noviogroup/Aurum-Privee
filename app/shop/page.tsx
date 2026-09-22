@@ -12,7 +12,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   const { family, audience = "All", query = "", sort = "featured" } = await searchParams;
   const allowed = ["All", "New", "Floral", "Fresh", "Woody", "Amber", "Gourmand"] as const;
   const initialFilter = allowed.includes(family as typeof allowed[number]) ? family as typeof allowed[number] : "All";
-  const allowedSorts = ["featured", "price-asc", "price-desc", "name"];
+  const allowedSorts = ["featured", "name"];
   const initialSort = allowedSorts.includes(sort) ? sort : "featured";
   const initialQuery = query.trim().slice(0, 100);
   const allowedAudiences = ["All", "Women", "Men", "Unisex"] as const;

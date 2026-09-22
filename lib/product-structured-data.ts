@@ -12,14 +12,6 @@ export function productStructuredData(product: Product) {
     sku: product.loyverseVariantId || product.id,
     brand: { "@type": "Brand", name: product.brand },
     category: `${product.family} fragrance`,
-    offers: {
-      "@type": "Offer",
-      url: `${siteConfig.url}/shop/${product.slug}`,
-      priceCurrency: siteConfig.currency,
-      price: product.price.toFixed(2),
-      availability: product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-      itemCondition: "https://schema.org/NewCondition",
-    },
   };
 }
 

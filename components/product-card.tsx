@@ -3,8 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Product } from "@/lib/types";
-import { formatMoney } from "@/lib/config";
-import { AddToBag } from "@/components/add-to-bag";
 import { SaveButton } from "@/components/save-button";
 import { productVariantLabel } from "@/lib/product-variants";
 
@@ -29,10 +27,6 @@ export function ProductCard({ product, priority = false, headingLevel = 3, mobil
           <p className="product-brand">{product.brand}</p>
           <Link href={`/shop/${product.slug}`}><ProductHeading>{product.name}</ProductHeading></Link>
           <p>{productVariantLabel(product)}</p>
-        </div>
-        <div className="product-price">
-          <strong>{formatMoney(product.price)}</strong>
-          <AddToBag product={product} compact />
         </div>
       </div>
     </article>

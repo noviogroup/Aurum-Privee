@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, MapPin, Sparkle } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight, Sparkle } from "@phosphor-icons/react/dist/ssr";
 
 export const metadata: Metadata = {
   title: "About Aurum Privée",
-  description: "Discover Aurum Privée’s considered approach to designer, niche and Arabian fragrance in The Bahamas.",
+  description: "Discover Aurum Privée’s considered approach to designer, niche and Arabian fragrance.",
   alternates: { canonical: "/about" },
 };
 
@@ -85,17 +85,6 @@ export default function AboutPage() {
               <p>{principle.body}</p>
             </article>
           ))}
-        </div>
-      </section>
-
-      <section className="about-presence section-shell">
-        <div className="about-presence-heading">
-          <MapPin size={24} weight="thin" aria-hidden="true" />
-          <h2>From the islands,<br />with a wider point of view.</h2>
-        </div>
-        <div className="about-presence-locations">
-          <p><strong>Nassau</strong><span>New Providence, The Bahamas</span></p>
-          <p><strong>Harbour Island</strong><span>Eleuthera, The Bahamas</span></p>
         </div>
       </section>
 

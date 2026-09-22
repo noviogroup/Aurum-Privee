@@ -2,12 +2,10 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Check, Package } from "@phosphor-icons/react/dist/ssr";
-import { AddToBag } from "@/components/add-to-bag";
+import { ArrowLeft, ArrowRight } from "@phosphor-icons/react/dist/ssr";
 import { ProductCard } from "@/components/product-card";
 import { ProductVariantOptions } from "@/components/product-variant-options";
 import { SaveButton } from "@/components/save-button";
-import { formatMoney } from "@/lib/config";
 import { getCatalogProductBySlug, getCatalogProducts } from "@/lib/catalog";
 import { rankRelatedProducts } from "@/lib/product-relationships";
 import { getProductVariantFamily, getProductVariants } from "@/lib/product-variants";
@@ -74,17 +72,15 @@ export default async function ProductPage({ params }: Props) {
           <p className="product-format">
             {productFormat.map((detail) => <span key={detail}>{detail}</span>)}
           </p>
-          <div className="product-primary-purchase">
-            <strong className="detail-price">{formatMoney(product.price)}</strong>
+          <div className="product-primary-purchase product-primary-discovery">
             <div className="product-purchase-actions">
-              <AddToBag product={product} />
+              <Link className="button button-primary" href="/contact">Request availability <ArrowRight size={17} /></Link>
               <SaveButton productId={product.id} productName={product.name} detail />
             </div>
-            <div className="availability"><Check size={18} /><span>{product.stock > 0 ? "Available for order" : "Currently unavailable"}</span></div>
           </div>
           <ProductVariantOptions current={product} variants={variants} />
           <p className="detail-description">{product.description}</p>
-          <div className="delivery-note"><Package size={21} weight="light" /><p><strong>Pickup or delivery</strong><br />Choose your preference during secure checkout.</p></div>
+          <p className="detail-consultation-note">Contact client care for availability and personal fragrance guidance.</p>
         </div>
       </div>
       {hasNotes && (
@@ -109,7 +105,7 @@ export default async function ProductPage({ params }: Props) {
             <div>
               <h2 id="related-title">You may also like</h2>
             </div>
-            <p>Thoughtfully connected through fragrance profile, audience, house, format and price.</p>
+            <p>Thoughtfully connected through fragrance profile, audience, house and format.</p>
           </header>
           <div className="related-grid">
             {related.map((relationship) => (

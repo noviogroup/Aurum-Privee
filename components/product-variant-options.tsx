@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { formatMoney } from "@/lib/config";
 import { productVariantLabel } from "@/lib/product-variants";
 import type { Product } from "@/lib/types";
 
@@ -21,7 +20,6 @@ export function ProductVariantOptions({ current, variants }: { current: Product;
             aria-current={variant.id === current.id ? "page" : undefined}
           >
             <span>{productVariantLabel(variant)}</span>
-            <strong>{formatMoney(variant.price)}</strong>
           </Link>
         ))}
       </div>

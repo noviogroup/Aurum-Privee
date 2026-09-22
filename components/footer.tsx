@@ -9,7 +9,6 @@ export function Footer() {
         <div className="footer-brand">
           <div className="footer-mark"><BrandMark /></div>
           <p>Exceptional fragrance.<br />Without boundaries.</p>
-          <p>Nassau, The Bahamas</p>
         </div>
         <div>
           <h2>Shop</h2>
@@ -43,7 +42,7 @@ export function Footer() {
       </div>
       <div className="footer-bottom">
         <span>© {new Date().getFullYear()} Aurum Privée</span>
-        <span>Designed in The Bahamas</span>
+        <span>Created with intention</span>
       </div>
     </footer>
   );

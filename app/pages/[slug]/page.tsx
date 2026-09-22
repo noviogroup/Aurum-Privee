@@ -10,11 +10,11 @@ type ContentPage = { title: string; intro: string; sections: ContentSection[]; a
 const pages: Record<string, ContentPage> = {
   "shipping-returns": {
     title: "Shipping & returns",
-    intro: "Collection, delivery, return and cancellation details are confirmed before any order is accepted.",
+    intro: "Service, return and cancellation details are confirmed before any order is accepted.",
     awaitingApproval: true,
     sections: [
-      { heading: "Collection", body: "Online collection is not open yet. Aurum Privée will confirm availability, location, hours and readiness directly. Please do not travel until you receive that confirmation." },
-      { heading: "Delivery", body: "Service areas, timing, fees and tax treatment will be shown before checkout opens. No delivery option is currently offered through this website." },
+      { heading: "Availability", body: "Online ordering is not open yet. Aurum Privée will confirm product availability directly through client care." },
+      { heading: "Service", body: "Service details will be shared directly once ordering becomes available. No purchase option is currently offered through this website." },
       { heading: "Returns & cancellations", body: "Final return, cancellation and refund terms are still awaiting merchant approval. Contact client care before purchasing if you need the current terms.", link: { href: "/contact", label: "Contact client care" } },
     ],
   },
@@ -28,17 +28,17 @@ const pages: Record<string, ContentPage> = {
     intro: "Aurum Privée is preparing its final merchant-approved privacy notice.",
     awaitingApproval: true,
     sections: [
-      { heading: "Before you share information", body: "Saved fragrances remain on your device. Contact and private-list forms send only the information you choose to provide. Online checkout remains closed while the full notice is finalized." },
+      { heading: "Before you share information", body: "Saved fragrances remain on your device. Contact and private-list forms send only the information you choose to provide. Online ordering remains closed while the full notice is finalized." },
       { heading: "Privacy questions", body: "Contact client care before submitting information if you have a question about access, correction, deletion, service providers or retention.", link: { href: "/contact", label: "Ask a privacy question" } },
     ],
   },
   terms: {
     title: "Terms",
-    intro: "Online checkout is closed while Aurum Privée’s final terms of sale are approved.",
+    intro: "Online ordering is closed while Aurum Privée’s final terms of sale are approved.",
     awaitingApproval: true,
     sections: [
-      { heading: "Current status", body: "The catalogue may be browsed and saved, but an order cannot be completed through this website until pricing, payment, fulfillment, cancellation, return and governing terms are published." },
-      { heading: "Before ordering", body: "Contact client care for the current purchase terms. Nothing shown in the catalogue should be treated as a completed sale or a promise of delivery.", link: { href: "/contact", label: "Contact client care" } },
+      { heading: "Current status", body: "The catalogue may be browsed and saved, but an order cannot be completed through this website until the final purchase and service terms are published." },
+      { heading: "Before ordering", body: "Contact client care for current availability. Nothing shown in the catalogue should be treated as a completed sale or service commitment.", link: { href: "/contact", label: "Contact client care" } },
     ],
   },
   "aurum-room": {

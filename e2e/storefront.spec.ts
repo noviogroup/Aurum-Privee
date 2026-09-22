@@ -26,6 +26,8 @@ test("homepage presents the primary action without layout overflow", async ({ pa
 
   await expect(page.getByRole("heading", { level: 1, name: "Without boundaries." })).toBeVisible();
   await expect(page.getByRole("link", { name: "Shop the collection" })).toBeInViewport();
+  await expect(page.getByRole("button", { name: /Open bag/ })).toHaveCount(0);
+  await expect(page.getByText(/Nassau|The Bahamas|Harbour Island|New Providence/i)).toHaveCount(0);
   if (page.viewportSize()!.width >= 981) {
     await expect(page.getByRole("navigation", { name: "Primary navigation" })).toBeVisible();
   } else {
@@ -57,6 +59,8 @@ test("catalog search returns useful results and preserves a stable layout", asyn
   await expect(main.getByRole("button", { name: "Unisex" })).toBeVisible();
   await expect(main.getByRole("link", { name: "Azlan Oud Amber", exact: true })).toBeVisible();
   await expect(main.getByRole("link", { name: "Azlan Oud Amber Extrait De", exact: true })).toHaveCount(0);
+  await expect(main.locator(".product-price")).toHaveCount(0);
+  await expect(main.getByRole("option", { name: /Price,/ })).toHaveCount(0);
   if (page.viewportSize()!.width >= 981) {
     const firstProduct = await main.locator(".product-card").first().boundingBox();
     expect(firstProduct, "first product row should be rendered").not.toBeNull();
@@ -77,7 +81,6 @@ test("catalog search returns useful results and preserves a stable layout", asyn
     await expectMinimumTapTarget(menuToggle);
     await expectMinimumTapTarget(page.getByRole("button", { name: "Search fragrances" }));
     await expectMinimumTapTarget(main.locator(".wish-button").first());
-    await expectMinimumTapTarget(main.locator(".quick-add").first());
     await menuToggle.click();
     const fragranceMenu = page.locator("#fragrance-menu");
     await expect(fragranceMenu).toHaveAttribute("aria-hidden", "false");
@@ -126,7 +129,7 @@ test("reviewed retail corrections survive the live Wix catalogue overlay", async
   await expect(page.getByRole("main").locator(".product-format")).toContainText("1.7 oz");
 });
 
-test("saved fragrance, bag and closed-checkout flow behave coherently", async ({ page }) => {
+test("saved fragrance and browse-only product flow behave coherently", async ({ page }) => {
   await navigate(page, "/shop/christian-dior-sauvage-edp-6-8-oz-bb4bf3");
 
   await expect(page.getByRole("heading", { level: 1, name: "Sauvage" })).toBeVisible();
@@ -135,41 +138,20 @@ test("saved fragrance, bag and closed-checkout flow behave coherently", async ({
     () => page.locator(".product-gallery img").first().evaluate((image) => (image as HTMLImageElement).currentSrc),
     { timeout: 20_000 },
   ).toContain("dior-sauvage");
-  if (page.viewportSize()!.width <= 430) {
-    await expectMinimumTapTarget(page.locator(".related .quick-add").first());
-  }
+  await expect(page.locator(".detail-price")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /Add Sauvage to bag/ })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /Open bag/ })).toHaveCount(0);
+  const availability = page.getByRole("link", { name: "Request availability" });
+  await expect(availability).toBeVisible();
+  if (page.viewportSize()!.width >= 981) await expect(availability).toBeInViewport();
+  await expect(page.getByRole("region", { name: "Choose your edition" })).not.toContainText("$");
 
   await page.getByRole("button", { name: "Save Sauvage", exact: true }).click();
   await expect(page.getByRole("button", { name: "Remove Sauvage from saved fragrances" })).toHaveAttribute("aria-pressed", "true");
 
-  const addToBag = page.getByRole("button", { name: "Add Sauvage to bag", exact: true });
-  if (page.viewportSize()!.width >= 981) await expect(addToBag).toBeInViewport();
-  await addToBag.click();
-  const bag = page.getByRole("dialog", { name: "Shopping bag" });
-  await expect(bag).toBeVisible();
-  await expect(bag).toContainText("Sauvage");
-  await expect(bag).toContainText("$250.00");
-
-  await page.keyboard.press("Escape");
-  await expect(bag).toBeHidden();
-  await expect(addToBag).toBeFocused();
-  await page.route("**/api/catalog?ids=*", async (route) => {
-    await route.fulfill({ status: 200, contentType: "application/json", body: "{}" });
-  });
-  await page.reload({ waitUntil: "domcontentloaded" });
-  await page.getByRole("button", { name: "Open bag with 1 items" }).first().click();
-  await expect(bag).toContainText("Sauvage");
-
-  await bag.getByRole("button", { name: "Checkout" }).click();
-  await expect(page).toHaveURL(/\/checkout$/);
-  await expect(page.getByText("Checkout is currently closed while the catalog, locations and order confirmations complete acceptance testing.")).toBeVisible();
-  await expect(page.getByRole("button", { name: /Checkout opening after testing/ })).toBeDisabled();
-  await expect(page.getByText(/Ghana/i)).toHaveCount(0);
-
-  await navigate(page, "/checkout?cancelled=1");
-  await expect(page.locator(".checkout-return-notice")).toContainText("Checkout wasn’t completed.");
-  await expect(page.getByText("Your shopping bag is still saved.", { exact: false })).toBeVisible();
-  await expect(page.locator(".checkout-summary")).toContainText("Sauvage");
+  await navigate(page, "/checkout");
+  await expect(page).toHaveURL(/\/shop$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Find the one that stays with you." })).toBeVisible();
 });
 
 test("search dialog rejects malformed catalogue data and restores focus when dismissed", async ({ page }) => {
@@ -208,17 +190,11 @@ test("reduced-motion mode keeps state feedback without spatial animation", async
   await expect(page.locator(".store-search-panel")).toHaveCSS("animation-name", "none");
 });
 
-test("an unverified Wix return cannot confirm an order or clear the saved bag", async ({ page }) => {
-  await navigate(page, "/shop/christian-dior-sauvage-edp-6-8-oz-bb4bf3");
-  await page.getByRole("button", { name: "Add Sauvage to bag", exact: true }).click();
-  await expect(page.getByRole("button", { name: "Open bag with 1 items" }).first()).toBeVisible();
-
+test("an unverified Wix return cannot confirm an order in browse-only mode", async ({ page }) => {
   await navigate(page, "/order/success?provider=wix&orderId=123e4567-e89b-42d3-a456-426614174000");
   await expect(page.getByRole("heading", { level: 1, name: "We are confirming your order." })).toBeVisible();
   await expect(page.getByText("Your fragrance is reserved.")).toHaveCount(0);
-
-  await page.getByRole("button", { name: "Open bag with 1 items" }).first().click();
-  await expect(page.getByRole("dialog", { name: "Shopping bag" })).toContainText("Sauvage");
+  await expect(page.getByRole("button", { name: /Open bag/ })).toHaveCount(0);
 });
 
 test("core public pages pass automated WCAG A and AA checks", async ({ page }) => {
@@ -268,7 +244,7 @@ test("public support routes, redirects and private-page metadata are coherent", 
   await navigate(page, "/account");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
   await navigate(page, "/checkout");
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+  await expect(page).toHaveURL(/\/shop$/);
 
   for (const path of ["/pages/shipping-returns", "/pages/privacy", "/pages/terms"]) {
     await navigate(page, path);

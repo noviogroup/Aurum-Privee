@@ -5,7 +5,6 @@ import Link from "next/link";
 import { ArrowRight, MagnifyingGlass, X } from "@phosphor-icons/react";
 import { FormEvent, KeyboardEvent as ReactKeyboardEvent, RefObject, useEffect, useRef, useState } from "react";
 import type { Product } from "@/lib/types";
-import { formatMoney } from "@/lib/config";
 import { parseClientCatalogResponse } from "@/lib/client-catalog-response";
 import { requestJson } from "@/lib/client-json-request";
 
@@ -125,7 +124,6 @@ export function StoreSearch({ open, onClose, returnFocusRef }: { open: boolean; 
               <Link className="store-search-result" href={`/shop/${product.slug}`} onClick={onClose} key={product.id}>
                 <span><Image src={product.image} alt="" fill sizes="72px" /></span>
                 <div><small>{product.brand}</small><strong>{product.name}</strong><p>{product.concentration} · {product.size}</p></div>
-                <b>{formatMoney(product.price)}</b>
                 <ArrowRight size={17} />
               </Link>
             ))}

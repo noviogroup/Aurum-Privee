@@ -12,14 +12,14 @@ import { requestJson } from "@/lib/client-json-request";
 type CatalogFilter = ScentFamily | "All" | "New";
 const families: CatalogFilter[] = ["All", "New", "Floral", "Fresh", "Woody", "Amber", "Gourmand"];
 
-type CatalogSort = "featured" | "price-asc" | "price-desc" | "name";
+type CatalogSort = "featured" | "name";
 type CatalogAudience = ProductAudience | "All";
 
 export function ProductBrowser({ products, compact = false, searchable = false, initialFilter = "All", initialAudience = "All", initialQuery = "", initialSort = "featured", remote = false, catalogTotal }: { products: Product[]; compact?: boolean; searchable?: boolean; initialFilter?: CatalogFilter; initialAudience?: CatalogAudience; initialQuery?: string; initialSort?: string; remote?: boolean; catalogTotal?: number }) {
   const [family, setFamily] = useState<CatalogFilter>(initialFilter);
   const [audience, setAudience] = useState<CatalogAudience>(initialAudience);
   const [query, setQuery] = useState(initialQuery);
-  const [sort, setSort] = useState<CatalogSort>((["featured", "price-asc", "price-desc", "name"].includes(initialSort) ? initialSort : "featured") as CatalogSort);
+  const [sort, setSort] = useState<CatalogSort>((["featured", "name"].includes(initialSort) ? initialSort : "featured") as CatalogSort);
   const [visibleCount, setVisibleCount] = useState(compact ? 6 : 24);
   const [remoteProducts, setRemoteProducts] = useState(products);
   const [remoteTotal, setRemoteTotal] = useState(catalogTotal ?? products.length);
@@ -37,7 +37,7 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
   const filtered = useMemo(() => (remote ? remoteProducts : products.filter((product) => {
     const familyMatch = family === "All" || (family === "New" ? product.newArrival : product.family === family);
     return familyMatch && matchesCatalogSearch(product, query);
-  }).sort((left, right) => sort === "price-asc" ? left.price - right.price : sort === "price-desc" ? right.price - left.price : sort === "name" ? `${left.brand} ${left.name}`.localeCompare(`${right.brand} ${right.name}`) : 0)), [family, products, query, remote, remoteProducts, sort]);
+  }).sort((left, right) => sort === "name" ? `${left.brand} ${left.name}`.localeCompare(`${right.brand} ${right.name}`) : 0)), [family, products, query, remote, remoteProducts, sort]);
 
   useEffect(() => {
     loadMoreController.current?.abort();
@@ -127,7 +127,7 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
         <section className="shop-editorial-intro" aria-labelledby="shop-title">
           <div className="shop-editorial-copy">
             <h1 id="shop-title">Find the one that stays with you.</h1>
-            <p>Explore designer, niche and Arabian fragrance, selected in Nassau for the way it wears, not simply the name on the bottle.</p>
+            <p>Explore designer, niche and Arabian fragrance, selected for the way it wears, not simply the name on the bottle.</p>
             <div className="catalog-search-wrap" id="catalog-search">
               <div className="catalog-search">
                 <MagnifyingGlass size={22} weight="light" />
@@ -165,7 +165,7 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
             <button className={family === item ? "is-active" : ""} aria-pressed={family === item} onClick={() => { cancelPendingLoadMore(); setFamily(item); setVisibleCount(24); }} key={item}>{item}</button>
           ))}
         </div>
-        <label className="catalog-sort"><SlidersHorizontal size={16} /><span>Sort</span><select value={sort} onChange={(event) => { cancelPendingLoadMore(); setSort(event.target.value as CatalogSort); }}><option value="featured">Featured</option><option value="price-asc">Price, low to high</option><option value="price-desc">Price, high to low</option><option value="name">Brand &amp; name</option></select></label>
+        <label className="catalog-sort"><SlidersHorizontal size={16} /><span>Sort</span><select value={sort} onChange={(event) => { cancelPendingLoadMore(); setSort(event.target.value as CatalogSort); }}><option value="featured">Featured</option><option value="name">Brand &amp; name</option></select></label>
       </div>}
       {!compact && <div className="catalog-status" aria-live="polite"><p><strong>{resultCount}</strong> {resultCount === 1 ? "fragrance" : "fragrances"}{audience !== "All" ? <> · {audience === "Women" ? "for her" : audience === "Men" ? "for him" : "unisex"}</> : ""}{query.trim() ? <> matching “{query.trim()}”</> : ""}{loading ? <span> Updating…</span> : ""}</p>{(query || audience !== "All" || family !== "All" || sort !== "featured") && <button type="button" onClick={() => { cancelPendingLoadMore(); setQuery(""); setAudience("All"); setFamily("All"); setSort("featured"); }}>Clear all <X size={14} /></button>}</div>}
       {error && <div className="catalog-error" role="alert"><span>{error}</span><button type="button" onClick={() => setError("")}>Dismiss</button></div>}

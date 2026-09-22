@@ -6,7 +6,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { CartProvider } from "@/components/cart-provider";
 import { WishlistProvider } from "@/components/wishlist-provider";
-import { MapPin } from "@phosphor-icons/react";
+import { Sparkle } from "@phosphor-icons/react";
 import type { CommerceProvider } from "@/lib/wix-config";
 
 export function SiteShell({ children, commerceProvider }: { children: React.ReactNode; commerceProvider: CommerceProvider }) {
@@ -21,9 +21,9 @@ export function SiteShell({ children, commerceProvider }: { children: React.Reac
   if (isOperations) return <main id="main" className="operations-main">{children}</main>;
 
   return (
-    <CartProvider commerceProvider={commerceProvider}>
+    <CartProvider commerceProvider={commerceProvider} showCart={false}>
       <WishlistProvider>
-        <div className="announcement"><span><MapPin size={14} weight="light" />Personal fragrance service in The Bahamas</span><b>Bahamas · BSD</b></div>
+        <div className="announcement"><span><Sparkle size={14} weight="light" />Private fragrance discovery</span><b>A considered edit</b></div>
         <Header />
         <main id="main">{children}</main>
         <Footer />

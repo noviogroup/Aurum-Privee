@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChatCircleDots, Gift, MapPin, SealCheck, WhatsappLogo } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight, ChatCircleDots, Gift, SealCheck, Sparkle, WhatsappLogo } from "@phosphor-icons/react/dist/ssr";
 import { ProductBrowser } from "@/components/product-browser";
 import { getHomepageCatalogProducts } from "@/lib/catalog";
 
@@ -62,7 +62,7 @@ export default async function HomePage() {
       <section className="home-campaign-hero">
         <div className="home-campaign-copy entrance">
           <h1>Without<br />{" "}boundaries.</h1>
-          <p>A considered wardrobe of designer, niche and Arabian fragrance, selected in Nassau and worn everywhere.</p>
+          <p>A considered wardrobe of designer, niche and Arabian fragrance, chosen for the way scent becomes personal.</p>
           <div className="hero-actions">
             <Link className="button button-primary" href="/shop">Shop the collection</Link>
             <Link className="campaign-text-link" href="#scent-finder">Find your scent <ArrowRight size={16} /></Link>
@@ -85,7 +85,7 @@ export default async function HomePage() {
       </section>
 
       <section className="home-assurance-bar" aria-label="Aurum Privée services">
-        <article><MapPin size={25} weight="light" /><div><strong>Private client service</strong><span>Personal sourcing &amp; guidance</span></div></article>
+        <article><Sparkle size={25} weight="light" /><div><strong>Private client service</strong><span>Personal sourcing &amp; guidance</span></div></article>
         <article><Gift size={25} weight="light" /><div><strong>Luxury packaging</strong><span>Every order beautifully wrapped</span></div></article>
         <article><SealCheck size={25} weight="light" /><div><strong>Authentic &amp; curated</strong><span>100% authentic guarantee</span></div></article>
         <article><ChatCircleDots size={25} weight="light" /><div><strong>Personal service</strong><span>We&apos;re here to help</span></div></article>

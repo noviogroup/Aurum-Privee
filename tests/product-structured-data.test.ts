@@ -20,13 +20,11 @@ const product: Product = {
   stock: 3,
 };
 
-test("product schema publishes current catalog truth", () => {
+test("product schema publishes descriptive catalog truth without commerce offers", () => {
   const schema = productStructuredData(product);
   assert.equal(schema["@type"], "Product");
   assert.equal(schema.sku, "loyverse-variant-1");
-  assert.equal(schema.offers.price, "125.00");
-  assert.equal(schema.offers.priceCurrency, "BSD");
-  assert.equal(schema.offers.availability, "https://schema.org/InStock");
+  assert.equal("offers" in schema, false);
 });
 
 test("structured data serialization cannot terminate its script element", () => {

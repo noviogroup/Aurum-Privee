@@ -8,6 +8,7 @@ Do not place credentials in chat, tickets or this repository. Enter them directl
 
 - The production catalogue provider is Wix and all 733 approved SKUs are mapped.
 - The public checkout remains deliberately closed through both `NEXT_PUBLIC_CHECKOUT_ENABLED=false` and `WIX_CHECKOUT_ENABLED=false`.
+- The public storefront is temporarily browse-only by owner request: geographic references, catalogue pricing, price sorting, cart controls and checkout presentation are removed. `/checkout` redirects to the collection, Product structured data omits commerce offers, and product pages use a client-care availability request. Wix still retains prices and stock for future commerce restoration.
 - The hardened storefront hotfix was published to production on September 22, 2026. Production passed the complete 70-check Chromium and WebKit desktop/mobile browser matrix after publication, including malformed-catalogue recovery, bag preservation, cancellation-safe pagination, reduced-motion behavior, minimum primary and menu touch targets, the branded 404 recovery path, resilient customer-form and checkout handoffs, and the route-layer frame, referrer, permissions and Content Security Policy headers. Checkout remains closed.
 - `docs/WIX-SETUP-STATUS.md` is the source of truth for the live Wix account and remaining business configuration.
 - `LOYVERSE-SETUP.md` applies only if the legacy provider is deliberately restored.
@@ -92,7 +93,7 @@ These checks prove the release candidate and hosted runtime, not fulfillment acc
 7. After approving and publishing the pending merchant-automation change, execute one controlled order from a 390-pixel phone viewport and one from desktop. Verify the SKU, quantity, amount, customer, fulfillment method, Wix order, customer message, merchant message, cancellation/refund behavior and inventory result. Confirm both automations move beyond their current zero-trigger/never-run state. Use an approved low-value live procedure when no sandbox exists.
 8. Verify that a forged, malformed, pending or rejected Wix return cannot display a confirmed order or clear the bag. Verify that an approved Wix order does both.
 9. Confirm the Netlify health monitor has a successful scheduled run. The four retained legacy recovery schedules should log a successful Wix-mode no-op; they become active only after an intentional rollback to the legacy provider.
-10. Obtain explicit owner approval. Set `WIX_CHECKOUT_ENABLED=true` and `NEXT_PUBLIC_CHECKOUT_ENABLED=true` in one controlled deploy, rerun all three preflights and rerun the external browser suite.
+10. Obtain explicit owner approval. Restore the reviewed public pricing, structured offers, cart and checkout presentation in source, then set `WIX_CHECKOUT_ENABLED=true` and `NEXT_PUBLIC_CHECKOUT_ENABLED=true` in one controlled deploy. Rerun all three preflights and the complete external browser suite.
 11. Monitor the first trading period in Wix, Netlify function logs, the monitored inbox, and the protected client-care and integration workspaces. Manage active orders and customer records in Wix. If acceptance fails, turn both checkout switches off immediately.
 
 ## Product photography
