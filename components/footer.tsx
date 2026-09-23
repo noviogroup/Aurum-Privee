@@ -12,6 +12,7 @@ export function Footer() {
         <div>
           <h2>Catalogue</h2>
           <Link href="/shop">All fragrances</Link>
+          <Link href="/brands">Shop by brand</Link>
           <Link href="/shop?audience=Women">Women&apos;s fragrance</Link>
           <Link href="/shop?audience=Men">Men&apos;s fragrance</Link>
           <Link href="/shop?audience=Unisex">Unisex fragrance</Link>

@@ -21,7 +21,7 @@ export function parseQuoteList(value: string | null): QuoteListItem[] {
       if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) continue;
       const item = candidate as Record<string, unknown>;
       if (typeof item.productId !== "string" || !item.productId || item.productId.length > 120) continue;
-      const note = typeof item.note === "string" ? item.note.trim().slice(0, 500) : undefined;
+      const note = typeof item.note === "string" ? item.note.slice(0, 500) : undefined;
       if (!byId.has(item.productId)) byId.set(item.productId, { productId: item.productId, quantity: normalizedQuantity(item.quantity), note: note || undefined });
     }
     return [...byId.values()].slice(0, MAX_QUOTE_ITEMS);

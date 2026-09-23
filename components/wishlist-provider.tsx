@@ -43,7 +43,10 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!hydrated) return;
     try {
-      window.localStorage.setItem(QUOTE_LIST_STORAGE_KEY, JSON.stringify(items));
+      const serialized = JSON.stringify(items);
+      if (window.localStorage.getItem(QUOTE_LIST_STORAGE_KEY) !== serialized) {
+        window.localStorage.setItem(QUOTE_LIST_STORAGE_KEY, serialized);
+      }
     } catch {
       // Saving is an enhancement; the storefront remains usable if storage is blocked.
     }

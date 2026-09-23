@@ -32,3 +32,9 @@ test("short words do not match inside unrelated words", () => {
 test("generic merchandising descriptions are not searchable product truth", () => {
   assert.equal(matchesCatalogSearch(product, "selected"), false);
 });
+
+test("corrected accents and apostrophes remain searchable with plain typing", () => {
+  assert.ok(matchesCatalogSearch({ ...product, brand: "Dior", name: "J’adore" }, "Dior Jadore"));
+  assert.ok(matchesCatalogSearch({ ...product, brand: "Dior", name: "J’adore" }, "J'adore"));
+  assert.ok(matchesCatalogSearch({ ...product, brand: "Lancôme" }, "Lancome"));
+});

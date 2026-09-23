@@ -76,10 +76,16 @@ export function QuoteList() {
     return () => controller.abort();
   }, [hydrated, productIdsKey]);
 
+  // Storage can change before the product fetch finishes (including in another tab).
+  const lines = products.flatMap((product) => {
+    const item = items.find((candidate) => candidate.productId === product.id);
+    return item ? [{ product, item }] : [];
+  });
+
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formElement = event.currentTarget;
-    if (formElement.dataset.submitting === "true" || requestPending.current || !form.consent || products.length === 0) return;
+    if (formElement.dataset.submitting === "true" || requestPending.current || !form.consent || lines.length === 0) return;
     formElement.dataset.submitting = "true";
     requestPending.current = true;
     const controller = new AbortController();
@@ -91,7 +97,7 @@ export function QuoteList() {
       const body = {
         ...form,
         submissionId: submissionId.current,
-        lines: items.filter((item) => products.some((product) => product.id === item.productId)),
+        lines: lines.map(({ item }) => item),
       };
       const { response, data } = await requestJson<{ message?: string; reference?: string }>("/api/quote-requests", {
         method: "POST",
@@ -136,14 +142,13 @@ export function QuoteList() {
       </section>
       {!hydrated || loading ? <div className="saved-status section-shell" role="status">Preparing your quote list…</div> : loadError ? (
         <section className="saved-empty section-shell" role="alert"><WarningCircle size={30} weight="light" /><h2>Your list is still here.</h2><p>{loadError}</p><button type="button" className="button button-primary" onClick={() => window.location.reload()}>Try again</button></section>
-      ) : products.length === 0 ? (
+      ) : lines.length === 0 ? (
         <section className="saved-empty section-shell"><span className="saved-empty-icon"><FileText size={29} weight="light" /></span><h2>Your quote list is empty.</h2><p>Browse the catalogue and add the products you need. Return here to enter quantities and send your request.</p><Link className="button button-primary" href="/shop">Browse the catalogue</Link></section>
       ) : (
         <div className="quote-workspace section-shell">
           <section className="quote-selection" aria-labelledby="quote-selection-title">
-            <header><div><p className="utility-label">Your selection</p><h2 id="quote-selection-title">{products.length} {products.length === 1 ? "fragrance" : "fragrances"}</h2></div><p>{totalQuantity} {totalQuantity === 1 ? "unit" : "units"} requested</p></header>
-            <div className="quote-line-list">{products.map((product) => {
-              const item = items.find((candidate) => candidate.productId === product.id)!;
+            <header><div><p className="utility-label">Your selection</p><h2 id="quote-selection-title">{lines.length} {lines.length === 1 ? "fragrance" : "fragrances"}</h2></div><p>{totalQuantity} {totalQuantity === 1 ? "unit" : "units"} requested</p></header>
+            <div className="quote-line-list">{lines.map(({ product, item }) => {
               return <article className="quote-line" key={product.id}>
                 <Link className="quote-line-image" href={`/shop/${product.slug}`}><Image src={product.image} alt={product.imageAlt} fill sizes="112px" /></Link>
                 <div className="quote-line-copy"><p>{product.brand}</p><h3><Link href={`/shop/${product.slug}`}>{product.name}</Link></h3><span>{[product.concentration, product.size].filter(Boolean).join(" · ")}</span><label>Buyer note<textarea maxLength={500} value={item.note || ""} onChange={(event) => setNote(product.id, event.target.value)} placeholder="Case-pack requirements or other product details" /></label></div>

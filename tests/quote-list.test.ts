@@ -8,7 +8,7 @@ test("quote list validates, deduplicates and bounds lines", () => {
   const result = parseQuoteList(JSON.stringify([values[0], values[0], { productId: "", quantity: 2 }, ...values.slice(1)]));
   assert.equal(result.length, MAX_QUOTE_ITEMS);
   assert.equal(new Set(result.map((line) => line.productId)).size, result.length);
-  assert.equal(result[0].note, "buyer note");
+  assert.equal(result[0].note, " buyer note ");
 });
 
 test("legacy saved fragrances migrate into quantity-one quote lines", () => {
@@ -31,7 +31,7 @@ test("a full quote list preserves every selection, quantity and note", () => {
 test("notes preserve spaces while the buyer is still typing", () => {
   let items = addQuoteListItem([], "p-1");
   for (const character of "Please quote by case ") {
-    items = updateQuoteListItem(items, "p-1", { note: (items[0].note || "") + character });
+    items = parseQuoteList(JSON.stringify(updateQuoteListItem(items, "p-1", { note: (items[0].note || "") + character })));
   }
   assert.equal(items[0].note, "Please quote by case ");
 });
