@@ -505,3 +505,37 @@ test("quote notes keep spaces across tabs and removing lines never crashes", asy
   expect(pageErrors).toEqual([]);
   await secondTab.close();
 });
+
+test("compact list view preserves filters, paging and quote actions", async ({ page }) => {
+  await navigate(page, "/shop?brand=Armaf");
+  const cards = page.locator(".product-card");
+  await expect(cards).toHaveCount(24);
+  await expect(page.getByRole("button", { name: "Grid view", exact: true })).toHaveAttribute("aria-pressed", "true");
+  const gridCard = await cards.first().boundingBox();
+  await page.getByRole("button", { name: "List view", exact: true }).click();
+  await expect(page.locator(".product-list .product-card")).toHaveCount(24);
+  const listCard = await cards.first().boundingBox();
+  expect(listCard!.height).toBeLessThan(gridCard!.height / 2);
+  expect(listCard!.height).toBeLessThan(140);
+  await expectMinimumTapTarget(page.getByRole("button", { name: "List view", exact: true }));
+  await expectMinimumTapTarget(cards.first().getByRole("button"));
+  await cards.first().getByRole("button").click();
+  await expect(cards.first().getByRole("button")).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Show more fragrances" }).click();
+  await expect.poll(() => cards.count()).toBeGreaterThan(24);
+  await expect(page.getByLabel("Brand", { exact: true })).toHaveValue("Armaf");
+  await page.reload();
+  await expect(page.getByRole("button", { name: "List view", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".product-list .product-card")).toHaveCount(24);
+  await expect(cards.first().getByRole("button")).toHaveAttribute("aria-pressed", "true");
+  await page.getByLabel("Search the catalogue").fill("Club de Nuit");
+  await expect(page.locator(".catalog-status")).toContainText("matching “Club de Nuit”");
+  await expect(page.locator(".catalog-status")).not.toContainText("Updating…");
+  await expect(page.locator(".product-list")).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1)).toBe(false);
+  await expectNoWcagViolations(page);
+  await page.getByRole("button", { name: "Grid view", exact: true }).click();
+  await expect(page.locator(".product-list")).toHaveCount(0);
+  await expect(page.getByLabel("Search the catalogue")).toHaveValue("Club de Nuit");
+  await expect(page.getByLabel("Brand", { exact: true })).toHaveValue("Armaf");
+});
