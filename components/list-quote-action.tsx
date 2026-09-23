@@ -15,7 +15,7 @@ export function ListQuoteAction({ productId, productName }: { productId: string;
       onChange={(event) => { const value = event.target.value; setDraft(value); if (item && value && Number(value) >= 1 && Number(value) <= MAX_QUOTE_QUANTITY) setQuantity(productId, Number(value)); }}
       onBlur={() => { const value = Math.min(MAX_QUOTE_QUANTITY, Math.max(1, Math.round(Number(quantity) || 1))); if (item) { setQuantity(productId, value); setDraft(null); } else setDraft(String(value)); }} /></label>
     <button type="button" disabled={!hydrated} aria-label={`${item ? "Remove" : "Add"} ${productName} ${item ? "from" : "to"} quote list`} aria-pressed={Boolean(item)}
-      onClick={() => item ? removeItem(productId) : addItem(productId, Number(quantity))}>
+      onClick={() => { if (item) removeItem(productId); else addItem(productId, Number(quantity)); setDraft(null); }}>
       {item ? <Check size={18} aria-hidden="true" /> : <Plus size={18} aria-hidden="true" />}<span>{item ? "Added" : "Add to quote"}</span>
     </button>
   </div>;
