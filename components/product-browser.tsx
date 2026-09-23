@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { matchesCatalogBrand } from "@/lib/catalog-brands";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MagnifyingGlass, SlidersHorizontal, X } from "@phosphor-icons/react";
+import { MagnifyingGlass, SlidersHorizontal, SquaresFour, List, X } from "@phosphor-icons/react";
 import type { ProductAudience, PublicProduct, ScentFamily } from "@/lib/types";
 import { ProductCard } from "@/components/product-card";
 import { matchesCatalogSearch } from "@/lib/catalog-search";
@@ -18,6 +18,26 @@ type CatalogSort = "featured" | "name";
 type CatalogAudience = ProductAudience | "All";
 
 export function ProductBrowser({ products, brands = [], initialBrand = "", compact = false, searchable = false, initialFilter = "All", initialAudience = "All", initialQuery = "", initialSort = "featured", remote = false, catalogTotal }: { products: PublicProduct[]; brands?: string[]; initialBrand?: string; compact?: boolean; searchable?: boolean; initialFilter?: CatalogFilter; initialAudience?: CatalogAudience; initialQuery?: string; initialSort?: string; remote?: boolean; catalogTotal?: number }) {
+  const [catalogView, setCatalogView] = useState<"grid" | "list">("grid");
+
+  useEffect(() => {
+    if (compact) return;
+    try {
+      if (window.localStorage.getItem("aurum-privee-catalog-view") === "list") setCatalogView("list");
+    } catch {
+      // The view toggle still works when browser storage is unavailable.
+    }
+  }, [compact]);
+
+  const changeView = (view: "grid" | "list") => {
+    setCatalogView(view);
+    try {
+      window.localStorage.setItem("aurum-privee-catalog-view", view);
+    } catch {
+      // Persistence is optional.
+    }
+  };
+
   const [brand, setBrand] = useState(initialBrand);
   const [family, setFamily] = useState<CatalogFilter>(initialFilter);
   const [audience, setAudience] = useState<CatalogAudience>(initialAudience);
@@ -180,13 +200,19 @@ export function ProductBrowser({ products, brands = [], initialBrand = "", compa
         </div>
         <label className="catalog-sort"><SlidersHorizontal size={16} /><span>Sort</span><select value={sort} onChange={(event) => { cancelPendingLoadMore(); setSort(event.target.value as CatalogSort); }}><option value="featured">Featured</option><option value="name">Brand &amp; name</option></select></label>
       </div>}
-      {!compact && <div className="catalog-status" aria-live="polite"><p><strong>{resultCount}</strong> {resultCount === 1 ? "fragrance" : "fragrances"}{brand ? <> · {brand}</> : ""}{audience !== "All" ? <> · {audience.toLowerCase()}</> : ""}{query.trim() ? <> matching “{query.trim()}”</> : ""}{loading ? <span> Updating…</span> : ""}</p>{(brand || query || audience !== "All" || family !== "All" || sort !== "featured") && <button type="button" onClick={() => { cancelPendingLoadMore(); setQuery(""); setBrand(""); setAudience("All"); setFamily("All"); setSort("featured"); }}>Clear all <X size={14} /></button>}</div>}
+      {!compact && <div className="catalog-results-toolbar"><div className="catalog-status" aria-live="polite"><p><strong>{resultCount}</strong> {resultCount === 1 ? "fragrance" : "fragrances"}{brand ? <> · {brand}</> : ""}{audience !== "All" ? <> · {audience.toLowerCase()}</> : ""}{query.trim() ? <> matching “{query.trim()}”</> : ""}{loading ? <span> Updating…</span> : ""}</p>{(brand || query || audience !== "All" || family !== "All" || sort !== "featured") && <button type="button" onClick={() => { cancelPendingLoadMore(); setQuery(""); setBrand(""); setAudience("All"); setFamily("All"); setSort("featured"); }}>Clear all <X size={14} /></button>}</div>
+        <div className="catalog-view-toggle" role="group" aria-label="Catalogue view">
+          <button type="button" aria-label="Grid view" aria-pressed={catalogView === "grid"} onClick={() => changeView("grid")}><SquaresFour size={18} aria-hidden="true" /><span>Grid</span></button>
+          <button type="button" aria-label="List view" aria-pressed={catalogView === "list"} onClick={() => changeView("list")}><List size={18} aria-hidden="true" /><span>List</span></button>
+        </div>
+      </div>}
       {error && <div className="catalog-error" role="alert"><span>{error}</span><button type="button" onClick={() => setError("")}>Dismiss</button></div>}
       {filtered.length ? (
-        <div className={`product-grid ${compact ? "product-grid-compact" : ""}`}>
+        <div className={`product-grid ${compact ? "product-grid-compact" : catalogView === "list" ? "product-list" : ""}`}>
           {(remote ? filtered : filtered.slice(0, visibleCount)).map((product, index) => (
             <ProductCard
               product={product}
+              listView={!compact && catalogView === "list"}
               key={product.id}
               priority={!compact && index < 2}
               headingLevel={compact ? 3 : 2}
