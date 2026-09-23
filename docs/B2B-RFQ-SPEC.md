@@ -2,7 +2,7 @@
 
 Status: Active MVP
 Owner: Aurum Privée / Novio Group
-Last updated: 22 September 2026
+Last updated: 23 September 2026
 
 ## Objective
 
@@ -119,6 +119,10 @@ The merchant notification includes buyer contact details, buyer type, destinatio
 - Desktop and mobile Chromium/WebKit journeys pass without horizontal overflow or automated WCAG A/AA violations.
 - Hosted security headers pass the production test suite.
 - One owner-approved controlled request proves real buyer and merchant email delivery.
+
+## Production evidence
+
+On 23 September 2026, controlled internal request `APQ-263ACAFF6E` completed the live storefront flow. The request was saved, the buyer received the success reference, and Resend reported both the buyer acknowledgement and merchant notification as delivered. The request is explicitly marked as an internal test and requires no commercial action.
 
 ## Phase 2 decision gates
 

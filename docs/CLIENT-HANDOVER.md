@@ -1,6 +1,6 @@
 # Aurum Privée B2B catalogue handover
 
-Updated for client review on 22 September 2026.
+Updated for client review on 23 September 2026.
 
 ## What is live
 
@@ -89,7 +89,7 @@ Product imagery must be owned by Aurum Privée or licensed for this use. A resol
 - [Complete] Buyer acknowledgement and merchant notification templates implemented.
 - [Complete] Protected quote-review workspace implemented.
 - [Complete] Desktop/mobile Chromium and WebKit release suite passed on production.
-- [Required] Submit one controlled internal quote and verify both real email deliveries.
+- [Complete] Controlled request `APQ-263ACAFF6E` was saved and both real emails were reported delivered by Resend on 23 September 2026.
 - [Required] Confirm the monitored trade inbox owner and response process.
 - [Required] Approve commercial, fulfilment, returns and claims rules.
 - [Required] Train staff on quote states and reference handling.

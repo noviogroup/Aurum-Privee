@@ -34,10 +34,17 @@ export function QuoteList() {
   const [submitError, setSubmitError] = useState("");
   const [reference, setReference] = useState("");
   const submissionId = useRef("");
+  const successHeading = useRef<HTMLHeadingElement>(null);
   const requestPending = useRef(false);
   const requestController = useRef<AbortController | null>(null);
 
   useEffect(() => () => requestController.current?.abort(), []);
+
+  useEffect(() => {
+    if (!reference) return;
+    window.scrollTo({ top: 0, behavior: "auto" });
+    successHeading.current?.focus();
+  }, [reference]);
 
   useEffect(() => {
     if (!hydrated || savedIds.length === 0) {
@@ -110,7 +117,7 @@ export function QuoteList() {
       <section className="quote-success section-shell" aria-labelledby="quote-success-title">
         <CheckCircle size={42} weight="light" aria-hidden="true" />
         <p className="utility-label">Reference {reference}</p>
-        <h1 id="quote-success-title">Your request is with us.</h1>
+        <h1 id="quote-success-title" ref={successHeading} tabIndex={-1}>Your request is with us.</h1>
         <p>We have sent an acknowledgement to your inbox. The trade team will review availability, quantities and commercial terms before responding.</p>
         <div><Link className="button button-primary" href="/shop">Continue browsing</Link><button className="button button-secondary" type="button" onClick={() => { setReference(""); submissionId.current = ""; }}>Start another request</button></div>
       </section>

@@ -185,6 +185,8 @@ test("buyer can submit a structured quote request without price data", async ({ 
   await expect.poll(() => submissionAttempts).toBe(1);
   releaseRequest();
   await expect(page.getByRole("heading", { level: 1, name: "Your request is with us." })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Your request is with us." })).toBeFocused();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
   await expect(page.getByText("Reference APQ-DEMO12345")).toBeVisible();
   expect(submitted).not.toBeNull();
   expect(JSON.stringify(submitted)).not.toContain("price");

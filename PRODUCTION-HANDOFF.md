@@ -2,6 +2,8 @@
 
 This release establishes Aurum Privée as a B2B fragrance catalogue with a digital request-for-quote workflow. It does not expose public pricing or accept orders, payments, delivery selections, or checkout submissions.
 
+Production RFQ evidence: controlled internal request `APQ-263ACAFF6E` was accepted on 23 September 2026, and Resend reported both its buyer acknowledgement and merchant notification as delivered. The request is marked as a test and requires no commercial follow-up.
+
 Do not place credentials in chat, tickets or this repository. Enter them directly in Netlify's encrypted environment settings or share them through an approved password manager.
 
 ## Active release model
