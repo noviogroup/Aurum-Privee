@@ -2,6 +2,11 @@
   command = "npm run verify:build"
   publish = ".next"
 
+# Source uploads through the deployment API do not infer the Next.js runtime.
+# Keep the adapter explicit so every build emits the server and edge handlers.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
 [functions]
   node_bundler = "zisi"
 
