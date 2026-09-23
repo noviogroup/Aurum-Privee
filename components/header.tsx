@@ -52,7 +52,7 @@ export function Header() {
           <button type="button" aria-label="Search fragrances" onClick={(event) => openSearch(event.currentTarget)}><MagnifyingGlass size={20} weight="light" /></button>
           <Link href="/quote-list" className="saved-header-link" aria-label={`Quote list${hydrated ? `, ${savedCount} ${savedCount === 1 ? "item" : "items"}` : ""}`}>
             <FileText size={20} weight={savedCount > 0 ? "fill" : "light"} />
-            {hydrated && savedCount > 0 && <span>{savedCount}</span>}
+            <span className="quote-header-label">Quote list</span><span className="quote-header-count">{hydrated ? savedCount : 0}</span>
           </Link>
         </div>
       </div>

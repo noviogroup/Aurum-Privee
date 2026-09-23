@@ -24,6 +24,9 @@ async function expectNoDraftOrFillerCopy(page: Page) {
 async function navigate(page: Page, path: string) {
   const response = await page.goto(path, { waitUntil: "domcontentloaded", timeout: 30_000 });
   await page.locator('html[data-hydrated="true"]').waitFor({ state: "attached", timeout: 20_000 });
+  if (path.startsWith("/shop") && await page.getByRole("button", { name: "Filter & sort", exact: true }).isVisible()) {
+    await page.getByRole("button", { name: "Filter & sort", exact: true }).click();
+  }
   return response;
 }
 
@@ -538,4 +541,40 @@ test("compact list view preserves filters, paging and quote actions", async ({ p
   await expect(page.locator(".product-list")).toHaveCount(0);
   await expect(page.getByLabel("Search the catalogue")).toHaveValue("Club de Nuit");
   await expect(page.getByLabel("Brand", { exact: true })).toHaveValue("Armaf");
+});
+
+test("trade buyers filter editions and set quantities before reviewing a quote", async ({ page }) => {
+  await navigate(page, "/shop?brand=Armaf");
+  await page.getByLabel("Find a brand", { exact: true }).fill("Armaf");
+  await expect(page.getByLabel("Brand", { exact: true }).locator("option")).toHaveCount(2);
+  await page.getByLabel("Concentration", { exact: true }).selectOption("Eau de Parfum");
+  await page.getByLabel("Size", { exact: true }).selectOption("3.4 oz");
+  await expect(page).toHaveURL(/size=3.4/);
+  await expect.poll(async () => page.locator(".catalog-status").textContent()).not.toContain("Updating");
+  await expect(page.locator(".product-card").first()).toBeVisible();
+  await expect.poll(async () => page.locator(".product-card-info").allTextContents()).toEqual(expect.arrayContaining([expect.stringContaining("3.4 oz · Eau de Parfum")]));
+  await page.getByRole("button", { name: "List view", exact: true }).click();
+  const first = page.locator(".product-card").first();
+  await first.getByRole("spinbutton").fill("12");
+  await first.getByRole("button").click();
+  const summary = page.getByRole("complementary", { name: "Your quote selection" });
+  await expect(summary).toContainText("12 units requested");
+  await first.getByRole("spinbutton").fill("24");
+  await first.getByRole("spinbutton").press("Tab");
+  await expect(summary).toContainText("24 units requested");
+  await page.getByRole("button", { name: "Remove Size filter: 3.4 oz", exact: true }).click();
+  await expect(page).not.toHaveURL(/size=/);
+  await expect(page).toHaveURL(/concentration=Eau/);
+  if (page.viewportSize()!.width <= 600) {
+    await page.getByRole("button", { name: "Filter & sort", exact: true }).click();
+    await expect(page.getByLabel("Size", { exact: true })).toBeHidden();
+  }
+  await expect(summary).toContainText("24 units requested");
+  await expectNoWcagViolations(page);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1)).toBe(false);
+  await summary.getByRole("link", { name: "Review quote" }).click();
+  await expect(page.locator(".quote-line input[type=number]")).toHaveValue("24");
+  await expect(summary).toHaveCount(0);
+  await page.reload();
+  await expect(page.locator(".quote-line input[type=number]")).toHaveValue("24");
 });
