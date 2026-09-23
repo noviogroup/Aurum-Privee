@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { PublicProduct } from "@/lib/types";
+import { ListQuoteAction } from "@/components/list-quote-action";
 import { SaveButton } from "@/components/save-button";
 import { productVariantLabel } from "@/lib/product-variants";
 
@@ -21,7 +22,7 @@ export function ProductCard({ product, priority = false, headingLevel = 3, listV
           <Image src={product.image} alt={product.imageAlt} fill sizes={listView ? "64px" : "(max-width: 700px) 86vw, (max-width: 1100px) 45vw, 28vw"} priority={priority} />
         )}
       </Link>
-      <SaveButton productId={product.id} productName={product.name} showLabel={listView} />
+      {listView ? <ListQuoteAction productId={product.id} productName={product.name} /> : <SaveButton productId={product.id} productName={product.name} />}
       <div className="product-card-info">
         <div>
           <p className="product-brand">{product.brand}</p>

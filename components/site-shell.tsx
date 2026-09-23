@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Header } from "@/components/header";
+import { QuoteSummary } from "@/components/quote-summary";
 import { Footer } from "@/components/footer";
 import { CartProvider } from "@/components/cart-provider";
 import { WishlistProvider } from "@/components/wishlist-provider";
@@ -27,6 +28,7 @@ export function SiteShell({ children, commerceProvider }: { children: React.Reac
         <Header />
         <main id="main">{children}</main>
         <Footer />
+        <QuoteSummary />
       </WishlistProvider>
     </CartProvider>
   );

@@ -136,7 +136,7 @@ export async function getCatalogProductsByIds(ids: string[]) {
   return ((data || []) as ProductRow[]).map(fromRow);
 }
 
-export async function getCatalogPage(input: { brand?: string; family?: string; audience?: ProductAudience | "All"; query?: string; sort?: string; offset?: number; limit?: number }) {
+export async function getCatalogPage(input: { size?: string; concentration?: string; brand?: string; family?: string; audience?: ProductAudience | "All"; query?: string; sort?: string; offset?: number; limit?: number }) {
   noStore();
   const supabase = getSupabaseAdmin();
   const family = input.family || "All";
@@ -147,12 +147,12 @@ export async function getCatalogPage(input: { brand?: string; family?: string; a
   const sort = input.sort || "featured";
   const offset = Math.max(0, input.offset || 0);
   const limit = Math.min(48, Math.max(1, input.limit || 24));
-  if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix" || audience !== "All" || brand) {
+  if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix" || audience !== "All" || brand || input.size || input.concentration) {
     const products = await getCatalogProducts();
     const filtered = collapseVariantFamilies(products.filter((product) => {
       const familyMatch = family === "All" || (family === "New" ? product.newArrival : product.family === family);
       const audienceMatch = audience === "All" || product.audience === audience;
-      return audienceMatch && familyMatch && matchesCatalogBrand(product, brand) && matchesCatalogSearch(product, query);
+      return (!input.size || product.size === input.size) && (!input.concentration || product.concentration === input.concentration) && audienceMatch && familyMatch && matchesCatalogBrand(product, brand) && matchesCatalogSearch(product, query);
     }));
     const sorted = [...filtered].sort((left, right) => sort === "price-asc" ? left.price - right.price : sort === "price-desc" ? right.price - left.price : sort === "name" ? `${left.brand} ${left.name}`.localeCompare(`${right.brand} ${right.name}`) : 0);
     return { products: sorted.slice(offset, offset + limit), total: sorted.length };

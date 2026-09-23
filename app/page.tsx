@@ -88,39 +88,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="home-assurance-bar" aria-label="Aurum Privée services">
-        <article><Sparkle size={25} weight="light" /><div><strong>Trade catalogue</strong><span>Designer, niche and Arabian fragrance</span></div></article>
-        <article><Gift size={25} weight="light" /><div><strong>Your selection</strong><span>Choose editions and quantities</span></div></article>
-        <article><SealCheck size={25} weight="light" /><div><strong>Clear product detail</strong><span>Sizes, concentrations and scent profiles</span></div></article>
-        <article><ChatCircleDots size={25} weight="light" /><div><strong>Wholesale quotes</strong><span>Pricing and availability confirmed directly</span></div></article>
-      </section>
-
-      <section className="trade-process section-shell" id="trade-process" aria-labelledby="trade-process-title">
-        <header>
-          <h2 id="trade-process-title">How quote requests work.</h2>
-          <p>Choose the products your business needs. We’ll review your request and confirm pricing, availability and order requirements directly.</p>
-        </header>
-        <div className="trade-process-steps">
-          <article><span>01</span><h3>Explore the catalogue</h3><p>Search by brand, fragrance or scent family. Compare sizes and concentrations, then add products to your quote list.</p></article>
-          <article><span>02</span><h3>Set your quantities</h3><p>Enter the number of units you need. Add notes about case packs, timing or special requirements.</p></article>
-          <article><span>03</span><h3>Send your request</h3><p>Share your business details and destination. We’ll review availability and prepare a quote, or contact you for more information.</p></article>
-        </div>
-        <Link className="button button-primary" href="/quote-list">Build a quote request <ArrowRight size={16} /></Link>
-      </section>
-
-      <div className="section-shell"><TradeBuyingGuide /></div>
-
-      <section className="home-collections section-shell" id="collections">
-        <div className="home-section-title home-section-title-centered collection-heading"><h2>Explore the catalogue</h2><Link href="/shop">View full catalogue <ArrowRight size={16} /></Link></div>
-        <div className="collection-cabinet">
-          <Link className="collection-tile" href="/shop?audience=Women"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/for-her-brands-v3.webp" mobileSrc="/images/collections/for-her-brands-v3-mobile.webp" alt="Carolina Herrera Good Girl Blush and Yves Saint Laurent Libre fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Carolina Herrera · YSL</small><strong>Women&apos;s fragrance</strong><b>Browse collection</b></span></Link>
-          <Link className="collection-tile" href="/shop?audience=Men"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/for-him-brands-v3.webp" mobileSrc="/images/collections/for-him-brands-v3-mobile.webp" alt="Dior Sauvage and Montblanc Explorer Platinum fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Dior · Montblanc</small><strong>Men&apos;s fragrance</strong><b>Browse collection</b></span></Link>
-          <Link className="collection-tile" href="/shop?audience=Unisex"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/unisex-brands-v3.webp" mobileSrc="/images/collections/unisex-brands-v3-mobile.webp" alt="Maison Francis Kurkdjian Baccarat Rouge 540 and Xerjoff Erba Pura fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>MFK · Xerjoff</small><strong>Unisex fragrance</strong><b>Browse collection</b></span></Link>
-          <Link className="collection-tile" href="/shop?query=oud"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/arabian-brands-v3.webp" mobileSrc="/images/collections/arabian-brands-v3-mobile.webp" alt="Al Haramain Amber Oud Gold and Afnan Supremacy Noir fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Al Haramain · Afnan</small><strong>Arabian collection</strong><b>Browse collection</b></span></Link>
-          <Link className="collection-tile" href="/shop?query=gift%20set"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/discovery-brands-v3.webp" mobileSrc="/images/collections/discovery-brands-v3-mobile.webp" alt="Carolina Herrera Good Girl and Versace Crystal Noir gift sets" sizes="(max-width: 760px) 100vw, 20vw" /><span><small>Carolina Herrera · Versace</small><strong>Gift sets</strong><b>Browse collection</b></span></Link>
-        </div>
-      </section>
-
       <section className="bestsellers home-storefront section-shell">
         <div className="home-section-title home-section-title-centered"><h2>Catalogue highlights</h2><Link href="/shop">View all <ArrowRight size={16} /></Link></div>
         <ProductBrowser products={featured} compact />
@@ -133,6 +100,39 @@ export default async function HomePage() {
           </Link>
         ))}
       </section>
+
+      <section className="home-assurance-bar" aria-label="Aurum Privée services">
+        <article><Sparkle size={25} weight="light" /><div><strong>Trade catalogue</strong><span>Designer, niche and Arabian fragrance</span></div></article>
+        <article><Gift size={25} weight="light" /><div><strong>Your selection</strong><span>Choose editions and quantities</span></div></article>
+        <article><SealCheck size={25} weight="light" /><div><strong>Clear product detail</strong><span>Sizes, concentrations and scent profiles</span></div></article>
+        <article><ChatCircleDots size={25} weight="light" /><div><strong>Wholesale quotes</strong><span>Pricing and availability confirmed directly</span></div></article>
+      </section>
+
+      <section className="home-collections section-shell" id="collections">
+        <div className="home-section-title home-section-title-centered collection-heading"><h2>Explore the catalogue</h2><Link href="/shop">View full catalogue <ArrowRight size={16} /></Link></div>
+        <div className="collection-cabinet">
+          <Link className="collection-tile" href="/shop?audience=Women"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/for-her-brands-v3.webp" mobileSrc="/images/collections/for-her-brands-v3-mobile.webp" alt="Carolina Herrera Good Girl Blush and Yves Saint Laurent Libre fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Carolina Herrera · YSL</small><strong>Women&apos;s fragrance</strong><b>Browse collection</b></span></Link>
+          <Link className="collection-tile" href="/shop?audience=Men"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/for-him-brands-v3.webp" mobileSrc="/images/collections/for-him-brands-v3-mobile.webp" alt="Dior Sauvage and Montblanc Explorer Platinum fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Dior · Montblanc</small><strong>Men&apos;s fragrance</strong><b>Browse collection</b></span></Link>
+          <Link className="collection-tile" href="/shop?audience=Unisex"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/unisex-brands-v3.webp" mobileSrc="/images/collections/unisex-brands-v3-mobile.webp" alt="Maison Francis Kurkdjian Baccarat Rouge 540 and Xerjoff Erba Pura fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>MFK · Xerjoff</small><strong>Unisex fragrance</strong><b>Browse collection</b></span></Link>
+          <Link className="collection-tile" href="/shop?query=oud"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/arabian-brands-v3.webp" mobileSrc="/images/collections/arabian-brands-v3-mobile.webp" alt="Al Haramain Amber Oud Gold and Afnan Supremacy Noir fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Al Haramain · Afnan</small><strong>Arabian collection</strong><b>Browse collection</b></span></Link>
+          <Link className="collection-tile" href="/shop?query=gift%20set"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/discovery-brands-v3.webp" mobileSrc="/images/collections/discovery-brands-v3-mobile.webp" alt="Carolina Herrera Good Girl and Versace Crystal Noir gift sets" sizes="(max-width: 760px) 100vw, 20vw" /><span><small>Carolina Herrera · Versace</small><strong>Gift sets</strong><b>Browse collection</b></span></Link>
+        </div>
+      </section>
+
+      <section className="trade-process section-shell" id="trade-process" aria-labelledby="trade-process-title">
+        <header>
+          <h2 id="trade-process-title">How quote requests work.</h2>
+          <p>Select fragrances, set quantities, and send one request to our trade team.</p>
+        </header>
+        <div className="trade-process-steps">
+          <article><span>01</span><h3>Explore the catalogue</h3><p>Search by brand, fragrance or scent family. Compare sizes and concentrations, then add products to your quote list.</p></article>
+          <article><span>02</span><h3>Set your quantities</h3><p>Enter the number of units you need. Add notes about case packs, timing or special requirements.</p></article>
+          <article><span>03</span><h3>Send your request</h3><p>Share your business details and destination. We’ll review availability and prepare a quote, or contact you for more information.</p></article>
+        </div>
+        <Link className="button button-primary" href="/quote-list">Build a quote request <ArrowRight size={16} /></Link>
+      </section>
+
+      <div className="section-shell"><TradeBuyingGuide /></div>
 
       <section className="campaign-journal section-shell" aria-labelledby="campaign-journal-title">
         <div className="campaign-journal-heading">

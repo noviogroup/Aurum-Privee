@@ -12,6 +12,7 @@ type WishlistContextValue = {
   hydrated: boolean;
   isSaved: (productId: string) => boolean;
   toggleSaved: (productId: string) => void;
+  addItem: (productId: string, quantity: number) => void;
   setQuantity: (productId: string, quantity: number) => void;
   setNote: (productId: string, note: string) => void;
   removeItem: (productId: string) => void;
@@ -64,13 +65,21 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
       ? current.filter((item) => item.productId !== productId)
       : addQuoteListItem(current, productId));
   }, [items]);
+  const addItem = useCallback((productId: string, quantity: number) => {
+    if (items.length >= MAX_QUOTE_ITEMS && !items.some((item) => item.productId === productId)) {
+      setLimitNotice(true);
+      return;
+    }
+    setLimitNotice(false);
+    setItems((current) => updateQuoteListItem(addQuoteListItem(current, productId), productId, { quantity }));
+  }, [items]);
   const setQuantity = useCallback((productId: string, quantity: number) => setItems((current) => updateQuoteListItem(current, productId, { quantity })), []);
   const setNote = useCallback((productId: string, note: string) => setItems((current) => updateQuoteListItem(current, productId, { note })), []);
   const removeItem = useCallback((productId: string) => setItems((current) => current.filter((item) => item.productId !== productId)), []);
   const clearItems = useCallback(() => setItems([]), []);
   const totalQuantity = useMemo(() => items.reduce((total, item) => total + item.quantity, 0), [items]);
 
-  const value = useMemo(() => ({ items, savedIds, count: items.length, totalQuantity, hydrated, isSaved, toggleSaved, setQuantity, setNote, removeItem, clearItems }), [items, savedIds, totalQuantity, hydrated, isSaved, toggleSaved, setQuantity, setNote, removeItem, clearItems]);
+  const value = useMemo(() => ({ items, savedIds, count: items.length, totalQuantity, hydrated, isSaved, toggleSaved, addItem, setQuantity, setNote, removeItem, clearItems }), [items, savedIds, totalQuantity, hydrated, isSaved, toggleSaved, addItem, setQuantity, setNote, removeItem, clearItems]);
   return <WishlistContext.Provider value={value}>
     {children}
     {limitNotice && items.length >= MAX_QUOTE_ITEMS && (
