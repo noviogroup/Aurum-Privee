@@ -196,8 +196,8 @@ export function ProductBrowser({ products, sizes = [], concentrations = [], init
           {matchingBrands.map((name) => <option key={name} value={name}>{name}</option>)}
         </select>
         <Link href="/brands">Shop by brand A–Z</Link>
-        <label className="catalog-format-label">Size<select value={size} onChange={(event) => { cancelPendingLoadMore(); setSize(event.target.value); }}><option value="">All sizes</option>{size && !sizes.includes(size) && <option>{size}</option>}{sizes.map((value) => <option key={value}>{value}</option>)}</select></label>
-        <label className="catalog-format-label">Concentration<select value={concentration} onChange={(event) => { cancelPendingLoadMore(); setConcentration(event.target.value); }}><option value="">All concentrations</option>{concentration && !concentrations.includes(concentration) && <option>{concentration}</option>}{concentrations.map((value) => <option key={value}>{value}</option>)}</select></label>
+        <label className="catalog-format-label">Size<select aria-label="Size" value={size} onChange={(event) => { cancelPendingLoadMore(); setSize(event.target.value); }}><option value="">All sizes</option>{size && !sizes.includes(size) && <option>{size}</option>}{sizes.map((value) => <option key={value}>{value}</option>)}</select></label>
+        <label className="catalog-format-label">Concentration<select aria-label="Concentration" value={concentration} onChange={(event) => { cancelPendingLoadMore(); setConcentration(event.target.value); }}><option value="">All concentrations</option>{concentration && !concentrations.includes(concentration) && <option>{concentration}</option>}{concentrations.map((value) => <option key={value}>{value}</option>)}</select></label>
       </div>
       <div className="catalog-tools">
         <div className="audience-row" role="group" aria-label="Filter by audience">
@@ -212,7 +212,7 @@ export function ProductBrowser({ products, sizes = [], concentrations = [], init
         </div>
         <label className="catalog-sort"><SlidersHorizontal size={16} /><span>Sort</span><select value={sort} onChange={(event) => { cancelPendingLoadMore(); setSort(event.target.value as CatalogSort); }}><option value="featured">Featured</option><option value="name">Brand &amp; name</option></select></label>
       </div></div>
-      <div className="catalog-filter-chips" aria-label="Active filters">
+      <div className="catalog-filter-chips" role="group" aria-label="Active filters">
         {[["Brand", brand, () => { setBrand(""); setBrandSearch(""); }], ["Size", size, () => setSize("")], ["Concentration", concentration, () => setConcentration("")], ["Audience", audience === "All" ? "" : audience, () => setAudience("All")], ["Scent family", family === "All" ? "" : family, () => setFamily("All")], ["Search", query, () => setQuery("")]].map(([label, value, clear]) => value ? <button key={String(label)} type="button" aria-label={`Remove ${label} filter: ${value}`} onClick={() => { cancelPendingLoadMore(); (clear as () => void)(); }}><span>{String(value)}</span><X size={14} aria-hidden="true" /></button> : null)}
       </div></>}
       {!compact && <div className="catalog-results-toolbar"><div className="catalog-status" aria-live="polite"><p><strong>{resultCount}</strong> {resultCount === 1 ? "fragrance" : "fragrances"}{brand ? <> · {brand}</> : ""}{audience !== "All" ? <> · {audience.toLowerCase()}</> : ""}{query.trim() ? <> matching “{query.trim()}”</> : ""}{loading ? <span> Updating…</span> : ""}</p>{(size || concentration || brand || query || audience !== "All" || family !== "All" || sort !== "featured") && <button type="button" onClick={() => { cancelPendingLoadMore(); setSize(""); setConcentration(""); setBrandSearch(""); setQuery(""); setBrand(""); setAudience("All"); setFamily("All"); setSort("featured"); }}>Clear all <X size={14} /></button>}</div>

@@ -547,8 +547,8 @@ test("trade buyers filter editions and set quantities before reviewing a quote",
   await navigate(page, "/shop?brand=Armaf");
   await page.getByLabel("Find a brand", { exact: true }).fill("Armaf");
   await expect(page.getByLabel("Brand", { exact: true }).locator("option")).toHaveCount(2);
-  await page.getByLabel("Concentration", { exact: true }).selectOption("Eau de Parfum");
-  await page.getByLabel("Size", { exact: true }).selectOption("3.4 oz");
+  await page.getByLabel("Concentration", { exact: true }).selectOption("Eau de Parfum", { timeout: 10_000 });
+  await page.getByLabel("Size", { exact: true }).selectOption("3.4 oz", { timeout: 10_000 });
   await expect(page).toHaveURL(/size=3.4/);
   await expect.poll(async () => page.locator(".catalog-status").textContent()).not.toContain("Updating");
   await expect(page.locator(".product-card").first()).toBeVisible();
