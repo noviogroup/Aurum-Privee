@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChatCircleDots, Gift, SealCheck, Sparkle, WhatsappLogo } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight, ChatCircleDots, Gift, SealCheck, Sparkle } from "@phosphor-icons/react/dist/ssr";
 import { ProductBrowser } from "@/components/product-browser";
 import { getHomepageCatalogProducts } from "@/lib/catalog";
 
@@ -179,21 +179,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="home-services section-shell" aria-label="Private fragrance services">
-        <Link className="home-service-card" href="/pages/aurum-room">
-          <Image src="/images/services/aurum-room-v2.webp" alt="A private fragrance consultation room" fill sizes="(max-width: 760px) 100vw, 34vw" />
-          <span><strong>The Aurum Room</strong><small>A private buyer consultation for assortment planning.</small><b>Plan a consultation</b></span>
-        </Link>
-        <Link className="home-service-card" href="/shop?query=gift%20set">
-          <Image src="/images/services/gifting-v2.webp" alt="Ivory gift box tied with a blush silk ribbon" fill sizes="(max-width: 760px) 100vw, 34vw" />
-          <span><strong>Gift sets</strong><small>Multi-piece and presentation-box formats.</small><b>Browse gift sets</b></span>
-        </Link>
-        <Link className="home-service-card home-service-help" href="/contact">
-          <Image src="/images/services/whatsapp-v2.webp" alt="Hand holding a phone for private fragrance assistance" fill sizes="(max-width: 760px) 100vw, 34vw" />
-          <WhatsappLogo className="service-chat-mark" size={28} weight="fill" aria-hidden="true" />
-          <span><strong>Trade support</strong><small>Tell us about your customers, format needs or sourcing priorities.</small><b>Contact us</b></span>
-        </Link>
-      </section>
     </div>
   );
 }
