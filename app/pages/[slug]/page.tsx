@@ -20,8 +20,8 @@ const pages: Record<string, ContentPage> = {
   },
   authenticity: {
     title: "Authenticity",
-    intro: "Aurum Privée is committed to selling authentic fragrance from trusted sources.",
-    sections: [{ heading: "Our standard", body: "Each bottle is checked for condition, presentation and traceability before fulfillment. Final sourcing language should be approved by the merchant." }],
+    intro: "Aurum Privée is committed to offering authentic fragrance sourced through trusted commercial relationships.",
+    sections: [{ heading: "Our standard", body: "Product condition, presentation and available traceability are reviewed before commercial fulfilment. Contact the trade team if your business requires specific sourcing documentation." }],
   },
   privacy: {
     title: "Privacy",
@@ -41,13 +41,23 @@ const pages: Record<string, ContentPage> = {
       { heading: "Commercial agreement", body: "Pricing, minimum quantities, lead times, freight, payment and other binding terms are provided privately. A transaction exists only after both parties separately accept those terms.", link: { href: "/contact", label: "Ask a trade question" } },
     ],
   },
+  "trade-program": {
+    title: "Trade programme",
+    intro: "A clear way for retailers and professional buyers to build an assortment and begin a private commercial conversation.",
+    sections: [
+      { heading: "Who it is for", body: "The trade catalogue is intended for retailers, distributors, hospitality teams, corporate buyers and other organisations sourcing fragrance for resale, gifting or professional use." },
+      { heading: "How quoting works", body: "Add products to a quote list, set the quantities you are considering and include any relevant notes. The Aurum Privée team reviews the complete request before responding.", link: { href: "/quote-list", label: "Build a quote request" } },
+      { heading: "Commercial terms", body: "Pricing, minimum quantities, availability, lead times, payment and freight are supplied privately. Catalogue inclusion does not guarantee supply, reserve inventory or create an order." },
+      { heading: "Buyer support", body: "If you need help shaping the assortment before submitting, request a private buyer consultation through The Aurum Room.", link: { href: "/pages/aurum-room", label: "Plan a consultation" } },
+    ],
+  },
   "aurum-room": {
     title: "The Aurum Room",
-    intro: "A private fragrance experience for thoughtful discovery, personal gifting and a more considered way to choose scent.",
+    intro: "A private buyer consultation for assortment planning, product discovery and a more considered way to navigate the catalogue.",
     sections: [
-      { heading: "Private fragrance guidance", body: "Share what you already wear, the feeling you want, or the occasion ahead. We will narrow the collection into a personal edit." },
-      { heading: "Gifting, made personal", body: "We can help choose a fragrance or discovery set with presentation suited to the occasion." },
-      { heading: "Arrange your experience", body: "Contact client care to discuss availability and the right format for your visit or consultation." },
+      { heading: "Assortment guidance", body: "Share your customer profile, existing range or sourcing priorities. We will help narrow the catalogue into a more relevant working selection." },
+      { heading: "Formats and opportunities", body: "Explore gift sets, fragrance families and complementary formats that may help broaden a retail or corporate programme." },
+      { heading: "Arrange a consultation", body: "Contact the trade team to discuss the right format for a private buyer conversation." },
     ],
   },
 };
@@ -77,7 +87,7 @@ export default async function ContentPage({ params }: { params: Promise<{ slug: 
       <article className="aurum-room-page page-top">
         <section className="aurum-room-hero section-shell">
           <div className="aurum-room-hero-copy entrance">
-            <p className="utility-label">Private fragrance service</p>
+            <p className="utility-label">Private buyer service</p>
             <h1>{page.title}</h1>
             <p>{page.intro}</p>
             <Link className="button button-primary" href="/contact">Request a consultation <ArrowRight size={16} /></Link>
@@ -86,7 +96,7 @@ export default async function ContentPage({ params }: { params: Promise<{ slug: 
             <Image src="/images/services/aurum-room-v2.webp" alt="A private Aurum Privée fragrance consultation room" fill priority sizes="(max-width: 767px) calc(100vw - 32px), 52vw" />
           </div>
         </section>
-        <section className="aurum-room-details section-shell" aria-label="The Aurum Room experience">
+        <section className="aurum-room-details section-shell" aria-label="The Aurum Room buyer experience">
           {page.sections.map((section) => (
             <article key={section.heading}>
               <h2>{section.heading}</h2>
@@ -100,8 +110,8 @@ export default async function ContentPage({ params }: { params: Promise<{ slug: 
           </div>
           <div className="aurum-room-consultation-copy">
             <p className="utility-label">Begin with a conversation</p>
-            <h2>Your edit, considered together.</h2>
-            <p>Tell us what you wear, the occasion ahead, or the feeling you want. Client care will respond with the next available consultation options.</p>
+            <h2>Your assortment, considered together.</h2>
+            <p>Tell us about your customers, target formats or the range you want to build. The trade team will respond with the next consultation options.</p>
             <Link className="text-link" href="/contact">Request a consultation <ArrowRight size={16} /></Link>
           </div>
         </section>

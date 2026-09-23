@@ -13,6 +13,7 @@ Do not place credentials in chat, tickets or this repository. Enter them directl
 - Quote submission is not an order, reservation, price quote or commercial acceptance. Pricing, minimum quantities, freight, payment and other binding terms are handled privately.
 - Staff review requests at `/operations/quotes` and may move them through `new`, `reviewing`, `needs_info`, `quoted` and `closed` states.
 - The retained cart, checkout, order, Supabase, Stripe and direct Loyverse implementation is dormant legacy code and is not part of this release.
+- The public content now addresses retailers and professional buyers, explains the three-step RFQ journey, and links to a dedicated trade programme. Unapproved minimums, territories, authorization claims, lead times and fulfilment promises remain intentionally absent.
 
 ## Runtime requirements
 

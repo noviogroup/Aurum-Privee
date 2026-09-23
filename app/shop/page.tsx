@@ -3,8 +3,8 @@ import { ProductBrowser } from "@/components/product-browser";
 import { getCatalogPage } from "@/lib/catalog";
 
 export const metadata: Metadata = {
-  title: "Shop fragrance",
-  description: "Browse the Aurum Privée edit of exceptional fragrance and cologne.",
+  title: "Trade fragrance catalogue",
+  description: "Browse designer, niche and Arabian fragrance, build an assortment and request private trade terms from Aurum Privée.",
   alternates: { canonical: "/shop" },
 };
 

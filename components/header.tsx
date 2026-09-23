@@ -43,7 +43,7 @@ export function Header() {
         <nav className="primary-nav" aria-label="Primary navigation">
           <Link href="/">Home</Link>
           <button type="button" aria-expanded={menuOpen} aria-controls="fragrance-menu" onClick={() => setMenuOpen((value) => !value)}>Catalogue</button>
-          <Link href="/#collections">Collections</Link>
+          <Link href="/pages/trade-program">Trade programme</Link>
           <Link href="/pages/aurum-room">The Aurum Room</Link>
           <Link href="/about">About</Link>
           <Link href="/contact">Contact</Link>
@@ -58,11 +58,11 @@ export function Header() {
       </div>
       <div id="fragrance-menu" className={`fragrance-menu ${menuOpen ? "is-open" : ""}`} aria-hidden={!menuOpen}>
         <div className="fragrance-menu-inner">
-          <div className="fragrance-menu-intro"><p className="utility-label">The fragrance index</p><h2>Follow your instinct.</h2><p>Begin with who it is for, how it should feel, or a fragrance already in mind.</p></div>
+          <div className="fragrance-menu-intro"><p className="utility-label">The trade catalogue</p><h2>Build with intention.</h2><p>Begin with audience, scent character or a house already relevant to your customers.</p></div>
           <div className="fragrance-menu-group"><p>Catalogue</p><Link href="/shop" onClick={() => setMenuOpen(false)}>All fragrance</Link><Link href="/shop?family=New" onClick={() => setMenuOpen(false)}>New arrivals</Link><Link href="/shop?query=gift%20set" onClick={() => setMenuOpen(false)}>Gift sets</Link><Link href="/quote-list" onClick={() => setMenuOpen(false)}>Quote list</Link></div>
-          <div className="fragrance-menu-group"><p>For whom</p><Link href="/shop?audience=Women" onClick={() => setMenuOpen(false)}>For her</Link><Link href="/shop?audience=Men" onClick={() => setMenuOpen(false)}>For him</Link><Link href="/shop?audience=Unisex" onClick={() => setMenuOpen(false)}>Unisex</Link></div>
+          <div className="fragrance-menu-group"><p>Audience</p><Link href="/shop?audience=Women" onClick={() => setMenuOpen(false)}>Women</Link><Link href="/shop?audience=Men" onClick={() => setMenuOpen(false)}>Men</Link><Link href="/shop?audience=Unisex" onClick={() => setMenuOpen(false)}>Unisex</Link></div>
           <div className="fragrance-menu-group"><p>Scent character</p>{['Floral', 'Fresh', 'Woody', 'Amber', 'Gourmand'].map((family) => <Link key={family} href={`/shop?family=${family}`} onClick={() => setMenuOpen(false)}>{family}</Link>)}</div>
-          <div className="fragrance-menu-help"><p>Know the name?</p><button type="button" onClick={(event) => openSearch(event.currentTarget)}><MagnifyingGlass size={18} /> Search the collection</button><Link href="/#scent-finder" onClick={() => setMenuOpen(false)}>Not sure? Find your scent</Link><Link href="/pages/aurum-room" onClick={() => setMenuOpen(false)}>Enter The Aurum Room</Link><Link href="/about" onClick={() => setMenuOpen(false)}>About Aurum Privée</Link></div>
+          <div className="fragrance-menu-help"><p>Know the name?</p><button type="button" onClick={(event) => openSearch(event.currentTarget)}><MagnifyingGlass size={18} /> Search the catalogue</button><Link href="/#scent-finder" onClick={() => setMenuOpen(false)}>Build by scent family</Link><Link href="/pages/trade-program" onClick={() => setMenuOpen(false)}>How trade quoting works</Link><Link href="/pages/aurum-room" onClick={() => setMenuOpen(false)}>Plan a buyer consultation</Link></div>
         </div>
       </div>
     </header>

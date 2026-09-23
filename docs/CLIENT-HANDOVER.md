@@ -1,97 +1,109 @@
-# Aurum Privée storefront handover
+# Aurum Privée B2B catalogue handover
 
-Prepared for client review on 17 September 2026.
+Updated for client review on 22 September 2026.
 
-## What has been built
+## What is live
 
-- A custom Aurum Privée storefront at `https://aurumprivee.com`, hosted on Netlify and maintained from the Novio Group GitHub repository.
-- A responsive luxury-fragrance experience covering the homepage, searchable catalogue, product pages, saved fragrances, an honest account-availability state, bag, checkout shell, client-care form and operations area.
-- Clean public routes for `/about` and `/contact`, with permanent redirects from the former `/pages/about` and `/pages/contact` addresses.
-- A structured catalogue of 733 sellable fragrance SKUs. Twenty product families have been reviewed for presentation as one product with selectable editions instead of unrelated duplicate pages.
-- An explainable relationship model for every SKU. Each product page shows four distinct in-stock alternatives ranked from verified notes, scent family, audience, brand line, concentration and price, with a visible reason for each connection.
-- Consistent BSD price presentation, customer-facing brand names, concentration labels, sizes and stock-aware catalogue behaviour.
-- Transactional email infrastructure through Resend for the existing order and client-care workflows. The sending domain is verified and its restricted credential is stored as a protected hosting variable, not in source control. A monitored notification inbox is still required before acceptance messages can be tested.
-- A connected Wix Headless client for the existing Wix account. Wix is being established as the business-management layer while the custom Aurum Privée design remains on Netlify.
-- A Wix catalogue read layer that reflects client-managed names, brands, descriptions, prices, visibility, stock status and product media in the custom storefront after cutover. The storefront refreshes its Wix catalogue cache automatically; no design rebuild is required for routine product edits.
+Aurum Privée now operates as a trade fragrance catalogue and digital request-for-quote service at `https://aurumprivee.com`.
 
-## What the client will manage in Wix
+Professional buyers can:
 
-Once the commerce cutover is accepted, the client can use Wix for:
+- browse the designer, niche and Arabian fragrance catalogue;
+- search and filter by house, product, format, audience or scent family;
+- add products to a private quote list stored on their device;
+- set a requested quantity and optional note for each product;
+- identify their company and buyer type; and
+- submit the complete selection for private commercial review.
 
-- products, prices, options and variants;
-- stock availability;
-- orders, customer records and fulfillment status;
-- manual payment methods;
-- coupons, discounts and abandoned-cart workflows;
-- store automations, customer emails and commerce analytics.
+The website does not display prices, inventory counts or geographic service claims. It does not accept payment or create an order. A quote request begins a business conversation; it is not a reservation, binding quotation or acceptance.
 
-The custom page design, navigation, editorial layouts and frontend code are not edited in the Wix drag-and-drop editor. Novio Group maintains those in the storefront repository. Promotional content can be connected to Wix CMS later if the client needs routine editing access.
+## What the client manages
 
-Customer account sign-in remains deferred until the business chooses a Wix guest/member policy and accepts the complete login and order-history flow. Until then, the account page does not offer a separate Supabase identity that would omit Wix orders. Saved fragrances remain private to the customer's device, and order help routes through client care.
+### In Wix
 
-## Catalogue model
+Wix remains the private catalogue source for routine product management:
 
-The Wix catalogue contains 707 controlled customer-facing product pages and 733 sellable SKUs. Twenty reviewed fragrance families consolidate valid size or concentration choices on one product page. Similar names are not automatically merged: for example, Dior Sauvage and Dior Eau Sauvage remain distinct products.
+- product and variant identity;
+- names, descriptions and media;
+- catalogue visibility; and
+- internal price and inventory information.
 
-The source SKU is preserved on every imported variant so that Wix records can be mapped back to the existing inventory data. All 733 SKUs are mapped to their live Wix product and variant IDs. Product URLs, fragrance-family classification, verified notes and the reviewed grouping rules remain protected in the custom storefront, while routine commerce fields come from Wix. The legacy Wix account currently also contains nine placeholder products, for 716 total Wix products. They have not been deleted because removal requires explicit owner approval.
+Price, stock, tax, SKU, barcode and Wix provider identifiers remain private and are not returned by the public catalogue API.
 
-### Variants versus related products
+### In the Aurum Privée operations workspace
 
-Variants and recommendations are intentionally different:
+Authorized staff use `/operations/quotes` to review:
 
-- A variant is another size or concentration of the same fragrance. Only 20 manually reviewed families are allowed to merge, covering 46 SKUs. On those pages, the customer sees **Choose your edition** and can select the exact size and concentration.
-- A related product is a separate fragrance that may be a useful alternative. Every controlled SKU has four ranked connections. The current product and all of its sibling editions are excluded, and another variant family can appear only once.
-- Similar wording never creates a variant. Dior Sauvage has six selectable editions; Dior Eau Sauvage and Eau Sauvage Extreme remain independent fragrances and can appear as related Dior alternatives.
+- the buyer and company;
+- requested products and quantities;
+- product-level and general notes;
+- contact details and destination information; and
+- email-delivery state.
 
-The complete client-readable register is in `docs/PRODUCT-RELATIONSHIPS.md`; the machine-readable source is `data/product-relationships.json`. Run `npm run catalog:relationships` after changing catalogue data, verified notes or the reviewed variant list. The command fails if any controlled SKU loses its Wix mapping or its four connections.
+Staff can move a request through `new`, `reviewing`, `needs_info`, `quoted` and `closed`. The current system does not author a price quote, generate a PDF, accept a quote or create an invoice.
 
-## Payments and fulfillment
+### In Netlify and Resend
 
-Cash collection is connected and active in Wix. Its checkout instruction tells the customer to wait for an email or call confirming the selected pickup location before travelling. Bank transfer can be added as soon as the business supplies its approved receiving-account instructions.
+Netlify hosts the application and provides private quote storage and rate-limit state. Resend sends the buyer acknowledgement and merchant notification. Production credentials remain encrypted hosting variables and are never stored in source control.
 
-The intended service areas are:
+## Buyer communication
 
-- Nassau, New Providence, The Bahamas;
-- Harbour Island, Eleuthera, The Bahamas;
-- Ghana, with the city and service details still to be confirmed.
+The active customer promise is intentionally narrow:
 
-The storefront must not advertise a street address, opening hours, delivery rate or cutoff time until the business confirms that information.
+1. Browse the catalogue.
+2. Build a proposed assortment and set quantities.
+3. Submit company and contact details.
+4. Receive an acknowledgement with an `APQ-…` reference.
+5. Wait for the trade team to confirm availability and the next commercial step.
 
-## Wix readiness verified 13 September 2026
+The website must not publish unapproved claims about authorization, territories, minimums, guaranteed availability, response time, freight, payment, returns or lead times.
 
-- The controlled import completed cleanly: Wix reported 707 products updated with no failures or partial-import warnings on the final pass.
-- Wix now contains 716 products: 707 controlled Aurum Privée products plus nine inherited placeholders that remain isolated from the custom storefront.
-- All 733 sellable SKUs are mapped to live Wix V3 variants, including the 20 reviewed variant families. The grouped Dior Sauvage product was spot-checked in Wix with six selectable variants; Dior Eau Sauvage remains a separate product.
-- Manual cash payment is connected, active and carries the approved collection-confirmation instruction.
-- Fulfillment is not launch-safe: Wix still exposes the inherited `Domestic Ghana` free-shipping region and `Rest of the world` free-shipping region, with no configured Nassau or Harbour Island pickup location.
-- The production storefront reads the controlled catalogue from Wix. Both checkout launch controls remain disabled until fulfillment setup and acceptance testing are complete.
-- A site-restricted Wix API key with only Wix eCommerce permission was generated and stored as a non-readable Netlify production and deploy-preview secret on 17 September 2026. It still requires runtime verification through the next preview before checkout acceptance.
+## Catalogue and content ownership
+
+Wix-managed product changes flow into the storefront through the catalogue integration. The custom design, navigation, trade-programme copy, quote workflow, SEO metadata and protected operations experience are maintained in the Novio Group repository.
+
+Product imagery must be owned by Aurum Privée or licensed for this use. A resolving image URL is not visual approval. Naming, concentrations, sizes and photography should continue through the catalogue review process.
 
 ## Information still required from the client
 
-1. Complete pickup addresses, contact numbers, opening hours and order cutoffs for Nassau and Harbour Island.
-2. Ghana city, complete location details, local fulfillment process, currency and tax treatment.
-3. Delivery zones, charges, free-delivery thresholds and expected delivery windows for each market.
-4. Bank-transfer instructions: beneficiary name, bank, account details, currency, payment reference format and proof-of-payment process.
-5. The monitored order email address and phone/WhatsApp number.
-6. Written approval of the returns, cancellations, refunds, privacy and terms content.
-7. Confirmation that the nine inherited Wix placeholder products may be removed.
+1. Which buyer types Aurum Privée will approve.
+2. Minimum opening and repeat-order quantities.
+3. Whether minimums apply per product, brand, case or total request.
+4. Currency and the method used to prepare private pricing.
+5. Quote-validity period and revision rules.
+6. Payment terms and the point at which inventory is allocated.
+7. Supported destinations and freight responsibility.
+8. Lead-time language that the business can reliably meet.
+9. Returns, shortages, damages, cancellations and claims procedure.
+10. The monitored trade inbox and target response time.
+11. Approved sourcing, authenticity and brand-relationship claims.
+12. The process for converting an accepted quote into an invoice and fulfilment instruction.
 
-## SEO ownership
+## Acceptance checklist
 
-The custom storefront controls technical SEO: page titles and descriptions, canonical URLs, structured product data, sitemap, robots rules, image alternative text, redirects and frontend performance. Wix will manage catalogue data used by those product pages after cutover. Search Console, analytics, conversion tracking and merchant feeds should be verified after the final domain and checkout flow are live.
+- [Complete] Public prices, checkout controls and geographic claims removed.
+- [Complete] Public catalogue allowlisted to non-commercial merchandising fields.
+- [Complete] Quantity-aware quote list implemented.
+- [Complete] Buyer/company RFQ form implemented with consent and abuse protection.
+- [Complete] Server-side product revalidation and atomic duplicate protection implemented.
+- [Complete] Buyer acknowledgement and merchant notification templates implemented.
+- [Complete] Protected quote-review workspace implemented.
+- [Complete] Desktop/mobile Chromium and WebKit release suite passed on production.
+- [Required] Submit one controlled internal quote and verify both real email deliveries.
+- [Required] Confirm the monitored trade inbox owner and response process.
+- [Required] Approve commercial, fulfilment, returns and claims rules.
+- [Required] Train staff on quote states and reference handling.
 
-## Launch acceptance checklist
+## Recommended next phase
 
-- [Complete] Import the controlled Wix catalogue and build the 733-SKU live mapping.
-- [Complete] Verify the reviewed variant model in Wix, including the six-edition Dior Sauvage family.
-- [Complete] Generate and verify four explainable related-product connections for every controlled SKU.
-- Configure and verify the three fulfillment markets with real business details.
-- Complete one cash-pickup order from a phone and a desktop browser.
-- Confirm that the order appears in Wix with the correct SKU, quantity, customer, total and pickup location.
-- Verify customer and merchant notifications.
-- Configure server-side Wix order verification and prove that only an approved order can display confirmation and clear the bag.
-- Test cancellation, refund and stock-update behaviour.
-- Approve production checkout and monitoring.
+After the business rules above are approved, the next release may add:
 
-Until the remaining fulfillment and order acceptance checks pass, the public storefront remains available for Wix-backed browsing while checkout stays deliberately gated.
+- staff-authored pricing and commercial terms;
+- branded email and PDF quotations;
+- quote versioning, validity dates and expiry;
+- buyer accept/decline actions;
+- approved trade accounts and account-specific price lists;
+- conversion of accepted quotes into invoices or orders; and
+- inventory-allocation and fulfilment handoff.
+
+The active technical and operational contract is [B2B-RFQ-SPEC.md](./B2B-RFQ-SPEC.md). Checkout-era handover and pilot documents are historical references only.

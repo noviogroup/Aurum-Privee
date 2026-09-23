@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "My account",
-  description: "Aurum Privée customer account services.",
+  description: "Aurum Privée buyer account services.",
   robots: { index: false, follow: false },
 };
 
@@ -67,8 +67,8 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         </section>
         <aside className="account-benefits">
           <div><Heart size={22} weight="light" /><h2>Quote list</h2><p>Build a private trade selection on this device without creating an account.</p></div>
-          <div><Package size={22} weight="light" /><h2>Order support</h2><p>Use your confirmation email or contact client care for help with an order.</p></div>
-          <div><ChatCircleDots size={22} weight="light" /><h2>Private assistance</h2><p>Client care can help with availability and fragrance guidance.</p></div>
+          <div><Package size={22} weight="light" /><h2>Quote support</h2><p>Use your quote reference or contact the team for help with an existing trade enquiry.</p></div>
+          <div><ChatCircleDots size={22} weight="light" /><h2>Private assistance</h2><p>The team can help with assortment planning, formats and product guidance.</p></div>
         </aside>
       </div>
     );

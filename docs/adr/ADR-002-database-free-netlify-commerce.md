@@ -1,8 +1,10 @@
 # ADR-002: Database-free commerce on Netlify
 
-- Status: Accepted
+- Status: Superseded by ADR-004 for the active public workflow
 - Date: 2026-08-31
 - Decider: Aurum Privée
+
+> Historical context only. The active site is a B2B catalogue and RFQ service; it does not run this payment/order model. See [`ADR-004-b2b-rfq.md`](./ADR-004-b2b-rfq.md).
 
 ## Context
 
@@ -47,4 +49,3 @@ The fewest components, but it cannot reliably support webhook replay, operations
 - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` and the checkout launch switch
 - `RESEND_API_KEY`, sender and merchant notification address
 - `RATE_LIMIT_SECRET`, operations password and operations session secret
-

@@ -126,8 +126,8 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
       {searchable && (
         <section className="shop-editorial-intro" aria-labelledby="shop-title">
           <div className="shop-editorial-copy">
-            <h1 id="shop-title">Find the one that stays with you.</h1>
-            <p>Explore designer, niche and Arabian fragrance, selected for the way it wears, not simply the name on the bottle.</p>
+            <h1 id="shop-title">Build an assortment worth returning to.</h1>
+            <p>Explore designer, niche and Arabian fragrance, then add the right editions and quantities to a private quote request.</p>
             <div className="catalog-search-wrap" id="catalog-search">
               <div className="catalog-search">
                 <MagnifyingGlass size={22} weight="light" />
@@ -155,9 +155,9 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
         </section>
       )}
       {!compact && <div className="catalog-tools">
-        <div className="audience-row" role="group" aria-label="Shop by recipient">
+        <div className="audience-row" role="group" aria-label="Filter by audience">
           {(["All", "Women", "Men", "Unisex"] as CatalogAudience[]).map((item) => (
-            <button className={audience === item ? "is-active" : ""} aria-pressed={audience === item} onClick={() => { cancelPendingLoadMore(); setAudience(item); setQuery(""); setVisibleCount(24); }} key={item}>{item === "Women" ? "For her" : item === "Men" ? "For him" : item === "Unisex" ? "Unisex" : "All fragrances"}</button>
+            <button className={audience === item ? "is-active" : ""} aria-pressed={audience === item} onClick={() => { cancelPendingLoadMore(); setAudience(item); setQuery(""); setVisibleCount(24); }} key={item}>{item === "Women" ? "Women" : item === "Men" ? "Men" : item === "Unisex" ? "Unisex" : "All fragrances"}</button>
           ))}
         </div>
         <div className="filter-row" role="group" aria-label="Filter by scent family">
@@ -167,7 +167,7 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
         </div>
         <label className="catalog-sort"><SlidersHorizontal size={16} /><span>Sort</span><select value={sort} onChange={(event) => { cancelPendingLoadMore(); setSort(event.target.value as CatalogSort); }}><option value="featured">Featured</option><option value="name">Brand &amp; name</option></select></label>
       </div>}
-      {!compact && <div className="catalog-status" aria-live="polite"><p><strong>{resultCount}</strong> {resultCount === 1 ? "fragrance" : "fragrances"}{audience !== "All" ? <> · {audience === "Women" ? "for her" : audience === "Men" ? "for him" : "unisex"}</> : ""}{query.trim() ? <> matching “{query.trim()}”</> : ""}{loading ? <span> Updating…</span> : ""}</p>{(query || audience !== "All" || family !== "All" || sort !== "featured") && <button type="button" onClick={() => { cancelPendingLoadMore(); setQuery(""); setAudience("All"); setFamily("All"); setSort("featured"); }}>Clear all <X size={14} /></button>}</div>}
+      {!compact && <div className="catalog-status" aria-live="polite"><p><strong>{resultCount}</strong> {resultCount === 1 ? "fragrance" : "fragrances"}{audience !== "All" ? <> · {audience.toLowerCase()}</> : ""}{query.trim() ? <> matching “{query.trim()}”</> : ""}{loading ? <span> Updating…</span> : ""}</p>{(query || audience !== "All" || family !== "All" || sort !== "featured") && <button type="button" onClick={() => { cancelPendingLoadMore(); setQuery(""); setAudience("All"); setFamily("All"); setSort("featured"); }}>Clear all <X size={14} /></button>}</div>}
       {error && <div className="catalog-error" role="alert"><span>{error}</span><button type="button" onClick={() => setError("")}>Dismiss</button></div>}
       {filtered.length ? (
         <div className={`product-grid ${compact ? "product-grid-compact" : ""}`}>

@@ -1,5 +1,7 @@
 # Aurum Privée Wix Headless pilot runbook
 
+> Superseded historical runbook. Do not use this document to launch checkout. The active architecture is the B2B RFQ workflow in [`B2B-RFQ-SPEC.md`](./B2B-RFQ-SPEC.md); Wix now supplies private catalogue data only.
+
 ## Purpose
 
 This began as an isolated 5–10 fragrance pilot. The full 733-SKU catalogue is now imported and the storefront reads Wix in production, while checkout remains closed pending the same fulfillment and order acceptance checks.

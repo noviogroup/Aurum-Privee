@@ -1,6 +1,6 @@
 # Resend setup for Aurum Privée
 
-The storefront email code is complete. On the active Wix path, Wix owns standard order messages while Resend delivers contact-form notifications, staff replies and newsletter confirmation emails. The retained legacy commerce path also contains order and fulfillment messages. Supabase Auth email is needed only if customer accounts are explicitly introduced later or the legacy provider is restored.
+The storefront email code is complete. In the active B2B RFQ release, Resend delivers quote-request acknowledgements, merchant quote notifications, contact-form notifications, staff replies and newsletter confirmation emails. The retained legacy commerce path also contains dormant order and fulfillment messages. Supabase Auth email is needed only if trade accounts are explicitly introduced later or the legacy provider is restored.
 
 ## Production identities
 
@@ -52,7 +52,7 @@ The preflight checks configuration, key acceptance and domain status. It never s
 
 ## 4. Configure Netlify without deploying
 
-In Netlify, open **Aurum Privée → Project configuration → Environment variables** and add the following. The key is intentionally available to both Production and Deploy Previews so the preview acceptance run can exercise the real integration while checkout remains closed.
+In Netlify, open **Aurum Privée → Project configuration → Environment variables** and add the following. The key is intentionally available to both Production and Deploy Previews so a controlled preview can exercise the real integration before production approval.
 
 | Variable | Value | Secret | Status on 18 September 2026 |
 | --- | --- | --- | --- |
@@ -64,9 +64,9 @@ In Netlify, open **Aurum Privée → Project configuration → Environment varia
 
 Saving variables does not require a manual deploy now. The values will be used by the next approved build.
 
-## 5. Optional future account email
+## 5. Optional future trade-account email
 
-Skip this section for the current Wix guest-checkout release. If the business later approves Supabase-backed accounts or restores the legacy provider, Supabase can send account magic links and recovery messages through a separate Resend connection. In Resend, open Integrations, connect the Aurum Privée Supabase project, select `aurumprivee.com`, and configure the sender as `Aurum Privée` / `accounts@aurumprivee.com`.
+Skip this section for the current account-free RFQ release. If the business later approves Supabase-backed trade accounts or restores the legacy provider, Supabase can send account magic links and recovery messages through a separate Resend connection. In Resend, open Integrations, connect the Aurum Privée Supabase project, select `aurumprivee.com`, and configure the sender as `Aurum Privée` / `accounts@aurumprivee.com`.
 
 If configured manually in Supabase Auth SMTP settings, use:
 
@@ -75,16 +75,15 @@ If configured manually in Supabase Auth SMTP settings, use:
 - Username: `resend`
 - Password: a Resend API key
 
-Use a separate Resend key for Supabase Auth so it can be rotated independently from order email.
+Use a separate Resend key for Supabase Auth so it can be rotated independently from RFQ email.
 
 ## 6. Acceptance test after approval
 
 1. In the actual deploy environment, run `npm run preflight:email` and confirm the domain-scoped Sending key passes.
-2. Submit the contact form from an address controlled by the team and confirm the merchant notification arrives.
-3. Reply from the protected client-care workspace and confirm the customer receives one message.
-4. Join the private list and complete the newsletter confirmation link.
-5. Confirm SPF, DKIM and DMARC pass in the received message headers.
-6. Check Resend logs for delivery, bounce and complaint events.
-7. Test Wix order notifications separately during the controlled Wix checkout acceptance run.
-
-Do not enable live checkout until these checks pass.
+2. Submit one controlled quote request from an address owned by the team and confirm both buyer and merchant messages arrive exactly once.
+3. Confirm the request and notification state appear in `/operations/quotes`.
+4. Submit the contact form from an address controlled by the team and confirm the merchant notification arrives.
+5. Reply from the protected client-care workspace and confirm the customer receives one message.
+6. Join the private list and complete the newsletter confirmation link.
+7. Confirm SPF, DKIM and DMARC pass in the received message headers.
+8. Check Resend logs for delivery, bounce and complaint events.

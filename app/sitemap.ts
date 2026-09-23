@@ -4,7 +4,7 @@ import { getCatalogProducts } from "@/lib/catalog";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const products = await getCatalogProducts();
-  const staticRoutes = ["", "/shop", "/about", "/contact", "/pages/authenticity"];
+  const staticRoutes = ["", "/shop", "/about", "/contact", "/pages/authenticity", "/pages/trade-program", "/pages/aurum-room"];
   return [
     ...staticRoutes.map((route) => ({ url: `${siteConfig.url}${route}`, lastModified: new Date(), changeFrequency: route === "" ? "weekly" as const : "monthly" as const })),
     ...products.map((product) => ({ url: `${siteConfig.url}/shop/${product.slug}`, lastModified: new Date(), changeFrequency: "weekly" as const })),

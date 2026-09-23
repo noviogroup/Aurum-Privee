@@ -8,14 +8,14 @@ export function Footer() {
       <div className="footer-grid">
         <div className="footer-brand">
           <div className="footer-mark"><BrandMark /></div>
-          <p>Exceptional fragrance.<br />Without boundaries.</p>
+          <p>A considered catalogue<br />for modern fragrance retail.</p>
         </div>
         <div>
           <h2>Catalogue</h2>
           <Link href="/shop">All fragrances</Link>
-          <Link href="/shop?audience=Women">For her</Link>
-          <Link href="/shop?audience=Men">For him</Link>
-          <Link href="/shop?audience=Unisex">Unisex</Link>
+          <Link href="/shop?audience=Women">Women&apos;s fragrance</Link>
+          <Link href="/shop?audience=Men">Men&apos;s fragrance</Link>
+          <Link href="/shop?audience=Unisex">Unisex fragrance</Link>
           <Link href="/shop?query=gift%20set">Gift sets</Link>
         </div>
         <div>
@@ -29,8 +29,8 @@ export function Footer() {
         <div>
           <h2>About</h2>
           <Link href="/about">Our story</Link>
+          <Link href="/pages/trade-program">Trade programme</Link>
           <Link href="/pages/aurum-room">The Aurum Room</Link>
-          <Link href="/#collections">Collections</Link>
           <Link href="/quote-list">Request a quote</Link>
         </div>
         <div className="footer-newsletter">

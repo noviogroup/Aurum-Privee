@@ -1,6 +1,6 @@
 # Aurum Privée Loyverse integration runbook
 
-> Legacy rollback only: the active release path uses Wix for catalogue, checkout, orders and standard order email. This Supabase/Stripe/Loyverse workflow must not be enabled alongside Wix. Use it only after an intentional `COMMERCE_PROVIDER=legacy` rollback and completion of its full acceptance matrix.
+> Legacy rollback only: the active B2B release uses Wix as a private catalogue source and does not expose checkout, public pricing or online orders. This Supabase/Stripe/Loyverse workflow must not be enabled alongside the RFQ release. Use it only after a new approved commerce decision and completion of its full acceptance matrix.
 
 This integration treats Loyverse as the source of truth for item identity, store price and stock. Supabase stores the storefront catalog and preserves the editorial fields that make Aurum Privée feel curated: imagery, fragrance family, notes, descriptions, featured placement and sort order.
 

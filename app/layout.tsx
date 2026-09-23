@@ -21,7 +21,7 @@ const body = Manrope({
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
-  title: { default: "Aurum Privée | Exceptional fragrance", template: "%s | Aurum Privée" },
+  title: { default: "Aurum Privée | Trade fragrance catalogue", template: "%s | Aurum Privée" },
   description: siteConfig.description,
   applicationName: siteConfig.name,
   formatDetection: { telephone: false },

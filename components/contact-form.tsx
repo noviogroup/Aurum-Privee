@@ -55,7 +55,7 @@ export function ContactForm() {
   if (status === "success") return (
     <div className="contact-success" role="status">
       <CheckCircle size={30} weight="light" />
-      <p className="utility-label">Note received</p>
+      <p className="utility-label">Trade note received</p>
       <h2>We’ll take it from here.</h2>
       <p>{message}</p>
       {reference && <strong>Reference {reference}</strong>}

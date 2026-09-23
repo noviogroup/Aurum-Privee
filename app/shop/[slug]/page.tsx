@@ -62,7 +62,7 @@ export default async function ProductPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeStructuredData(productStructuredData(product)) }}
       />
-      <Link href="/shop" className="back-link"><ArrowLeft size={16} /> Back to fragrance</Link>
+      <Link href="/shop" className="back-link"><ArrowLeft size={16} /> Back to catalogue</Link>
       <div className="product-detail">
         <div className="product-gallery">
           <Image src={product.image} alt={product.imageAlt} fill priority sizes="(max-width: 900px) calc(100vw - 48px), 660px" />
@@ -103,9 +103,9 @@ export default async function ProductPage({ params }: Props) {
         <section className="related section-shell" aria-labelledby="related-title">
           <header className="related-heading">
             <div>
-              <h2 id="related-title">You may also like</h2>
+              <h2 id="related-title">Build around this fragrance</h2>
             </div>
-            <p>Thoughtfully connected through fragrance profile, audience, house and format.</p>
+            <p>Related options to help broaden a quote list by profile, audience, house and format.</p>
           </header>
           <div className="related-grid">
             {related.map((relationship) => (

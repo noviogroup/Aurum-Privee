@@ -5,7 +5,11 @@ import { ArrowRight, ChatCircleDots, Gift, SealCheck, Sparkle, WhatsappLogo } fr
 import { ProductBrowser } from "@/components/product-browser";
 import { getHomepageCatalogProducts } from "@/lib/catalog";
 
-export const metadata: Metadata = { alternates: { canonical: "/" } };
+export const metadata: Metadata = {
+  title: "Trade fragrance catalogue",
+  description: "Explore Aurum Privée’s trade fragrance catalogue, build an assortment and request private commercial terms.",
+  alternates: { canonical: "/" },
+};
 export const revalidate = 60;
 
 const homepageProductIds = [
@@ -61,11 +65,11 @@ export default async function HomePage() {
     <div className="home-page">
       <section className="home-campaign-hero">
         <div className="home-campaign-copy entrance">
-          <h1>Without<br />{" "}boundaries.</h1>
-          <p>A considered wardrobe of designer, niche and Arabian fragrance, chosen for the way scent becomes personal.</p>
+          <h1>A considered catalogue<br />for modern fragrance retail.</h1>
+          <p>Explore designer, niche and Arabian fragrance, build the assortment your business needs and request private trade terms.</p>
           <div className="hero-actions">
-            <Link className="button button-primary" href="/shop">Browse the catalogue</Link>
-            <Link className="campaign-text-link" href="#scent-finder">Find your scent <ArrowRight size={16} /></Link>
+            <Link className="button button-primary" href="/shop">Browse trade catalogue</Link>
+            <Link className="campaign-text-link" href="#trade-process">How quoting works <ArrowRight size={16} /></Link>
           </div>
         </div>
         <div className="home-campaign-visual">
@@ -80,30 +84,44 @@ export default async function HomePage() {
               sizes="(max-width: 767px) 100vw, 64vw"
             />
           </picture>
-          <div className="home-campaign-caption"><strong>Four icons. One considered edit.</strong><span>Dior, Carolina Herrera, MFK, Tom Ford</span></div>
+          <div className="home-campaign-caption"><strong>Recognisable houses. A considered edit.</strong><span>Designer, niche and Arabian fragrance</span></div>
         </div>
       </section>
 
       <section className="home-assurance-bar" aria-label="Aurum Privée services">
-        <article><Sparkle size={25} weight="light" /><div><strong>Private client service</strong><span>Personal sourcing &amp; guidance</span></div></article>
-        <article><Gift size={25} weight="light" /><div><strong>Tailored assortment</strong><span>Selections shaped for your business</span></div></article>
-        <article><SealCheck size={25} weight="light" /><div><strong>Authentic &amp; curated</strong><span>100% authentic guarantee</span></div></article>
-        <article><ChatCircleDots size={25} weight="light" /><div><strong>Personal service</strong><span>We&apos;re here to help</span></div></article>
+        <article><Sparkle size={25} weight="light" /><div><strong>Trade catalogue</strong><span>A focused multi-brand selection</span></div></article>
+        <article><Gift size={25} weight="light" /><div><strong>Tailored assortment</strong><span>Choose products and quantities</span></div></article>
+        <article><SealCheck size={25} weight="light" /><div><strong>Clear product detail</strong><span>Formats and scent profiles together</span></div></article>
+        <article><ChatCircleDots size={25} weight="light" /><div><strong>Private terms</strong><span>Reviewed directly with your business</span></div></article>
+      </section>
+
+      <section className="trade-process section-shell" id="trade-process" aria-labelledby="trade-process-title">
+        <header>
+          <p className="utility-label">A simpler trade enquiry</p>
+          <h2 id="trade-process-title">From catalogue to considered quote.</h2>
+          <p>No public price list and no checkout. Build your selection first; commercial terms follow after review.</p>
+        </header>
+        <div className="trade-process-steps">
+          <article><span>01</span><h3>Explore the catalogue</h3><p>Search by house, fragrance, format or scent family and add relevant editions to your quote list.</p></article>
+          <article><span>02</span><h3>Set your quantities</h3><p>Add quantities and notes so the team can understand the assortment your business is considering.</p></article>
+          <article><span>03</span><h3>Request private terms</h3><p>Share your business details. Aurum Privée will review availability and respond with the next commercial step.</p></article>
+        </div>
+        <Link className="button button-primary" href="/quote-list">Build a quote request <ArrowRight size={16} /></Link>
       </section>
 
       <section className="home-collections section-shell" id="collections">
-        <div className="home-section-title home-section-title-centered collection-heading"><h2>Browse by collection</h2><Link href="/shop">View all fragrance <ArrowRight size={16} /></Link></div>
+        <div className="home-section-title home-section-title-centered collection-heading"><h2>Build by collection</h2><Link href="/shop">View full catalogue <ArrowRight size={16} /></Link></div>
         <div className="collection-cabinet">
-          <Link className="collection-tile" href="/shop?audience=Women"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/for-her-brands-v3.webp" mobileSrc="/images/collections/for-her-brands-v3-mobile.webp" alt="Carolina Herrera Good Girl Blush and Yves Saint Laurent Libre fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Carolina Herrera · YSL</small><strong>For her</strong><b>Browse collection</b></span></Link>
-          <Link className="collection-tile" href="/shop?audience=Men"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/for-him-brands-v3.webp" mobileSrc="/images/collections/for-him-brands-v3-mobile.webp" alt="Dior Sauvage and Montblanc Explorer Platinum fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Dior · Montblanc</small><strong>For him</strong><b>Browse collection</b></span></Link>
-          <Link className="collection-tile" href="/shop?audience=Unisex"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/unisex-brands-v3.webp" mobileSrc="/images/collections/unisex-brands-v3-mobile.webp" alt="Maison Francis Kurkdjian Baccarat Rouge 540 and Xerjoff Erba Pura fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>MFK · Xerjoff</small><strong>Unisex</strong><b>Browse collection</b></span></Link>
+          <Link className="collection-tile" href="/shop?audience=Women"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/for-her-brands-v3.webp" mobileSrc="/images/collections/for-her-brands-v3-mobile.webp" alt="Carolina Herrera Good Girl Blush and Yves Saint Laurent Libre fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Carolina Herrera · YSL</small><strong>Women&apos;s fragrance</strong><b>Browse collection</b></span></Link>
+          <Link className="collection-tile" href="/shop?audience=Men"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/for-him-brands-v3.webp" mobileSrc="/images/collections/for-him-brands-v3-mobile.webp" alt="Dior Sauvage and Montblanc Explorer Platinum fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Dior · Montblanc</small><strong>Men&apos;s fragrance</strong><b>Browse collection</b></span></Link>
+          <Link className="collection-tile" href="/shop?audience=Unisex"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/unisex-brands-v3.webp" mobileSrc="/images/collections/unisex-brands-v3-mobile.webp" alt="Maison Francis Kurkdjian Baccarat Rouge 540 and Xerjoff Erba Pura fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>MFK · Xerjoff</small><strong>Unisex fragrance</strong><b>Browse collection</b></span></Link>
           <Link className="collection-tile" href="/shop?query=oud"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/arabian-brands-v3.webp" mobileSrc="/images/collections/arabian-brands-v3-mobile.webp" alt="Al Haramain Amber Oud Gold and Afnan Supremacy Noir fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Al Haramain · Afnan</small><strong>Arabian collection</strong><b>Browse collection</b></span></Link>
           <Link className="collection-tile" href="/shop?query=gift%20set"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/discovery-brands-v3.webp" mobileSrc="/images/collections/discovery-brands-v3-mobile.webp" alt="Carolina Herrera Good Girl and Versace Crystal Noir gift sets" sizes="(max-width: 760px) 100vw, 20vw" /><span><small>Carolina Herrera · Versace</small><strong>Gift sets</strong><b>Browse collection</b></span></Link>
         </div>
       </section>
 
       <section className="bestsellers home-storefront section-shell">
-        <div className="home-section-title home-section-title-centered"><h2>Featured fragrances</h2><Link href="/shop">View all <ArrowRight size={16} /></Link></div>
+        <div className="home-section-title home-section-title-centered"><h2>Catalogue highlights</h2><Link href="/shop">View all <ArrowRight size={16} /></Link></div>
         <ProductBrowser products={featured} compact />
       </section>
 
@@ -117,8 +135,8 @@ export default async function HomePage() {
 
       <section className="campaign-journal section-shell" aria-labelledby="campaign-journal-title">
         <div className="campaign-journal-heading">
-          <h2 id="campaign-journal-title">A fragrance wardrobe,<br />{" "}composed slowly.</h2>
-          <p>Follow instinct across luminous florals, polished amber and the darker pull of oud.</p>
+          <h2 id="campaign-journal-title">An assortment with range,<br />{" "}built with intention.</h2>
+          <p>Balance recognisable signatures with distinctive florals, woods, amber and oud.</p>
         </div>
         <div className="campaign-journal-grid">
           <Link className="campaign-story campaign-story-baccarat" href="/shop/maison-francis-kurkdjian-baccarat-rouge-540-edp-2-4-540-a5076e">
@@ -146,8 +164,8 @@ export default async function HomePage() {
 
       <section className="scent-finder section-shell" id="scent-finder">
         <div className="scent-title">
-          <h2>Find your fragrance by feeling.</h2>
-          <p>Choose a scent family and step straight into a more personal edit.</p>
+          <h2>Build by scent family.</h2>
+          <p>Use fragrance character to shape a more balanced and distinctive assortment.</p>
         </div>
         <div className="scent-choices">
           {[
@@ -166,7 +184,7 @@ export default async function HomePage() {
       <section className="home-services section-shell" aria-label="Private fragrance services">
         <Link className="home-service-card" href="/pages/aurum-room">
           <Image src="/images/services/aurum-room-v2.webp" alt="A private fragrance consultation room" fill sizes="(max-width: 760px) 100vw, 34vw" />
-          <span><strong>The Aurum Room</strong><small>A private fragrance experience, tailored to you.</small><b>Learn more</b></span>
+          <span><strong>The Aurum Room</strong><small>A private buyer consultation for assortment planning.</small><b>Plan a consultation</b></span>
         </Link>
         <Link className="home-service-card" href="/shop?query=gift%20set">
           <Image src="/images/services/gifting-v2.webp" alt="Ivory gift box tied with a blush silk ribbon" fill sizes="(max-width: 760px) 100vw, 34vw" />
@@ -175,7 +193,7 @@ export default async function HomePage() {
         <Link className="home-service-card home-service-help" href="/contact">
           <Image src="/images/services/whatsapp-v2.webp" alt="Hand holding a phone for private fragrance assistance" fill sizes="(max-width: 760px) 100vw, 34vw" />
           <WhatsappLogo className="service-chat-mark" size={28} weight="fill" aria-hidden="true" />
-          <span><strong>Need help?</strong><small>Tell us what you wear or the feeling you want.</small><b>Contact us</b></span>
+          <span><strong>Trade support</strong><small>Tell us about your customers, format needs or sourcing priorities.</small><b>Contact us</b></span>
         </Link>
       </section>
     </div>

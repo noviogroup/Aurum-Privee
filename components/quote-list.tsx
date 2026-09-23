@@ -111,7 +111,7 @@ export function QuoteList() {
         <CheckCircle size={42} weight="light" aria-hidden="true" />
         <p className="utility-label">Reference {reference}</p>
         <h1 id="quote-success-title">Your request is with us.</h1>
-        <p>We have sent an acknowledgement to your inbox. Our team will review availability, quantities and trade terms before responding.</p>
+        <p>We have sent an acknowledgement to your inbox. The trade team will review availability, quantities and commercial terms before responding.</p>
         <div><Link className="button button-primary" href="/shop">Continue browsing</Link><button className="button button-secondary" type="button" onClick={() => { setReference(""); submissionId.current = ""; }}>Start another request</button></div>
       </section>
     </div>
@@ -121,7 +121,7 @@ export function QuoteList() {
     <div className="quote-list-page page-top">
       <section className="saved-heading section-shell entrance">
         <h1>Quote list</h1>
-        <p>Build a trade enquiry, set your quantities and send the complete list to our team for a tailored quote.</p>
+        <p>Build an assortment, set your quantities and send the complete list for a private commercial review.</p>
       </section>
       {!hydrated || loading ? <div className="saved-status section-shell" role="status">Preparing your quote list…</div> : loadError ? (
         <section className="saved-empty section-shell" role="alert"><WarningCircle size={30} weight="light" /><h2>Your list is still here.</h2><p>{loadError}</p><button type="button" className="button button-primary" onClick={() => window.location.reload()}>Try again</button></section>

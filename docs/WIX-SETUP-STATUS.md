@@ -1,5 +1,7 @@
 # Wix headless setup status
 
+> Historical commerce-configuration snapshot. It is retained for audit context, not as the active launch checklist. See [`B2B-RFQ-SPEC.md`](./B2B-RFQ-SPEC.md) and [`../PRODUCTION-HANDOFF.md`](../PRODUCTION-HANDOFF.md).
+
 Last verified: 18 September 2026
 
 This document records the live Wix configuration for the existing Aurum Privée site and the remaining gates for the headless-commerce cutover. It contains no credentials.

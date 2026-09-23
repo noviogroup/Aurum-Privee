@@ -378,6 +378,17 @@ h3 { font-size: 1.65rem; }
 .home-assurance-bar div { min-width: 0; display: grid; gap: 3px; }
 .home-assurance-bar strong { font-size: 11px; line-height: 1.35; letter-spacing: .08em; text-transform: uppercase; }
 .home-assurance-bar span { color: var(--muted); font-size: 12px; line-height: 1.4; }
+.trade-process { padding-block: clamp(82px, 9vw, 128px); display: grid; grid-template-columns: minmax(260px, .72fr) minmax(0, 1.28fr); gap: clamp(52px, 8vw, 120px); align-items: start; }
+.trade-process > header { position: sticky; top: calc(var(--announcement-height) + var(--header-height) + 34px); }
+.trade-process > header .utility-label { margin-bottom: 20px; color: var(--accent-hover); }
+.trade-process > header h2 { max-width: 8.5ch; margin: 0 0 24px; font-size: clamp(3.2rem, 5vw, 5.6rem); line-height: .93; }
+.trade-process > header > p:last-child { max-width: 40ch; margin: 0; color: var(--muted); line-height: 1.7; }
+.trade-process-steps { border-top: 1px solid var(--ink); }
+.trade-process-steps article { min-height: 180px; padding: 28px 0; display: grid; grid-template-columns: 48px minmax(180px, .62fr) minmax(0, 1fr); gap: 24px; align-items: start; border-bottom: 1px solid var(--line); }
+.trade-process-steps article > span { color: var(--accent-hover); font-size: 11px; font-weight: 700; letter-spacing: .1em; }
+.trade-process-steps h3 { margin: 0; font-size: clamp(1.65rem, 2.1vw, 2.3rem); line-height: 1.05; }
+.trade-process-steps p { max-width: 42ch; margin: 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.trade-process > .button { grid-column: 2; width: fit-content; margin-top: -72px; gap: 9px; }
 .home-collections { padding-block: 50px 68px; }
 .home-section-title { margin-bottom: 32px; display: grid; grid-template-columns: 1fr auto; align-items: flex-end; gap: 6px 30px; }
 .home-section-title .utility-label { grid-column: 1; margin: 0; color: var(--accent); }
@@ -1352,6 +1363,12 @@ h3 { font-size: 1.65rem; }
   .home-assurance-bar article:nth-child(odd) { border-right: 1px solid var(--line); }
   .home-assurance-bar article:nth-child(even) { border-right: 0; }
   .home-assurance-bar article:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+  .trade-process { padding: 74px 16px; grid-template-columns: 1fr; gap: 46px; }
+  .trade-process > header { position: static; }
+  .trade-process > header h2 { max-width: 10ch; }
+  .trade-process-steps article { min-height: 0; grid-template-columns: 34px 1fr; gap: 12px 16px; }
+  .trade-process-steps article p { grid-column: 2; }
+  .trade-process > .button { grid-column: 1; margin-top: -18px; }
   .home-collections { padding: 52px 16px 60px; }
   .home-section-title { margin-bottom: 30px; grid-template-columns: 1fr; align-items: flex-end; gap: 18px; }
   .home-section-title > a { justify-self: start; }

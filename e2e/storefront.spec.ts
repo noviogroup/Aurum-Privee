@@ -24,8 +24,8 @@ async function navigate(page: Page, path: string) {
 test("homepage presents the primary action without layout overflow", async ({ page }) => {
   await navigate(page, "/");
 
-  await expect(page.getByRole("heading", { level: 1, name: "Without boundaries." })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Browse the catalogue" })).toBeInViewport();
+  await expect(page.getByRole("heading", { level: 1, name: "A considered catalogue for modern fragrance retail." })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Browse trade catalogue" })).toBeInViewport();
   await expect(page.getByRole("button", { name: /Open bag/ })).toHaveCount(0);
   await expect(page.getByText(/Nassau|The Bahamas|Harbour Island|New Providence/i)).toHaveCount(0);
   if (page.viewportSize()!.width >= 981) {
@@ -154,7 +154,7 @@ test("trade catalogue and quote-list product flow behave coherently", async ({ p
 
   await navigate(page, "/checkout");
   await expect(page).toHaveURL(/\/shop$/);
-  await expect(page.getByRole("heading", { level: 1, name: "Find the one that stays with you." })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Build an assortment worth returning to." })).toBeVisible();
 });
 
 test("buyer can submit a structured quote request without price data", async ({ page }) => {
@@ -213,7 +213,7 @@ test("search dialog rejects malformed catalogue data and restores focus when dis
 test("reduced-motion mode keeps state feedback without spatial animation", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await navigate(page, "/");
-  const primaryAction = page.getByRole("link", { name: "Browse the catalogue" });
+  const primaryAction = page.getByRole("link", { name: "Browse trade catalogue" });
   const primaryActionMotion = await primaryAction.evaluate((element) => {
     const style = getComputedStyle(element);
     return { animationName: style.animationName, transitionProperty: style.transitionProperty, transitionDuration: style.transitionDuration };
@@ -253,6 +253,7 @@ test("public support routes, redirects and private-page metadata are coherent", 
   for (const path of [
     "/about",
     "/pages/aurum-room",
+    "/pages/trade-program",
     "/quote-list",
     "/account",
     "/pages/shipping-returns",

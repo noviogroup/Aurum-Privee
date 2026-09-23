@@ -1,9 +1,11 @@
 # ADR-003: Wix Headless commerce with Loyverse inventory authority
 
-- Status: Proposed
+- Status: Superseded by ADR-004
 - Date: 2026-09-06
 - Deciders: Aurum Privée owner and Novio Group implementation lead
 - Supersedes on acceptance: ADR-002 for catalogue, checkout, orders, customers, fulfilment and transactional order email
+
+> Historical checkout architecture only. Wix remains the private catalogue source, but the active public workflow is B2B request-for-quote and does not use Wix checkout. See [`ADR-004-b2b-rfq.md`](./ADR-004-b2b-rfq.md).
 
 ## Context
 

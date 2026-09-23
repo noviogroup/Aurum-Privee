@@ -1,5 +1,7 @@
 # Payment provider handoff
 
+> Dormant legacy reference. The active B2B RFQ release does not accept payment or create online orders. Reintroducing payment requires a new accepted architecture decision and full acceptance cycle.
+
 ## Current state
 
 The repository includes a complete Stripe Checkout Sessions adapter with secure server-side pricing, hosted checkout, signature-verified webhook handling, order persistence, email confirmation and Loyverse receipt creation.
