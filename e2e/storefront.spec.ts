@@ -167,17 +167,18 @@ test("trade catalogue and quote-list product flow behave coherently", async ({ p
 test("the quote-list limit warns without dropping an existing selection", async ({ page }) => {
   await navigate(page, "/shop");
   const addButtons = page.getByRole("button", { name: /^Add .+ to quote list$/ });
+  const removeButtons = page.getByRole("button", { name: /^Remove .+ from quote list$/ });
   for (let i = 0; i < 20; i += 1) await addButtons.first().click();
-  await expect(page.getByRole("link", { name: "Quote list, 20 items", exact: true })).toBeVisible();
+  await expect(removeButtons).toHaveCount(20);
   const before = await page.evaluate(() => localStorage.getItem("aurum-privee-quote-list-v1"));
   await addButtons.first().click();
   await expect(page.getByRole("status").filter({ hasText: "Your list holds up to 20 fragrances" })).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem("aurum-privee-quote-list-v1"))).toBe(before);
   await page.getByRole("button", { name: "Dismiss", exact: true }).click();
-  await page.getByRole("button", { name: /^Remove .+ from quote list$/ }).first().click();
-  await expect(page.getByRole("link", { name: "Quote list, 19 items", exact: true })).toBeVisible();
+  await removeButtons.first().click();
+  await expect(removeButtons).toHaveCount(19);
   await addButtons.first().click();
-  await expect(page.getByRole("link", { name: "Quote list, 20 items", exact: true })).toBeVisible();
+  await expect(removeButtons).toHaveCount(20);
 });
 
 test("buyer can submit a structured quote request without price data", async ({ page }) => {

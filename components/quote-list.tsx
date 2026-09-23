@@ -42,8 +42,8 @@ export function QuoteList() {
 
   useEffect(() => {
     if (!reference) return;
-    window.scrollTo({ top: 0, behavior: "auto" });
-    successHeading.current?.focus();
+    successHeading.current?.focus({ preventScroll: true });
+    window.scrollTo({ top: 0, behavior: "instant" });
   }, [reference]);
 
   // A note or quantity edit must not reload products and unmount the inputs.
