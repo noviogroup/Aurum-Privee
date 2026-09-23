@@ -13,10 +13,10 @@ export async function POST(request: Request) {
   if (!isSameOriginRequest(request)) return NextResponse.json({ message: "Invalid request origin." }, { status: 403 });
   try {
     if (![process.env.RESEND_API_KEY, process.env.RESEND_FROM_EMAIL, process.env.STORE_NOTIFICATION_EMAIL].every(isConfiguredSecret)) {
-      return NextResponse.json({ message: "Trade enquiries will open when merchant email is configured." }, { status: 503 });
+      return NextResponse.json({ message: "Quote requests are temporarily unavailable. Your list is still here; please try again later." }, { status: 503 });
     }
     const limit = await consumeBlobRateLimit({ request, scope: "quote-request", limit: 8, windowSeconds: 86_400 });
-    if (!limit.configured) return NextResponse.json({ message: "Quote-request protection is not configured." }, { status: 503 });
+    if (!limit.configured) return NextResponse.json({ message: "Quote requests are temporarily unavailable. Your list is still here; please try again later." }, { status: 503 });
     if (!limit.allowed) return NextResponse.json({ message: "Please wait before sending another quote request." }, { status: 429, headers: { "Retry-After": String(limit.retryAfter) } });
     const input = quoteRequestSchema.parse(await readJsonBody<unknown>(request, 24_000));
     if (input.website) return NextResponse.json({ message: "Your request has been received.", reference: "" });

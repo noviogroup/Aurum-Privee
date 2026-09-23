@@ -13,12 +13,12 @@ export async function POST(request: Request) {
   try {
     const supabase = getSupabaseAdmin();
     if (!isConfiguredSecret(process.env.RESEND_API_KEY) || !isConfiguredSecret(process.env.RESEND_FROM_EMAIL)) {
-      return NextResponse.json({ message: "Email signup will open when confirmation email is configured." }, { status: 503 });
+      return NextResponse.json({ message: "Signup is temporarily unavailable. Please try again later." }, { status: 503 });
     }
     const rateLimit = supabase
       ? await consumeRateLimit({ supabase, request, scope: "newsletter", limit: 4, windowSeconds: 3600 })
       : await consumeBlobRateLimit({ request, scope: "newsletter", limit: 4, windowSeconds: 3600 });
-    if (!rateLimit.configured) return NextResponse.json({ message: "Email signup protection is not configured." }, { status: 503 });
+    if (!rateLimit.configured) return NextResponse.json({ message: "Signup is temporarily unavailable. Please try again later." }, { status: 503 });
     if (!rateLimit.allowed) return NextResponse.json({ message: "Please wait before requesting another confirmation." }, { status: 429, headers: { "Retry-After": String(rateLimit.retryAfter) } });
     const globalLimit = supabase
       ? await consumeRateLimit({ supabase, request, scope: "newsletter-global", limit: 300, windowSeconds: 3600, global: true })

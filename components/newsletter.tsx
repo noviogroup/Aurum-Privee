@@ -36,10 +36,10 @@ export function Newsletter() {
       if (controller.signal.aborted) return;
       setStatus("error");
       setMessage(error instanceof ClientRequestTimeoutError
-        ? "Joining took too long. Check your connection and try again."
+        ? "The request took too long. Check your connection and try again."
         : error instanceof ClientResponseFormatError
-          ? "The private list returned an unexpected response. Your email is still here, so please try again."
-          : "We could not reach the private list. Check your connection and try again.");
+          ? "We could not confirm your signup. Your email is still here, so please try again."
+          : "We could not submit your signup. Check your connection and try again.");
     } finally {
       if (requestController.current === controller) {
         requestController.current = null;

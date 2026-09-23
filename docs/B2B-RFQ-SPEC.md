@@ -21,13 +21,13 @@ The MVP does not approve trade accounts or verify resale credentials automatical
 ## Public journey
 
 1. The buyer browses or searches the catalogue.
-2. The buyer adds up to 20 unique products to a device-local quote list.
+2. The buyer adds up to 20 unique products to a device-local quote list. At capacity, additional products are rejected with a visible message; existing selections are never evicted.
 3. The buyer sets a quantity from 1 to 999 and may add a note of up to 500 characters per product.
 4. The buyer supplies company, contact name, business email, buyer type, optional phone, optional destination and optional general notes.
 5. The buyer explicitly consents to the use of those details for the enquiry.
 6. The server reloads every product from the private catalogue and rejects unknown or unavailable items.
 7. The server atomically records the request and returns an `APQ-…` reference.
-8. Resend sends a buyer acknowledgement and merchant notification using stable idempotency keys.
+8. Resend attempts a buyer acknowledgement and merchant notification using stable idempotency keys. The on-screen confirmation reports that the request was saved, without claiming delivery.
 9. Staff review the request in the protected operations workspace.
 
 ## Public catalogue contract
@@ -127,3 +127,7 @@ On 23 September 2026, controlled internal request `APQ-263ACAFF6E` completed the
 ## Phase 2 decision gates
 
 Before implementing formal quotes, Aurum Privée must approve minimums, pricing ownership, currencies, quote validity, payment terms, freight responsibility, inventory allocation, returns/claims and the accepted-quote handoff. See [CLIENT-HANDOVER.md](./CLIENT-HANDOVER.md) for the complete client decision list.
+
+## Commercial operating defaults
+
+See [B2B-OPERATING-DEFAULTS.md](./B2B-OPERATING-DEFAULTS.md) for buyer eligibility, quote validity, payment, freight and the manual staff workflow.

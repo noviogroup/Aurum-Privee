@@ -59,10 +59,10 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
         <section className="account-intro">
           <UserCircle size={34} weight="thin" />
           <h1>Buyer accounts are not available yet.</h1>
-          <p>Buyer sign-in is not active yet. Your quote list stays on this device, and client care can help with a trade enquiry.</p>
+          <p>You don’t need an account to request a quote. Your quote list is saved in this browser; the trade team handles pricing and order arrangements directly.</p>
           <div className="account-availability-actions">
             <Link href="/quote-list" className="button button-primary">View quote list</Link>
-            <Link href="/contact" className="text-link">Contact client care</Link>
+            <Link href="/contact" className="text-link">Contact the trade team</Link>
           </div>
         </section>
         <aside className="account-benefits">

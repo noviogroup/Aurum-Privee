@@ -30,7 +30,7 @@ async function navigate(page: Page, path: string) {
 test("homepage presents the primary action without layout overflow", async ({ page }) => {
   await navigate(page, "/");
 
-  await expect(page.getByRole("heading", { level: 1, name: "Wholesale fragrance for professional buyers." })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Wholesale fragrance for your business." })).toBeVisible();
   await expect(page.getByRole("link", { name: "Browse trade catalogue" })).toBeInViewport();
   await expect(page.getByRole("button", { name: /Open bag/ })).toHaveCount(0);
   await expect(page.getByText(/Nassau|The Bahamas|Harbour Island|New Providence/i)).toHaveCount(0);
@@ -73,7 +73,7 @@ test("catalog search returns useful results and preserves a stable layout", asyn
     expect(firstProduct, "first product row should be rendered").not.toBeNull();
     expect(firstProduct!.y).toBeLessThan(page.viewportSize()!.height);
   }
-  await page.getByLabel("Search the collection").fill("Dior Sauvage");
+  await page.getByLabel("Search the catalogue").fill("Dior Sauvage");
 
   const status = main.locator(".catalog-status");
   await expect(status).toContainText("3 fragrances matching “Dior Sauvage”", { timeout: 20_000 });
@@ -164,6 +164,23 @@ test("trade catalogue and quote-list product flow behave coherently", async ({ p
   await expect(page.getByRole("heading", { level: 1, name: "Trade fragrance catalogue." })).toBeVisible();
 });
 
+test("the quote-list limit warns without dropping an existing selection", async ({ page }) => {
+  await navigate(page, "/shop");
+  const addButtons = page.getByRole("button", { name: /^Add .+ to quote list$/ });
+  const removeButtons = page.getByRole("button", { name: /^Remove .+ from quote list$/ });
+  for (let i = 0; i < 20; i += 1) await addButtons.first().click();
+  await expect(removeButtons).toHaveCount(20);
+  const before = await page.evaluate(() => localStorage.getItem("aurum-privee-quote-list-v1"));
+  await addButtons.first().click();
+  await expect(page.getByRole("status").filter({ hasText: "Your list holds up to 20 fragrances" })).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem("aurum-privee-quote-list-v1"))).toBe(before);
+  await page.getByRole("button", { name: "Dismiss", exact: true }).click();
+  await removeButtons.first().click();
+  await expect(removeButtons).toHaveCount(19);
+  await addButtons.first().click();
+  await expect(removeButtons).toHaveCount(20);
+});
+
 test("buyer can submit a structured quote request without price data", async ({ page }) => {
   let submitted: Record<string, unknown> | null = null;
   let submissionAttempts = 0;
@@ -179,7 +196,13 @@ test("buyer can submit a structured quote request without price data", async ({ 
   await page.getByRole("button", { name: "Add Sauvage to quote list", exact: true }).click();
   await navigate(page, "/quote-list");
   await page.getByRole("spinbutton", { name: "Quantity" }).fill("24");
-  await page.getByLabel("Buyer note").fill("Please quote by the case.");
+  const buyerNote = page.getByLabel("Buyer note");
+  await buyerNote.pressSequentially("Please quote by the case.", { delay: 40 });
+  await expect(buyerNote).toBeFocused();
+  await expect(buyerNote).toHaveValue("Please quote by the case.");
+  await page.reload();
+  await expect(page.getByRole("spinbutton", { name: "Quantity" })).toHaveValue("24");
+  await expect(buyerNote).toHaveValue("Please quote by the case.");
   await page.getByLabel("Company name").fill("Maison Retail Ltd");
   await page.getByLabel("Contact name").fill("Amara Clarke");
   await page.getByLabel("Business email").fill("amara@example.com");
@@ -195,6 +218,8 @@ test("buyer can submit a structured quote request without price data", async ({ 
   await expect(page.getByRole("heading", { level: 1, name: "Your request is with us." })).toBeFocused();
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
   await expect(page.getByText("Reference APQ-DEMO12345")).toBeVisible();
+  await expect(page.getByText(/Your quote request has been saved/)).toBeVisible();
+  await expect(page.getByText(/We have sent an acknowledgement/)).toHaveCount(0);
   expect(submitted).not.toBeNull();
   expect(JSON.stringify(submitted)).not.toContain("price");
   expect((submitted!.lines as Array<{ productId: string; quantity: number; note?: string }>)[0]).toMatchObject({ quantity: 24, note: "Please quote by the case." });
@@ -306,7 +331,7 @@ test("unexpected routes keep a branded and accessible recovery path", async ({ p
   const response = await navigate(page, "/this-page-does-not-exist");
   expect(response?.status()).toBe(404);
   await expect(page.getByRole("heading", { level: 1, name: "Page not found." })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Browse fragrance" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Browse catalogue" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Return home" })).toBeVisible();
   const hasOverflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
   expect(hasOverflow).toBe(false);
@@ -331,12 +356,12 @@ test("contact and newsletter forms complete their browser-side workflows", async
       await route.fulfill({ status: 504, contentType: "text/html", body: "Gateway timeout" });
       return;
     }
-    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ message: "Your note has been received.", reference: "AP-TEST1234" }) });
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ message: "Your message has been received.", reference: "AP-TEST1234" }) });
   });
   await navigate(page, "/contact");
   await page.getByLabel("Name").fill("Amara Clarke");
   await page.getByLabel("Email", { exact: true }).fill("amara@example.com");
-  await page.getByLabel("Your note").fill("I would like help choosing a fresh evening fragrance.");
+  await page.getByLabel("Your message").fill("I would like help selecting fresh fragrances for a retail opening order.");
   await page.evaluate(() => {
     const form = document.querySelector<HTMLFormElement>(".contact-form");
     form?.requestSubmit();
@@ -347,10 +372,10 @@ test("contact and newsletter forms complete their browser-side workflows", async
   const sameTickContactAttempts = contactAttempts;
   releaseFirstContact();
   expect(sameTickContactAttempts).toBe(1);
-  await expect(page.getByRole("main").getByRole("alert")).toContainText("Your note is still here");
-  await expect(page.getByLabel("Your note")).toHaveValue("I would like help choosing a fresh evening fragrance.");
-  await expect(page.getByRole("button", { name: "Send your note" })).toBeEnabled();
-  await page.getByRole("button", { name: "Send your note" }).click();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("Your message is still here");
+  await expect(page.getByLabel("Your message")).toHaveValue("I would like help selecting fresh fragrances for a retail opening order.");
+  await expect(page.getByRole("button", { name: "Send message" })).toBeEnabled();
+  await page.getByRole("button", { name: "Send message" }).click();
   await expect(page.getByRole("status")).toContainText("Reference AP-TEST1234");
 
   let newsletterAttempts = 0;

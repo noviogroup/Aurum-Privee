@@ -31,20 +31,20 @@ export function parseQuoteList(value: string | null): QuoteListItem[] {
 }
 
 export function migrateSavedFragrances(storage: Pick<Storage, "getItem">): QuoteListItem[] {
-  const current = parseQuoteList(storage.getItem(QUOTE_LIST_STORAGE_KEY));
-  if (current.length) return current;
+  const stored = storage.getItem(QUOTE_LIST_STORAGE_KEY);
+  if (stored !== null) return parseQuoteList(stored);
   return parseSavedFragranceIds(storage.getItem(WISHLIST_STORAGE_KEY)).map((productId) => ({ productId, quantity: 1 }));
 }
 
 export function addQuoteListItem(items: QuoteListItem[], productId: string): QuoteListItem[] {
-  if (!productId || productId.length > 120 || items.some((item) => item.productId === productId)) return items;
-  return [{ productId, quantity: 1 }, ...items].slice(0, MAX_QUOTE_ITEMS);
+  if (items.length >= MAX_QUOTE_ITEMS || !productId || productId.length > 120 || items.some((item) => item.productId === productId)) return items;
+  return [{ productId, quantity: 1 }, ...items];
 }
 
 export function updateQuoteListItem(items: QuoteListItem[], productId: string, patch: Partial<Pick<QuoteListItem, "quantity" | "note">>) {
   return items.map((item) => item.productId !== productId ? item : {
     ...item,
     ...(patch.quantity === undefined ? {} : { quantity: normalizedQuantity(patch.quantity) }),
-    ...(patch.note === undefined ? {} : { note: patch.note.trim().slice(0, 500) || undefined }),
+    ...(patch.note === undefined ? {} : { note: patch.note.slice(0, 500) || undefined }),
   });
 }
