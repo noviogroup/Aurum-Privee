@@ -80,21 +80,21 @@ export default async function ProductPage({ params }: Props) {
           </div>
           <ProductVariantOptions current={product} variants={variants} />
           <p className="detail-description">{product.description}</p>
-          <p className="detail-consultation-note">Add this edition to your list. Trade pricing and availability are confirmed in a private quote.</p>
+          <p className="detail-consultation-note">Add this edition to your quote list, then choose your quantity. Pricing, minimums and availability are confirmed by the trade team.</p>
         </div>
       </div>
       {hasNotes && (
         <section className="scent-profile section-shell" aria-labelledby="scent-profile-title">
           <header className="scent-profile-intro">
             <h2 id="scent-profile-title">Fragrance notes</h2>
-            <p>See how this composition develops from its opening notes through its lasting base.</p>
+            <p>Explore the notes listed for this fragrance.</p>
           </header>
           <div className={`scent-profile-notes scent-profile-notes-${noteSections.length}`}>
             {noteSections.map((section) => <article key={section.label}><span>{section.label}</span><h3>{section.notes.join(", ")}</h3></article>)}
           </div>
           {product.detailsSource && (
             <a className="scent-profile-source" href={product.detailsSource.url} target="_blank" rel="noreferrer">
-              Composition verified by {product.detailsSource.label}
+              Fragrance details from {product.detailsSource.label}
             </a>
           )}
         </section>
@@ -105,12 +105,12 @@ export default async function ProductPage({ params }: Props) {
             <div>
               <h2 id="related-title">Build around this fragrance</h2>
             </div>
-            <p>Related options to help broaden a quote list by profile, audience, house and format.</p>
+            <p>Compare related products by scent profile, brand and format.</p>
           </header>
           <div className="related-grid">
             {related.map((relationship) => (
               <div className="related-card" key={relationship.product.id}>
-                <p className="related-match"><span>Why it connects</span>{relationship.primaryReason}</p>
+                <p className="related-match"><span>Why it’s suggested</span>{relationship.primaryReason}</p>
                 <ProductCard product={relationship.product} />
               </div>
             ))}

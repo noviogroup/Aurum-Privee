@@ -13,13 +13,13 @@ export default function ErrorPage({ error, reset }: { error: Error & { digest?: 
   return (
     <section className="state-page section-shell" aria-labelledby="error-title">
       <div className="state-page-copy">
-        <h1 id="error-title">We could not prepare this page.</h1>
-        <p>The connection may have paused. Try again, or return to the fragrance collection.</p>
+        <h1 id="error-title">We could not load this page.</h1>
+        <p>Try again, or return to the catalogue to continue browsing.</p>
         <div className="state-page-actions">
           <button className="button button-primary" type="button" onClick={reset}>
             Try again <ArrowClockwise size={17} aria-hidden="true" />
           </button>
-          <Link className="text-link" href="/shop">Browse fragrance</Link>
+          <Link className="text-link" href="/shop">Browse catalogue</Link>
         </div>
       </div>
       <figure className="state-page-media">

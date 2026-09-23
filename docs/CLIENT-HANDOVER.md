@@ -53,7 +53,7 @@ The active customer promise is intentionally narrow:
 1. Browse the catalogue.
 2. Build a proposed assortment and set quantities.
 3. Submit company and contact details.
-4. Receive an acknowledgement with an `APQ-…` reference.
+4. Receive an on-screen confirmation with an `APQ-…` reference; an email acknowledgement is also attempted.
 5. Wait for the trade team to confirm availability and the next commercial step.
 
 The website must not publish unapproved claims about authorization, territories, minimums, guaranteed availability, response time, freight, payment, returns or lead times.
@@ -64,20 +64,11 @@ Wix-managed product changes flow into the storefront through the catalogue integ
 
 Product imagery must be owned by Aurum Privée or licensed for this use. A resolving image URL is not visual approval. Naming, concentrations, sizes and photography should continue through the catalogue review process.
 
-## Information still required from the client
+## Operating defaults and ownership
 
-1. Which buyer types Aurum Privée will approve.
-2. Minimum opening and repeat-order quantities.
-3. Whether minimums apply per product, brand, case or total request.
-4. Currency and the method used to prepare private pricing.
-5. Quote-validity period and revision rules.
-6. Payment terms and the point at which inventory is allocated.
-7. Supported destinations and freight responsibility.
-8. Lead-time language that the business can reliably meet.
-9. Returns, shortages, damages, cancellations and claims procedure.
-10. The monitored trade inbox and target response time.
-11. Approved sourcing, authenticity and brand-relationship claims.
-12. The process for converting an accepted quote into an invoice and fulfilment instruction.
+The instruction to use standard B2B practices is implemented in [B2B-OPERATING-DEFAULTS.md](./B2B-OPERATING-DEFAULTS.md): professional buyers, quote-specific minimums and freight, seven-day quote validity unless stated otherwise, and payment before dispatch unless credit is approved in writing. A two-business-day first-response target is internal until staff coverage is assigned.
+
+Record the named trade inbox owner and backup, actual supplier minimums, supported carrier routes, merchant legal identity and privacy/retention owner during handover. Written quotes must contain the final transaction-specific terms. Staff status changes do not send emails automatically.
 
 ## Acceptance checklist
 
@@ -91,7 +82,7 @@ Product imagery must be owned by Aurum Privée or licensed for this use. A resol
 - [Complete] Desktop/mobile Chromium and WebKit release suite passed on production.
 - [Complete] Controlled request `APQ-263ACAFF6E` was saved and both real emails were reported delivered by Resend on 23 September 2026.
 - [Required] Confirm the monitored trade inbox owner and response process.
-- [Required] Approve commercial, fulfilment, returns and claims rules.
+- [Required] Apply the operating defaults and include final fulfilment, returns and claims terms in each written quote.
 - [Required] Train staff on quote states and reference handling.
 
 ## Recommended next phase

@@ -337,19 +337,19 @@ h3 { font-size: 1.65rem; }
   min-height: clamp(570px, 46vw, 680px);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(400px, .72fr) minmax(0, 1.28fr);
+  grid-template-columns: minmax(0, .96fr) minmax(0, 1.04fr);
   border-bottom: 1px solid var(--line);
   background: var(--surface);
 }
 .home-campaign-copy {
   min-width: 0;
-  padding: clamp(54px, 6vw, 92px);
+  padding: clamp(36px, 4vw, 64px);
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 .home-campaign-copy .utility-label { margin-bottom: 22px; color: var(--accent); }
-.home-campaign-copy h1 { margin-bottom: 28px; font-size: clamp(4.15rem, 5.8vw, 5.25rem); }
+.home-campaign-copy h1 { max-width: 13ch; margin-bottom: 28px; font-size: clamp(3.4rem, 4.8vw, 4.6rem); line-height: 1; text-wrap: balance; }
 .home-campaign-copy > p:not(.utility-label) { max-width: 420px; margin-bottom: 32px; color: var(--muted); font-size: 16px; }
 .home-campaign-copy .hero-actions { align-items: center; gap: 24px; }
 .campaign-text-link { display: inline-flex; align-items: center; gap: 8px; border-bottom: 1px solid currentColor; padding-bottom: 4px; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
@@ -1094,6 +1094,11 @@ h3 { font-size: 1.65rem; }
 .saved-privacy p { margin: 0; color: var(--muted); font-size: 12px; }
 
 /* Trade quote list */
+.quote-limit-notice { position: fixed; z-index: 100; right: 20px; bottom: 20px; width: min(420px, calc(100% - 40px)); padding: 20px; border: 1px solid var(--ink); background: var(--surface); color: var(--ink); box-shadow: 0 8px 30px rgb(0 0 0 / 15%); }
+.quote-limit-notice p { margin: 0 0 12px; font-size: 14px; line-height: 1.6; }
+.quote-limit-notice > div { display: flex; justify-content: space-between; gap: 16px; }
+.quote-limit-notice a, .quote-limit-notice button { min-height: 44px; display: inline-flex; align-items: center; border: 0; padding: 0; background: transparent; color: inherit; font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
+.quote-request-form > small a { text-decoration: underline; }
 .quote-list-page { padding-bottom: 80px; }
 .quote-workspace { border-top: 1px solid var(--line); padding-top: 42px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(360px, .8fr); gap: clamp(48px, 7vw, 100px); align-items: start; }
 .quote-selection > header { margin-bottom: 24px; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; }
@@ -1270,9 +1275,9 @@ h3 { font-size: 1.65rem; }
   .account-benefits { border-top: 1px solid var(--line); border-left: 0; grid-template-columns: repeat(3, 1fr); grid-template-rows: none; }
   .account-benefits div { border-right: 1px solid var(--line); border-bottom: 0; }
   .account-benefits div:last-child { border-right: 0; }
-  .home-campaign-hero { grid-template-columns: minmax(340px, .82fr) minmax(0, 1.18fr); }
+  .home-campaign-hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .home-campaign-copy { padding: 50px 38px; }
-  .home-campaign-copy h1 { font-size: clamp(3.6rem, 6.4vw, 4.4rem); }
+  .home-campaign-copy h1 { font-size: clamp(2.7rem, 4.9vw, 3.5rem); }
   .campaign-journal-grid { min-height: 720px; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
   .shop-editorial-intro { grid-template-columns: minmax(0, 1fr) minmax(390px, .9fr); min-height: 410px; }
   .shop-editorial-copy { padding: 44px; }
@@ -1342,19 +1347,17 @@ h3 { font-size: 1.65rem; }
   .hero-product-tom-ford { width: 46%; height: 92%; left: 39%; bottom: 0; }
   .hero-product-afnan { display: none; }
   .home-campaign-hero {
-    height: calc(100dvh - var(--announcement-height) - var(--header-height));
-    min-height: 575px;
-    max-height: 780px;
+    height: auto;
+    min-height: 0;
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(240px, 42%) minmax(0, 1fr);
-    overflow: hidden;
+    grid-template-rows: clamp(200px, 56vw, 320px) auto;
   }
   .home-campaign-visual { order: -1; min-height: 0; }
   .home-campaign-picture > img { object-position: 49% center; }
   .home-campaign-copy { min-height: 0; padding: 24px 20px 26px; }
-  .home-campaign-copy h1 { margin-bottom: 14px; font-size: clamp(3.65rem, 15.5vw, 4.4rem); line-height: .9; }
+  .home-campaign-copy h1 { max-width: 15ch; margin-bottom: 16px; font-size: clamp(2.6rem, 10.2vw, 3.4rem); line-height: 1; }
   .home-campaign-copy > p:not(.utility-label) { max-width: 45ch; margin-bottom: 18px; font-size: 16px; line-height: 1.5; }
-  .home-campaign-copy .hero-actions { display: flex; gap: 14px; flex-wrap: nowrap; }
+  .home-campaign-copy .hero-actions { display: flex; gap: 18px; flex-wrap: wrap; }
   .home-campaign-caption { right: 10px; bottom: 10px; min-width: 0; width: calc(100% - 20px); padding: 14px 16px; }
   .home-campaign-caption strong { font-size: 1.2rem; }
   .button { min-height: 46px; padding-inline: 20px; }

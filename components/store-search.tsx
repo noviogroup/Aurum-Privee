@@ -76,7 +76,7 @@ export function StoreSearch({ open, onClose, returnFocusRef }: { open: boolean; 
         if (!controller.signal.aborted) {
           setResults([]);
           setTotal(0);
-          setError("Search is temporarily unavailable. Open the full collection to keep browsing.");
+          setError("Search is temporarily unavailable. Open the full catalogue to keep browsing.");
         }
       } finally {
         if (!controller.signal.aborted) setLoading(false);
@@ -111,15 +111,15 @@ export function StoreSearch({ open, onClose, returnFocusRef }: { open: boolean; 
 
         {query.trim().length < 2 ? (
           <div className="store-search-start">
-            <p>Browse by scent character</p>
+            <p>Browse by scent family</p>
             <div>
               {['Floral', 'Fresh', 'Woody', 'Amber', 'Gourmand'].map((family) => <Link key={family} href={`/shop?family=${family}`} onClick={onClose}>{family}</Link>)}
             </div>
           </div>
         ) : (
           <div className="store-search-results" aria-live="polite" aria-busy={loading}>
-            <div className="store-search-result-head"><span>{loading ? "Searching the collection" : `${total} ${total === 1 ? "match" : "matches"}`}</span></div>
-            {error && <div className="store-search-none" role="alert"><strong>Search needs a moment.</strong><p>{error}</p><Link href="/shop" onClick={onClose}>Browse all fragrances <ArrowRight size={17} /></Link></div>}
+            <div className="store-search-result-head"><span>{loading ? "Searching the catalogue" : `${total} ${total === 1 ? "match" : "matches"}`}</span></div>
+            {error && <div className="store-search-none" role="alert"><strong>Search is unavailable.</strong><p>{error}</p><Link href="/shop" onClick={onClose}>Browse all fragrances <ArrowRight size={17} /></Link></div>}
             {!loading && !error && results.map((product) => (
               <Link className="store-search-result" href={`/shop/${product.slug}`} onClick={onClose} key={product.id}>
                 <span><Image src={product.image} alt="" fill sizes="72px" /></span>
@@ -127,7 +127,7 @@ export function StoreSearch({ open, onClose, returnFocusRef }: { open: boolean; 
                 <ArrowRight size={17} />
               </Link>
             ))}
-            {!loading && !error && total === 0 && <div className="store-search-none"><strong>No exact match yet.</strong><p>Check the spelling, search the brand, or browse a scent family below.</p></div>}
+            {!loading && !error && total === 0 && <div className="store-search-none"><strong>No matching fragrances.</strong><p>Check the spelling or try a brand name or scent family.</p></div>}
             {!loading && !error && total > 0 && <Link className="store-search-all" href={`/shop?query=${encodeURIComponent(query.trim())}`} onClick={onClose}>See all {total} results <ArrowRight size={17} /></Link>}
           </div>
         )}

@@ -11,7 +11,7 @@ export default function NotFound() {
         <p>The address may be incomplete, or this fragrance may no longer be available.</p>
         <div className="state-page-actions">
           <Link className="button button-primary" href="/shop">
-            Browse fragrance <ArrowRight size={17} aria-hidden="true" />
+            Browse catalogue <ArrowRight size={17} aria-hidden="true" />
           </Link>
           <Link className="text-link" href="/">Return home</Link>
         </div>

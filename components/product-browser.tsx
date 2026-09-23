@@ -61,7 +61,7 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
         setRemoteTotal(result.total);
       } catch {
         if (!controller.signal.aborted) {
-          setError("We could not refresh the collection. Your current selection is still available.");
+          setError("We could not update the results. The products below are from your previous search.");
         }
       } finally {
         if (!controller.signal.aborted) setLoading(false);
@@ -118,7 +118,7 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
   const resultCount = remote ? remoteTotal : filtered.length;
 
   if (!products.length && !remote) {
-    return <div className="catalog-empty"><h2>The collection is being prepared.</h2><p>Please check back shortly or contact Aurum Privée for assistance.</p></div>;
+    return <div className="catalog-empty"><h2>No fragrances to display.</h2><p>Please check back shortly or contact Aurum Privée for assistance.</p></div>;
   }
 
   return (
@@ -127,11 +127,11 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
         <section className="shop-editorial-intro" aria-labelledby="shop-title">
           <div className="shop-editorial-copy">
             <h1 id="shop-title">Trade fragrance catalogue.</h1>
-            <p>Browse products, select editions and add quantities to a private quote request.</p>
+            <p>Compare brands, sizes and concentrations. Add products to your quote list, then enter quantities and request wholesale pricing.</p>
             <div className="catalog-search-wrap" id="catalog-search">
               <div className="catalog-search">
                 <MagnifyingGlass size={22} weight="light" />
-                <label htmlFor="catalog-query">Search the collection</label>
+                <label htmlFor="catalog-query">Search the catalogue</label>
                 <input id="catalog-query" value={query} onChange={(event) => { cancelPendingLoadMore(); setQuery(event.target.value); setVisibleCount(24); }} placeholder="Brand, fragrance, note or size" autoComplete="off" />
                 {query && <button type="button" aria-label="Clear search" onClick={() => { cancelPendingLoadMore(); setQuery(""); }}><X size={17} /></button>}
               </div>
@@ -182,7 +182,7 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
           ))}
         </div>
       ) : (
-        <div className="catalog-empty"><h2>No fragrances found.</h2><p>Check the spelling, search only the brand, or clear the collection filters.</p><button className="button button-secondary" type="button" onClick={() => { cancelPendingLoadMore(); setQuery(""); setAudience("All"); setFamily("All"); }}>Clear search</button></div>
+        <div className="catalog-empty"><h2>No fragrances found.</h2><p>Check the spelling, search only the brand, or clear the catalogue filters.</p><button className="button button-secondary" type="button" onClick={() => { cancelPendingLoadMore(); setQuery(""); setAudience("All"); setFamily("All"); }}>Clear filters</button></div>
       )}
       {!compact && ((remote && remoteTotal > remoteProducts.length) || (!remote && filtered.length > visibleCount)) && (
         <div className="catalog-load-more">

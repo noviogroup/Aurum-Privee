@@ -7,15 +7,15 @@ export default async function ConfirmNewsletterPage({ searchParams }: { searchPa
   const { token, status } = await searchParams;
   const validToken = typeof token === "string" && /^[A-Za-z0-9_-]{43}$/.test(token);
   const copy = status === "confirmed"
-    ? { title: "Subscription confirmed.", body: "You will receive occasional updates about new arrivals, gifts and trade news." }
+    ? { title: "Subscription confirmed.", body: "You’re subscribed to Aurum Privée catalogue news and product updates." }
     : status === "invalid"
-      ? { title: "That link has expired.", body: "Return to the home page and request a fresh confirmation email." }
+      ? { title: "That link is invalid or has expired.", body: "Return to the home page and request a fresh confirmation email." }
       : status === "unavailable"
         ? { title: "Confirmation is briefly unavailable.", body: "Please try the same link again shortly." }
-        : { title: "Confirm your place.", body: "One final click confirms that this address belongs to you." };
+        : { title: "Confirm your subscription.", body: "Confirm that you want to receive catalogue news and product updates from Aurum Privée." };
   return (
     <div className="section-shell page-top" style={{ minHeight: "65vh", maxWidth: 760 }}>
-      <p className="utility-label">A note from Aurum Privée</p>
+      <p className="utility-label">Aurum Privée trade updates</p>
       <h1>{copy.title}</h1>
       <p>{copy.body}</p>
       {!status && validToken ? (

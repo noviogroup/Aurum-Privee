@@ -5,22 +5,22 @@ import { ArrowRight, Sparkle } from "@phosphor-icons/react/dist/ssr";
 
 export const metadata: Metadata = {
   title: "About Aurum Privée",
-  description: "Learn how Aurum Privée supports trade fragrance sourcing and assortment planning.",
+  description: "Meet Aurum Privée: a fragrance sourcing service for retailers, hospitality teams and professional buyers.",
   alternates: { canonical: "/about" },
 };
 
 const principles = [
   {
-    title: "Compare fragrance categories",
-    body: "Recognisable designer houses, niche signatures and Arabian perfumery can sit together when every addition has a clear role in the assortment.",
+    title: "Explore the range",
+    body: "Compare designer, niche and Arabian fragrance in one catalogue, with scent profiles and product formats to guide your selection.",
   },
   {
-    title: "Select the right formats",
-    body: "A large catalogue becomes useful only when formats, fragrance character and audience are easy to compare and select.",
+    title: "Choose for your customers",
+    body: "Select sizes, concentrations and gift sets that suit your customers, intended use and buying plans.",
   },
   {
-    title: "Review terms directly",
-    body: "A quote request begins the conversation. Availability and commercial terms are reviewed with the needs of each business in mind.",
+    title: "Agree the details",
+    body: "Receive pricing, order requirements and fulfilment terms in writing before deciding whether to proceed.",
   },
 ];
 
@@ -29,16 +29,16 @@ export default function AboutPage() {
     <div className="about-page page-top">
       <section className="about-hero section-shell">
         <div className="about-hero-copy entrance">
-          <h1>Trade fragrance<br />sourcing.</h1>
+          <h1>Fragrance for business.</h1>
           <p>
-            Aurum Privée brings designer, niche and Arabian fragrance into one catalogue for retailers and professional buyers.
+            Aurum Privée helps retailers, hospitality teams and corporate buyers source fragrance through a trade catalogue and direct quotation service.
           </p>
-          <Link href="/shop" className="button button-primary">Browse catalogue <ArrowRight size={17} /></Link>
+          <Link href="/shop" className="button button-primary">Browse trade catalogue <ArrowRight size={17} /></Link>
         </div>
         <figure className="about-hero-image">
           <Image
             src="/images/campaign/signature-consultation.webp"
-            alt="Aurum Privée fragrance consultation with Dior fragrances and scent blotters"
+            alt="Fragrance bottles and scent blotters arranged for a consultation"
             fill
             priority
             sizes="(max-width: 767px) 100vw, 58vw"
@@ -48,7 +48,7 @@ export default function AboutPage() {
 
       <section className="about-manifesto section-shell" aria-label="Aurum Privée point of view">
         <Sparkle size={24} weight="thin" aria-hidden="true" />
-        <h2>The catalogue combines established designer houses, niche fragrance and Arabian perfumery for professional buyers.</h2>
+        <h2>Build a fragrance range around the people you serve.</h2>
       </section>
 
       <section className="about-editorial section-shell">
@@ -61,20 +61,20 @@ export default function AboutPage() {
           />
         </figure>
         <div className="about-editorial-copy">
-          <h2>Compare houses, formats and fragrance families.</h2>
+          <h2>Start with your customers.</h2>
           <p>
-            Browse floral, woody, amber, oud and fresh profiles across multiple houses and formats.
+            Whether you are planning a retail range, selecting corporate gifts or sourcing for hospitality, begin with the products and quantities that fit your brief.
           </p>
           <p>
-            Add relevant products to a quote list, set quantities and send the selection for availability and private commercial terms.
+            Send us your selection for pricing and availability. If you need help deciding, The Aurum Room offers a conversation with the trade team about your requirements.
           </p>
-          <Link href="/pages/aurum-room" className="text-link">Plan a buyer consultation <ArrowRight size={15} /></Link>
+          <Link href="/pages/aurum-room" className="text-link">Request a consultation <ArrowRight size={15} /></Link>
         </div>
       </section>
 
       <section className="about-principles section-shell" aria-labelledby="about-principles-title">
         <div className="about-principles-heading">
-          <h2 id="about-principles-title">How we support assortment planning.</h2>
+          <h2 id="about-principles-title">A clear process for professional buyers.</h2>
         </div>
         <div className="about-principles-list">
           {principles.map((principle) => (
@@ -90,10 +90,10 @@ export default function AboutPage() {
         <Image src="/images/campaign/oud-ritual.webp" alt="Amber oud fragrance arranged for a warm evening ritual" fill sizes="100vw" />
         <div className="about-closing-scrim" />
         <div className="about-closing-copy section-shell">
-          <h2>Ready to build your quote list?</h2>
+          <h2>Build your next selection.</h2>
           <div>
-            <Link href="/shop" className="button button-light">Browse catalogue <ArrowRight size={17} /></Link>
-            <Link href="/quote-list" className="about-closing-link">Start a quote request</Link>
+            <Link href="/shop" className="button button-light">Browse trade catalogue <ArrowRight size={17} /></Link>
+            <Link href="/quote-list" className="about-closing-link">Review quote list</Link>
           </div>
         </div>
       </section>

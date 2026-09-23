@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowRight, CheckCircle } from "@phosphor-icons/react";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { inquiryTopics } from "@/lib/contact-inquiry";
@@ -32,7 +33,7 @@ export function ContactForm() {
         body: JSON.stringify(Object.fromEntries(form.entries())),
         signal: controller.signal,
       });
-      setMessage(data.message || (response.ok ? "Your note has been received." : "We could not send your note."));
+      setMessage(data.message || (response.ok ? "Your message has been received." : "We could not send your message."));
       setReference(data.reference || "");
       setStatus(response.ok ? "success" : "error");
       if (response.ok) formElement.reset();
@@ -42,8 +43,8 @@ export function ContactForm() {
       setMessage(error instanceof ClientRequestTimeoutError
         ? "Sending took too long. Check your connection and try again."
         : error instanceof ClientResponseFormatError
-          ? "Client care returned an unexpected response. Your note is still here, so please try again."
-          : "We could not send your note. Check your connection and try again.");
+          ? "We could not confirm receipt. Your message is still here, so please try again."
+          : "We could not send your message. Check your connection and try again.");
     } finally {
       if (requestController.current === controller) {
         requestController.current = null;
@@ -55,11 +56,11 @@ export function ContactForm() {
   if (status === "success") return (
     <div className="contact-success" role="status">
       <CheckCircle size={30} weight="light" />
-      <p className="utility-label">Trade note received</p>
-      <h2>We’ll take it from here.</h2>
-      <p>{message}</p>
+      <p className="utility-label">Trade enquiry</p>
+      <h2>Your message is with us.</h2>
+      <p>{message}</p><p>The trade team will reply to the email address you provided. Keep your reference for follow-up.</p>
       {reference && <strong>Reference {reference}</strong>}
-      <button type="button" className="text-button" onClick={() => { setStatus("idle"); setMessage(""); setReference(""); }}>Send another note</button>
+      <button type="button" className="text-button" onClick={() => { setStatus("idle"); setMessage(""); setReference(""); }}>Send another message</button>
     </div>
   );
 
@@ -88,14 +89,14 @@ export function ContactForm() {
         </select>
       </div>
       <div className="contact-field contact-field-wide">
-        <label htmlFor="contact-message">Your note</label>
+        <label htmlFor="contact-message">Your message</label>
         <textarea id="contact-message" name="message" minLength={20} maxLength={2000} rows={7} required />
-        <small>Tell us about your business, the assortment you need, or how we can help with your quote.</small>
+        <small>Include your company name, requirements and any APQ reference. Please write at least 20 characters.</small>
       </div>
       <div className="contact-form-foot contact-field-wide">
-        <p>By sending this note, you agree that Aurum Privée may use these details to respond to your inquiry.</p>
+        <p>We use these details to respond to your enquiry. Read our <Link href="/pages/privacy">privacy notice</Link>.</p>
         <button type="submit" className="button button-primary" disabled={status === "loading"}>
-          {status === "loading" ? "Sending…" : <>Send your note <ArrowRight size={16} /></>}
+          {status === "loading" ? "Sending…" : <>Send message <ArrowRight size={16} /></>}
         </button>
       </div>
       {message && <p className="form-error contact-field-wide" role="alert">{message}</p>}

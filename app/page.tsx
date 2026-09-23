@@ -7,7 +7,7 @@ import { getHomepageCatalogProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
   title: "Trade fragrance catalogue",
-  description: "Explore Aurum Privée’s trade fragrance catalogue, build an assortment and request private commercial terms.",
+  description: "Source designer, niche and Arabian fragrance for your business. Browse the Aurum Privée catalogue and request wholesale pricing and availability.",
   alternates: { canonical: "/" },
 };
 export const revalidate = 60;
@@ -65,8 +65,8 @@ export default async function HomePage() {
     <div className="home-page">
       <section className="home-campaign-hero">
         <div className="home-campaign-copy entrance">
-          <h1>Wholesale fragrance<br />for professional buyers.</h1>
-          <p>Browse designer, niche and Arabian fragrance. Add products and quantities to a quote request for private pricing and availability.</p>
+          <h1>Wholesale fragrance for your business.</h1>
+          <p>Explore designer, niche and Arabian fragrance for retail, hospitality and corporate gifting. Build your selection and request pricing from our trade team.</p>
           <div className="hero-actions">
             <Link className="button button-primary" href="/shop">Browse trade catalogue</Link>
             <Link className="campaign-text-link" href="#trade-process">How quoting works <ArrowRight size={16} /></Link>
@@ -81,34 +81,34 @@ export default async function HomePage() {
               fill
               loading="eager"
               fetchPriority="high"
-              sizes="(max-width: 767px) 100vw, 64vw"
+              sizes="(max-width: 767px) 100vw, 52vw"
             />
           </picture>
         </div>
       </section>
 
       <section className="home-assurance-bar" aria-label="Aurum Privée services">
-        <article><Sparkle size={25} weight="light" /><div><strong>Trade catalogue</strong><span>A focused multi-brand selection</span></div></article>
-        <article><Gift size={25} weight="light" /><div><strong>Tailored assortment</strong><span>Choose products and quantities</span></div></article>
-        <article><SealCheck size={25} weight="light" /><div><strong>Clear product detail</strong><span>Formats and scent profiles together</span></div></article>
-        <article><ChatCircleDots size={25} weight="light" /><div><strong>Private terms</strong><span>Reviewed directly with your business</span></div></article>
+        <article><Sparkle size={25} weight="light" /><div><strong>Trade catalogue</strong><span>Designer, niche and Arabian fragrance</span></div></article>
+        <article><Gift size={25} weight="light" /><div><strong>Your selection</strong><span>Choose editions and quantities</span></div></article>
+        <article><SealCheck size={25} weight="light" /><div><strong>Clear product detail</strong><span>Sizes, concentrations and scent profiles</span></div></article>
+        <article><ChatCircleDots size={25} weight="light" /><div><strong>Wholesale quotes</strong><span>Pricing and availability confirmed directly</span></div></article>
       </section>
 
       <section className="trade-process section-shell" id="trade-process" aria-labelledby="trade-process-title">
         <header>
           <h2 id="trade-process-title">How quote requests work.</h2>
-          <p>No public price list and no checkout. Build your selection first; commercial terms follow after review.</p>
+          <p>Choose the products your business needs. We’ll review your request and confirm pricing, availability and order requirements directly.</p>
         </header>
         <div className="trade-process-steps">
-          <article><span>01</span><h3>Explore the catalogue</h3><p>Search by house, fragrance, format or scent family and add relevant editions to your quote list.</p></article>
-          <article><span>02</span><h3>Set your quantities</h3><p>Add quantities and notes so the team can understand the assortment your business is considering.</p></article>
-          <article><span>03</span><h3>Request private terms</h3><p>Share your business details. Aurum Privée will review availability and respond with the next commercial step.</p></article>
+          <article><span>01</span><h3>Explore the catalogue</h3><p>Search by brand, fragrance or scent family. Compare sizes and concentrations, then add products to your quote list.</p></article>
+          <article><span>02</span><h3>Set your quantities</h3><p>Enter the number of units you need. Add notes about case packs, timing or special requirements.</p></article>
+          <article><span>03</span><h3>Send your request</h3><p>Share your business details and destination. We’ll review availability and prepare a quote, or contact you for more information.</p></article>
         </div>
         <Link className="button button-primary" href="/quote-list">Build a quote request <ArrowRight size={16} /></Link>
       </section>
 
       <section className="home-collections section-shell" id="collections">
-        <div className="home-section-title home-section-title-centered collection-heading"><h2>Build by collection</h2><Link href="/shop">View full catalogue <ArrowRight size={16} /></Link></div>
+        <div className="home-section-title home-section-title-centered collection-heading"><h2>Explore the catalogue</h2><Link href="/shop">View full catalogue <ArrowRight size={16} /></Link></div>
         <div className="collection-cabinet">
           <Link className="collection-tile" href="/shop?audience=Women"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/for-her-brands-v3.webp" mobileSrc="/images/collections/for-her-brands-v3-mobile.webp" alt="Carolina Herrera Good Girl Blush and Yves Saint Laurent Libre fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Carolina Herrera · YSL</small><strong>Women&apos;s fragrance</strong><b>Browse collection</b></span></Link>
           <Link className="collection-tile" href="/shop?audience=Men"><ResponsiveFillImage className="collection-tile-picture" src="/images/collections/for-him-brands-v3.webp" mobileSrc="/images/collections/for-him-brands-v3-mobile.webp" alt="Dior Sauvage and Montblanc Explorer Platinum fragrances" sizes="(max-width: 760px) 50vw, 20vw" /><span><small>Dior · Montblanc</small><strong>Men&apos;s fragrance</strong><b>Browse collection</b></span></Link>
@@ -123,7 +123,7 @@ export default async function HomePage() {
         <ProductBrowser products={featured} compact />
       </section>
 
-      <section className="brand-rail" aria-label="Brands carried by Aurum Privée">
+      <section className="brand-rail" aria-label="Brands in the catalogue">
         {carriedBrands.map(([label, query, image]) => (
           <Link href={`/shop?query=${encodeURIComponent(query)}`} className={label === "Montblanc" ? "brand-wordmark brand-wordmark-compact" : label === "Dior" || label === "Creed" ? "brand-wordmark brand-wordmark-restrained" : "brand-wordmark"} aria-label={`Browse ${label}`} key={query}>
             <Image src={image} alt={label} width={170} height={54} unoptimized />
@@ -133,18 +133,18 @@ export default async function HomePage() {
 
       <section className="campaign-journal section-shell" aria-labelledby="campaign-journal-title">
         <div className="campaign-journal-heading">
-          <h2 id="campaign-journal-title">Build across fragrance families.</h2>
-          <p>Compare floral, woody, amber and oud profiles across established and niche houses.</p>
+          <h2 id="campaign-journal-title">Explore fragrance profiles.</h2>
+          <p>Find products to complement your current range, from floral and fresh profiles to amber and oud.</p>
         </div>
         <div className="campaign-journal-grid">
           <Link className="campaign-story campaign-story-baccarat" href="/shop/maison-francis-kurkdjian-baccarat-rouge-540-edp-2-4-540-a5076e">
             <ResponsiveFillImage className="campaign-story-picture" src="/images/campaign/baccarat-gifting.webp" mobileSrc="/images/campaign/baccarat-gifting-mobile.webp" alt="Baccarat Rouge 540 presented with Aurum Privée gift packaging" sizes="(max-width: 767px) 100vw, 42vw" />
-            <span><small>Single-bottle format</small><strong>Baccarat Rouge 540</strong><b>View product <ArrowRight size={15} /></b></span>
+            <span><small>Maison Francis Kurkdjian</small><strong>Baccarat Rouge 540</strong><b>View product <ArrowRight size={15} /></b></span>
           </Link>
           <div className="campaign-journal-side">
             <Link className="campaign-story campaign-story-amber-gold" href="/shop/al-haramain-amber-oud-gold-edp-spray-3-4-oz-e36239">
               <ResponsiveFillImage className="campaign-story-picture" src="/images/campaign/amber-oud-gold.webp" mobileSrc="/images/campaign/amber-oud-gold-mobile.webp" alt="Al Haramain Amber Oud Gold Edition in warm daylight" sizes="(max-width: 767px) 100vw, 58vw" />
-              <span><small>Golden and enveloping</small><strong>Amber Oud Gold</strong><b>View the fragrance <ArrowRight size={15} /></b></span>
+              <span><small>Al Haramain</small><strong>Amber Oud Gold</strong><b>View product <ArrowRight size={15} /></b></span>
             </Link>
             <div className="campaign-journal-pair">
               <Link className="campaign-story campaign-story-oud" href="/shop?query=oud">
@@ -167,10 +167,10 @@ export default async function HomePage() {
         </div>
         <div className="scent-choices">
           {[
-            ["Floral", "Petal-soft and luminous"],
-            ["Fresh", "Clear, green and bright"],
-            ["Woody", "Warm and close to skin"],
-            ["Amber", "Deep, magnetic and spiced"],
+            ["Floral", "Rose, jasmine and floral accords"],
+            ["Fresh", "Citrus, green and aquatic accords"],
+            ["Woody", "Cedar, sandalwood and woody accords"],
+            ["Amber", "Warm, resinous and spiced accords"],
           ].map(([name, mood]) => (
             <Link href={`/shop?family=${name}`} className="scent-choice" key={name}>
               <span>{name}</span><strong>{mood}</strong><ArrowRight size={18} />
