@@ -24,9 +24,10 @@ export async function GET(request: Request) {
   }
   const family = allowedFamilies.has(url.searchParams.get("family") || "") ? url.searchParams.get("family") || "All" : "All";
   const audience = allowedAudiences.has(url.searchParams.get("audience") || "") ? url.searchParams.get("audience") || "All" : "All";
+  const brand = (url.searchParams.get("brand") || "").trim().slice(0, 100);
   const query = (url.searchParams.get("query") || "").trim().toLowerCase().slice(0, 100);
   const sort = allowedSorts.has(url.searchParams.get("sort") || "") ? url.searchParams.get("sort") || "featured" : "featured";
   const offset = Math.max(0, Number.parseInt(url.searchParams.get("offset") || "0", 10) || 0);
   const limit = Math.min(48, Math.max(1, Number.parseInt(url.searchParams.get("limit") || "24", 10) || 24));
-  return NextResponse.json(toPublicCatalog(await getCatalogPage({ family, audience: audience as ProductAudience | "All", query, sort, offset, limit })));
+  return NextResponse.json(toPublicCatalog(await getCatalogPage({ brand, family, audience: audience as ProductAudience | "All", query, sort, offset, limit })));
 }

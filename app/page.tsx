@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChatCircleDots, Gift, SealCheck, Sparkle } from "@phosphor-icons/react/dist/ssr";
 import { ProductBrowser } from "@/components/product-browser";
+import { TradeBuyingGuide } from "@/components/trade-buying-guide";
 import { getHomepageCatalogProducts } from "@/lib/catalog";
 
 export const metadata: Metadata = {
@@ -107,6 +108,8 @@ export default async function HomePage() {
         <Link className="button button-primary" href="/quote-list">Build a quote request <ArrowRight size={16} /></Link>
       </section>
 
+      <div className="section-shell"><TradeBuyingGuide /></div>
+
       <section className="home-collections section-shell" id="collections">
         <div className="home-section-title home-section-title-centered collection-heading"><h2>Explore the catalogue</h2><Link href="/shop">View full catalogue <ArrowRight size={16} /></Link></div>
         <div className="collection-cabinet">
@@ -125,7 +128,7 @@ export default async function HomePage() {
 
       <section className="brand-rail" aria-label="Brands in the catalogue">
         {carriedBrands.map(([label, query, image]) => (
-          <Link href={`/shop?query=${encodeURIComponent(query)}`} className={label === "Montblanc" ? "brand-wordmark brand-wordmark-compact" : label === "Dior" || label === "Creed" ? "brand-wordmark brand-wordmark-restrained" : "brand-wordmark"} aria-label={`Browse ${label}`} key={query}>
+          <Link href={`/shop?brand=${encodeURIComponent(label)}`} className={label === "Montblanc" ? "brand-wordmark brand-wordmark-compact" : label === "Dior" || label === "Creed" ? "brand-wordmark brand-wordmark-restrained" : "brand-wordmark"} aria-label={`Browse ${label}`} key={query}>
             <Image src={image} alt={label} width={170} height={54} unoptimized />
           </Link>
         ))}

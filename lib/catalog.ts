@@ -5,6 +5,8 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 import { products as sampleProducts } from "@/lib/products";
 import { Product, ProductAudience, ScentFamily } from "@/lib/types";
 import { CommerceTax } from "@/lib/tax";
+import { matchesCatalogBrand } from "@/lib/catalog-brands";
+import { cache } from "react";
 import { matchesCatalogSearch } from "@/lib/catalog-search";
 import { customerFacingBrand, customerFacingConcentration, customerFacingCopy, customerFacingProductName, customerFacingSize } from "@/lib/brand";
 import { applyProductEnrichment } from "@/lib/product-enrichment";
@@ -95,7 +97,7 @@ async function getWixManagedProducts() {
   return applyWixCatalog(localProducts);
 }
 
-export async function getCatalogProducts() {
+export const getCatalogProducts = cache(async function getCatalogProducts() {
   noStore();
   if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix") return getWixManagedProducts();
   const supabase = getSupabaseAdmin();
@@ -104,7 +106,7 @@ export async function getCatalogProducts() {
   if (error) throw new Error(`The live product catalog is unavailable: ${error.message}`);
   if (!data?.length) return [];
   return (data as ProductRow[]).map(fromRow);
-}
+});
 
 export async function getHomepageCatalogProducts() {
   if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix") return getWixManagedProducts();
@@ -134,22 +136,23 @@ export async function getCatalogProductsByIds(ids: string[]) {
   return ((data || []) as ProductRow[]).map(fromRow);
 }
 
-export async function getCatalogPage(input: { family?: string; audience?: ProductAudience | "All"; query?: string; sort?: string; offset?: number; limit?: number }) {
+export async function getCatalogPage(input: { brand?: string; family?: string; audience?: ProductAudience | "All"; query?: string; sort?: string; offset?: number; limit?: number }) {
   noStore();
   const supabase = getSupabaseAdmin();
   const family = input.family || "All";
   const audience = input.audience || "All";
+  const brand = (input.brand || "").trim().slice(0, 100);
   const query = (input.query || "").trim().toLowerCase();
   const tokens = query.split(/\s+/).map((token) => token.replace(/[%_,()]/g, "")).filter(Boolean).slice(0, 8);
   const sort = input.sort || "featured";
   const offset = Math.max(0, input.offset || 0);
   const limit = Math.min(48, Math.max(1, input.limit || 24));
-  if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix" || audience !== "All") {
+  if (getCommerceProvider(process.env.COMMERCE_PROVIDER) === "wix" || audience !== "All" || brand) {
     const products = await getCatalogProducts();
     const filtered = collapseVariantFamilies(products.filter((product) => {
       const familyMatch = family === "All" || (family === "New" ? product.newArrival : product.family === family);
       const audienceMatch = audience === "All" || product.audience === audience;
-      return audienceMatch && familyMatch && matchesCatalogSearch(product, query);
+      return audienceMatch && familyMatch && matchesCatalogBrand(product, brand) && matchesCatalogSearch(product, query);
     }));
     const sorted = [...filtered].sort((left, right) => sort === "price-asc" ? left.price - right.price : sort === "price-desc" ? right.price - left.price : sort === "name" ? `${left.brand} ${left.name}`.localeCompare(`${right.brand} ${right.name}`) : 0);
     return { products: sorted.slice(offset, offset + limit), total: sorted.length };

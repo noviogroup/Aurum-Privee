@@ -3,6 +3,16 @@ export const BRAND_EDIT = "Aurum Privée Edit";
 export const BRAND_TAGLINE = "Trade fragrance catalogue.";
 
 const canonicalBrands: Record<string, string> = {
+  "gucci": "Gucci",
+  "montblanc": "Montblanc",
+  "lataffa": "Lattafa",
+  "liz claibourne": "Liz Claiborne",
+  "michel germain": "Michael Germain",
+  "cacharell": "Cacharel",
+  "lancome": "Lancôme",
+  "tiffany & co": "Tiffany & Co.",
+  "oscar de la renta": "Oscar de la Renta",
+
   "christian dior": "Dior",
   "parfums christian dior": "Dior",
   "afnan perfumes": "Afnan",

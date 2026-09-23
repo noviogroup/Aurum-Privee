@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { matchesCatalogBrand } from "@/lib/catalog-brands";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MagnifyingGlass, SlidersHorizontal, X } from "@phosphor-icons/react";
 import type { ProductAudience, PublicProduct, ScentFamily } from "@/lib/types";
@@ -15,7 +17,8 @@ const families: CatalogFilter[] = ["All", "New", "Floral", "Fresh", "Woody", "Am
 type CatalogSort = "featured" | "name";
 type CatalogAudience = ProductAudience | "All";
 
-export function ProductBrowser({ products, compact = false, searchable = false, initialFilter = "All", initialAudience = "All", initialQuery = "", initialSort = "featured", remote = false, catalogTotal }: { products: PublicProduct[]; compact?: boolean; searchable?: boolean; initialFilter?: CatalogFilter; initialAudience?: CatalogAudience; initialQuery?: string; initialSort?: string; remote?: boolean; catalogTotal?: number }) {
+export function ProductBrowser({ products, brands = [], initialBrand = "", compact = false, searchable = false, initialFilter = "All", initialAudience = "All", initialQuery = "", initialSort = "featured", remote = false, catalogTotal }: { products: PublicProduct[]; brands?: string[]; initialBrand?: string; compact?: boolean; searchable?: boolean; initialFilter?: CatalogFilter; initialAudience?: CatalogAudience; initialQuery?: string; initialSort?: string; remote?: boolean; catalogTotal?: number }) {
+  const [brand, setBrand] = useState(initialBrand);
   const [family, setFamily] = useState<CatalogFilter>(initialFilter);
   const [audience, setAudience] = useState<CatalogAudience>(initialAudience);
   const [query, setQuery] = useState(initialQuery);
@@ -36,8 +39,8 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
   };
   const filtered = useMemo(() => (remote ? remoteProducts : products.filter((product) => {
     const familyMatch = family === "All" || (family === "New" ? product.newArrival : product.family === family);
-    return familyMatch && matchesCatalogSearch(product, query);
-  }).sort((left, right) => sort === "name" ? `${left.brand} ${left.name}`.localeCompare(`${right.brand} ${right.name}`) : 0)), [family, products, query, remote, remoteProducts, sort]);
+    return familyMatch && matchesCatalogBrand(product, brand) && matchesCatalogSearch(product, query);
+  }).sort((left, right) => sort === "name" ? `${left.brand} ${left.name}`.localeCompare(`${right.brand} ${right.name}`) : 0)), [brand, family, products, query, remote, remoteProducts, sort]);
 
   useEffect(() => {
     loadMoreController.current?.abort();
@@ -53,7 +56,7 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
       setLoading(true);
       setError("");
       try {
-        const parameters = new URLSearchParams({ family, audience, query, sort, offset: "0", limit: "24" });
+        const parameters = new URLSearchParams({ brand, family, audience, query, sort, offset: "0", limit: "24" });
         const { response, data } = await requestJson<unknown>(`/api/catalog?${parameters}`, { signal: controller.signal });
         if (!response.ok) throw new Error("Catalog request failed");
         const result = parseClientCatalogResponse(data);
@@ -68,20 +71,21 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
       }
     }, query ? 250 : 0);
     return () => { window.clearTimeout(timer); controller.abort(); };
-  }, [audience, family, query, remote, sort]);
+  }, [brand, audience, family, query, remote, sort]);
 
   useEffect(() => () => loadMoreController.current?.abort(), []);
 
   useEffect(() => {
     if (!searchable) return;
     const parameters = new URLSearchParams();
+    if (brand) parameters.set("brand", brand);
     if (family !== "All") parameters.set("family", family);
     if (audience !== "All") parameters.set("audience", audience);
     if (query.trim()) parameters.set("query", query.trim());
     if (sort !== "featured") parameters.set("sort", sort);
     const next = `${window.location.pathname}${parameters.size ? `?${parameters}` : ""}`;
     window.history.replaceState(null, "", next);
-  }, [audience, family, query, searchable, sort]);
+  }, [brand, audience, family, query, searchable, sort]);
 
   const loadMore = async () => {
     if (!remote) {
@@ -96,7 +100,7 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
     setLoading(true);
     setError("");
     try {
-      const parameters = new URLSearchParams({ family, audience, query, sort, offset: remoteProducts.length.toString(), limit: "24" });
+      const parameters = new URLSearchParams({ brand, family, audience, query, sort, offset: remoteProducts.length.toString(), limit: "24" });
       const { response, data } = await requestJson<unknown>(`/api/catalog?${parameters}`, { signal: controller.signal });
       if (!response.ok) throw new Error("Catalog request failed");
       const result = parseClientCatalogResponse(data);
@@ -154,6 +158,15 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
           </aside>
         </section>
       )}
+      {!compact && <div className="catalog-brand-tools">
+        <label htmlFor="catalog-brand">Brand</label>
+        <select id="catalog-brand" value={brand} onChange={(event) => { cancelPendingLoadMore(); setBrand(event.target.value); setVisibleCount(24); }}>
+          <option value="">All brands</option>
+          {brand && !brands.includes(brand) && <option value={brand}>{brand}</option>}
+          {brands.map((name) => <option key={name} value={name}>{name}</option>)}
+        </select>
+        <Link href="/brands">Shop by brand A–Z</Link>
+      </div>}
       {!compact && <div className="catalog-tools">
         <div className="audience-row" role="group" aria-label="Filter by audience">
           {(["All", "Women", "Men", "Unisex"] as CatalogAudience[]).map((item) => (
@@ -167,7 +180,7 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
         </div>
         <label className="catalog-sort"><SlidersHorizontal size={16} /><span>Sort</span><select value={sort} onChange={(event) => { cancelPendingLoadMore(); setSort(event.target.value as CatalogSort); }}><option value="featured">Featured</option><option value="name">Brand &amp; name</option></select></label>
       </div>}
-      {!compact && <div className="catalog-status" aria-live="polite"><p><strong>{resultCount}</strong> {resultCount === 1 ? "fragrance" : "fragrances"}{audience !== "All" ? <> · {audience.toLowerCase()}</> : ""}{query.trim() ? <> matching “{query.trim()}”</> : ""}{loading ? <span> Updating…</span> : ""}</p>{(query || audience !== "All" || family !== "All" || sort !== "featured") && <button type="button" onClick={() => { cancelPendingLoadMore(); setQuery(""); setAudience("All"); setFamily("All"); setSort("featured"); }}>Clear all <X size={14} /></button>}</div>}
+      {!compact && <div className="catalog-status" aria-live="polite"><p><strong>{resultCount}</strong> {resultCount === 1 ? "fragrance" : "fragrances"}{brand ? <> · {brand}</> : ""}{audience !== "All" ? <> · {audience.toLowerCase()}</> : ""}{query.trim() ? <> matching “{query.trim()}”</> : ""}{loading ? <span> Updating…</span> : ""}</p>{(brand || query || audience !== "All" || family !== "All" || sort !== "featured") && <button type="button" onClick={() => { cancelPendingLoadMore(); setQuery(""); setBrand(""); setAudience("All"); setFamily("All"); setSort("featured"); }}>Clear all <X size={14} /></button>}</div>}
       {error && <div className="catalog-error" role="alert"><span>{error}</span><button type="button" onClick={() => setError("")}>Dismiss</button></div>}
       {filtered.length ? (
         <div className={`product-grid ${compact ? "product-grid-compact" : ""}`}>
@@ -182,7 +195,7 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
           ))}
         </div>
       ) : (
-        <div className="catalog-empty"><h2>No fragrances found.</h2><p>Check the spelling, search only the brand, or clear the catalogue filters.</p><button className="button button-secondary" type="button" onClick={() => { cancelPendingLoadMore(); setQuery(""); setAudience("All"); setFamily("All"); }}>Clear filters</button></div>
+        <div className="catalog-empty"><h2>No fragrances found.</h2><p>Check the spelling, search only the brand, or clear the catalogue filters.</p><button className="button button-secondary" type="button" onClick={() => { cancelPendingLoadMore(); setQuery(""); setBrand(""); setAudience("All"); setFamily("All"); }}>Clear filters</button></div>
       )}
       {!compact && ((remote && remoteTotal > remoteProducts.length) || (!remote && filtered.length > visibleCount)) && (
         <div className="catalog-load-more">

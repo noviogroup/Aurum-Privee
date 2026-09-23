@@ -271,6 +271,7 @@ test("an unverified Wix return cannot confirm an order in browse-only mode", asy
 test("core public pages pass automated WCAG A and AA checks", async ({ page }) => {
   test.slow();
   for (const path of [
+    "/brands",
     "/shop",
     "/shop/christian-dior-sauvage-edp-6-8-oz-bb4bf3",
     "/contact",
@@ -437,4 +438,70 @@ test("hosted releases apply the production security policy", async ({ request })
   expect.soft(health.headers()["cache-control"], "Public health cache policy").toContain("max-age=30");
   expect.soft(health.headers()["x-robots-tag"], "Public health indexing policy").toContain("noindex");
   expect.soft(health.headers()["x-robots-tag"], "Public health indexing policy").toContain("nofollow");
+});
+
+test("brand directory links to an exact filter that survives search and refresh", async ({ page }) => {
+  await navigate(page, "/brands");
+  await page.getByLabel("Find a brand").fill("Tom Ford");
+  await expect(page.getByRole("status")).toHaveText("1 brand");
+  await page.getByRole("main").getByRole("link", { name: "Tom Ford" }).click();
+  await expect(page.getByLabel("Brand", { exact: true })).toHaveValue("Tom Ford");
+  await expect(page.locator(".product-card")).toHaveCount(5);
+  await expect(page.locator(".product-card").filter({ hasText: "Noir Extreme by" })).toHaveCount(0);
+  await page.getByLabel("Search the catalogue").fill("Noir Extreme");
+  await expect(page.locator(".product-card")).toHaveCount(1);
+  await expect(page.getByRole("link", { name: "View Noir Extreme", exact: true })).toBeVisible();
+  await expect(page).toHaveURL(/brand=Tom\+Ford/);
+  await page.reload();
+  await expect(page.getByLabel("Brand", { exact: true })).toHaveValue("Tom Ford");
+  await expect(page.getByLabel("Search the catalogue")).toHaveValue("Noir Extreme");
+  await expect(page.locator(".product-card")).toHaveCount(1);
+  await page.getByRole("button", { name: "Clear all" }).click();
+  await expect(page.getByLabel("Brand", { exact: true })).toHaveValue("");
+  await expect(page.locator(".product-card")).toHaveCount(24);
+});
+
+test("brand filtering applies before pagination and combines with audience", async ({ page, request }) => {
+  await navigate(page, "/shop?brand=Armaf");
+  const cards = page.locator(".product-card");
+  await expect(cards).toHaveCount(24);
+  await page.getByRole("button", { name: "Show more fragrances" }).click();
+  await expect.poll(() => cards.count()).toBeGreaterThan(24);
+  const response = await request.get("/api/catalog?brand=Armaf&offset=24&limit=24");
+  expect(response.ok()).toBeTruthy();
+  const result = await response.json();
+  expect(result.products.length).toBeGreaterThan(0);
+  expect(result.products.every((product: { brand: string }) => product.brand === "Armaf")).toBeTruthy();
+  const combined = await request.get("/api/catalog?brand=Tom%20Ford&audience=Unisex&query=Oud");
+  const selection = await combined.json();
+  expect(selection.products.length).toBeGreaterThan(0);
+  expect(selection.products.every((product: { brand: string; audience: string }) => product.brand === "Tom Ford" && product.audience === "Unisex")).toBeTruthy();
+  await expect(page.getByLabel("Brand", { exact: true })).toHaveValue("Armaf");
+});
+
+test("quote notes keep spaces across tabs and removing lines never crashes", async ({ page, context }) => {
+  const pageErrors: string[] = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+  await navigate(page, "/shop?brand=Tom%20Ford");
+  await page.getByRole("button", { name: /^Add .+ to quote list$/ }).first().click();
+  await page.getByRole("button", { name: /^Add .+ to quote list$/ }).first().click();
+  await navigate(page, "/quote-list");
+  await expect(page.locator(".quote-line")).toHaveCount(2);
+  const secondTab = await context.newPage();
+  secondTab.on("pageerror", (error) => pageErrors.push(error.message));
+  await navigate(secondTab, "/quote-list");
+  await expect(secondTab.locator(".quote-line")).toHaveCount(2);
+  const note = page.getByLabel("Buyer note").first();
+  await note.pressSequentially("Please quote by the case. ", { delay: 60 });
+  await expect(note).toHaveValue("Please quote by the case. ");
+  await expect(note).toBeFocused();
+  await expect(secondTab.getByLabel("Buyer note").first()).toHaveValue("Please quote by the case. ");
+  await page.getByRole("button", { name: "Remove", exact: true }).first().click();
+  await expect(page.locator(".quote-line")).toHaveCount(1);
+  await expect(secondTab.locator(".quote-line")).toHaveCount(1);
+  await secondTab.getByRole("button", { name: "Remove", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Your quote list is empty." })).toBeVisible();
+  await expect(secondTab.getByRole("heading", { name: "Your quote list is empty." })).toBeVisible();
+  expect(pageErrors).toEqual([]);
+  await secondTab.close();
 });

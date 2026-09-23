@@ -57,3 +57,22 @@ test("every retail correction records review evidence", () => {
     assert.ok(correction.evidence.trim());
   }
 });
+
+test("reviewed catalogue names and the Addict edition photograph stay consistent", () => {
+  const cases = [
+    ["60cf643c-e57f-4510-94a1-744b03fb2f2e", "J’adore"],
+    ["3a691c08-e61c-4921-99d4-74dd5aab7544", "Addict"],
+    ["9a389809-ba1f-4809-b390-0c92b3626d1c", "Noir Extreme"],
+    ["baa50a74-6f02-4161-b435-d29b7c5d81d1", "Oud Wood"],
+  ];
+  for (const [id, name] of cases) {
+    const original = product(id, "Imported source title");
+    const corrected = normalizeLocalCatalogProduct(original);
+    assert.equal(corrected.name, name);
+    assert.equal(corrected.slug, original.slug);
+    assert.equal(corrected.id, original.id);
+  }
+  const addict = applyProductRetailCorrection(product(cases[1][0], "Addict Christian"));
+  assert.equal(addict.concentration, "Eau de Toilette");
+  assert.equal(addict.image, "/product-images/catalog-v2/378416e9-c033-4eee-a712-9d70f4a6913f.webp");
+});
