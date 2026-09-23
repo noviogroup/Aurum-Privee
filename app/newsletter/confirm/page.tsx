@@ -7,7 +7,7 @@ export default async function ConfirmNewsletterPage({ searchParams }: { searchPa
   const { token, status } = await searchParams;
   const validToken = typeof token === "string" && /^[A-Za-z0-9_-]{43}$/.test(token);
   const copy = status === "confirmed"
-    ? { title: "You’re on the list.", body: "Your subscription is confirmed. We’ll keep every note considered and occasional." }
+    ? { title: "Subscription confirmed.", body: "You will receive occasional updates about new arrivals, gifts and trade news." }
     : status === "invalid"
       ? { title: "That link has expired.", body: "Return to the home page and request a fresh confirmation email." }
       : status === "unavailable"

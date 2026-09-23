@@ -52,7 +52,7 @@ export function Newsletter() {
     <form className="newsletter-form" onSubmit={submit} aria-busy={status === "loading"}>
       <label htmlFor="newsletter-email">Email address</label>
       <div>
-        <input id="newsletter-email" name="email" type="email" autoComplete="email" placeholder="you@example.com" required />
+        <input id="newsletter-email" name="email" type="email" autoComplete="email" placeholder="Email address" required />
         <button type="submit" disabled={status === "loading"}>{status === "loading" ? "Joining" : "Join the list"}</button>
       </div>
       {message && <p className={status === "error" ? "form-error" : "form-success"} role={status === "error" ? "alert" : "status"}>{message}</p>}

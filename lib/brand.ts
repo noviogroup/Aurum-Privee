@@ -1,6 +1,6 @@
 export const BRAND_NAME = "Aurum Privée";
 export const BRAND_EDIT = "Aurum Privée Edit";
-export const BRAND_TAGLINE = "Exceptional fragrance. Without boundaries.";
+export const BRAND_TAGLINE = "Trade fragrance catalogue.";
 
 const canonicalBrands: Record<string, string> = {
   "christian dior": "Dior",

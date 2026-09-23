@@ -8,7 +8,6 @@ export function Footer() {
       <div className="footer-grid">
         <div className="footer-brand">
           <div className="footer-mark"><BrandMark /></div>
-          <p>A considered catalogue<br />for modern fragrance retail.</p>
         </div>
         <div>
           <h2>Catalogue</h2>
@@ -41,7 +40,6 @@ export function Footer() {
       </div>
       <div className="footer-bottom">
         <span>© {new Date().getFullYear()} Aurum Privée</span>
-        <span>Created with intention</span>
       </div>
     </footer>
   );

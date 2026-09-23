@@ -58,7 +58,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
       <div className="account-page section-shell page-top">
         <section className="account-intro">
           <UserCircle size={34} weight="thin" />
-          <h1>Accounts are being prepared.</h1>
+          <h1>Buyer accounts are not available yet.</h1>
           <p>Buyer sign-in is not active yet. Your quote list stays on this device, and client care can help with a trade enquiry.</p>
           <div className="account-availability-actions">
             <Link href="/quote-list" className="button button-primary">View quote list</Link>

@@ -65,8 +65,8 @@ export default async function HomePage() {
     <div className="home-page">
       <section className="home-campaign-hero">
         <div className="home-campaign-copy entrance">
-          <h1>A considered catalogue<br />for modern fragrance retail.</h1>
-          <p>Explore designer, niche and Arabian fragrance, build the assortment your business needs and request private trade terms.</p>
+          <h1>Wholesale fragrance<br />for professional buyers.</h1>
+          <p>Browse designer, niche and Arabian fragrance. Add products and quantities to a quote request for private pricing and availability.</p>
           <div className="hero-actions">
             <Link className="button button-primary" href="/shop">Browse trade catalogue</Link>
             <Link className="campaign-text-link" href="#trade-process">How quoting works <ArrowRight size={16} /></Link>
@@ -84,7 +84,6 @@ export default async function HomePage() {
               sizes="(max-width: 767px) 100vw, 64vw"
             />
           </picture>
-          <div className="home-campaign-caption"><strong>Recognisable houses. A considered edit.</strong><span>Designer, niche and Arabian fragrance</span></div>
         </div>
       </section>
 
@@ -97,8 +96,7 @@ export default async function HomePage() {
 
       <section className="trade-process section-shell" id="trade-process" aria-labelledby="trade-process-title">
         <header>
-          <p className="utility-label">A simpler trade enquiry</p>
-          <h2 id="trade-process-title">From catalogue to considered quote.</h2>
+          <h2 id="trade-process-title">How quote requests work.</h2>
           <p>No public price list and no checkout. Build your selection first; commercial terms follow after review.</p>
         </header>
         <div className="trade-process-steps">
@@ -135,13 +133,13 @@ export default async function HomePage() {
 
       <section className="campaign-journal section-shell" aria-labelledby="campaign-journal-title">
         <div className="campaign-journal-heading">
-          <h2 id="campaign-journal-title">An assortment with range,<br />{" "}built with intention.</h2>
-          <p>Balance recognisable signatures with distinctive florals, woods, amber and oud.</p>
+          <h2 id="campaign-journal-title">Build across fragrance families.</h2>
+          <p>Compare floral, woody, amber and oud profiles across established and niche houses.</p>
         </div>
         <div className="campaign-journal-grid">
           <Link className="campaign-story campaign-story-baccarat" href="/shop/maison-francis-kurkdjian-baccarat-rouge-540-edp-2-4-540-a5076e">
             <ResponsiveFillImage className="campaign-story-picture" src="/images/campaign/baccarat-gifting.webp" mobileSrc="/images/campaign/baccarat-gifting-mobile.webp" alt="Baccarat Rouge 540 presented with Aurum Privée gift packaging" sizes="(max-width: 767px) 100vw, 42vw" />
-            <span><small>Gift-worthy signatures</small><strong>Baccarat Rouge 540</strong><b>Discover the fragrance <ArrowRight size={15} /></b></span>
+            <span><small>Single-bottle format</small><strong>Baccarat Rouge 540</strong><b>View product <ArrowRight size={15} /></b></span>
           </Link>
           <div className="campaign-journal-side">
             <Link className="campaign-story campaign-story-amber-gold" href="/shop/al-haramain-amber-oud-gold-edp-spray-3-4-oz-e36239">
@@ -151,11 +149,11 @@ export default async function HomePage() {
             <div className="campaign-journal-pair">
               <Link className="campaign-story campaign-story-oud" href="/shop?query=oud">
                 <Image src="/images/campaign/oud-ritual.webp" alt="Amber oud fragrance beside carved lantern and oud wood" fill sizes="(max-width: 767px) 100vw, 29vw" />
-                <span><small>Smoked woods and resin</small><strong>The oud ritual</strong><b>Explore oud <ArrowRight size={15} /></b></span>
+                <span><small>Smoked woods and resin</small><strong>Oud fragrances</strong><b>Browse oud <ArrowRight size={15} /></b></span>
               </Link>
               <Link className="campaign-story campaign-story-roja" href="/shop?family=Amber">
                 <Image src="/images/campaign/roja-amber.webp" alt="Amber fragrance presented with oud wood and Aurum Privée ribbon" fill sizes="(max-width: 767px) 100vw, 29vw" />
-                <span><small>Deep, magnetic, spiced</small><strong>The amber edit</strong><b>Explore amber <ArrowRight size={15} /></b></span>
+                <span><small>Deep, warm and spiced</small><strong>Amber fragrances</strong><b>Browse amber <ArrowRight size={15} /></b></span>
               </Link>
             </div>
           </div>
@@ -164,8 +162,8 @@ export default async function HomePage() {
 
       <section className="scent-finder section-shell" id="scent-finder">
         <div className="scent-title">
-          <h2>Build by scent family.</h2>
-          <p>Use fragrance character to shape a more balanced and distinctive assortment.</p>
+          <h2>Browse by scent family.</h2>
+          <p>Compare products by their primary fragrance profile.</p>
         </div>
         <div className="scent-choices">
           {[
@@ -188,7 +186,7 @@ export default async function HomePage() {
         </Link>
         <Link className="home-service-card" href="/shop?query=gift%20set">
           <Image src="/images/services/gifting-v2.webp" alt="Ivory gift box tied with a blush silk ribbon" fill sizes="(max-width: 760px) 100vw, 34vw" />
-          <span><strong>Gift sets</strong><small>Curated formats for considered assortments.</small><b>Browse gift sets</b></span>
+          <span><strong>Gift sets</strong><small>Multi-piece and presentation-box formats.</small><b>Browse gift sets</b></span>
         </Link>
         <Link className="home-service-card home-service-help" href="/contact">
           <Image src="/images/services/whatsapp-v2.webp" alt="Hand holding a phone for private fragrance assistance" fill sizes="(max-width: 760px) 100vw, 34vw" />

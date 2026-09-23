@@ -12,7 +12,7 @@ export default function ContactPage() {
   return (
     <div className="contact-page page-top">
       <header className="contact-heading section-shell entrance">
-        <h1>A thoughtful answer,<br />from a real person.</h1>
+        <h1>Contact the trade team.</h1>
         <p>Ask about a trade quote, product assortment or partnership. We’ll reply using the email address you share below.</p>
       </header>
       <div className="contact-layout section-shell">

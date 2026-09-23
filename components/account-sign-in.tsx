@@ -44,7 +44,7 @@ export function AccountSignIn({ configured, supabaseUrl, publishableKey }: Accou
   return (
     <form className="account-sign-in-form" onSubmit={submit}>
       <label htmlFor="account-email">Email address</label>
-      <div><input id="account-email" value={email} onChange={(event) => setEmail(event.target.value)} type="email" autoComplete="email" required maxLength={320} placeholder="you@example.com" /><button type="submit" disabled={status === "sending"}>{status === "sending" ? "Sending" : "Email me a secure link"}<ArrowRight size={16} /></button></div>
+      <div><input id="account-email" value={email} onChange={(event) => setEmail(event.target.value)} type="email" autoComplete="email" required maxLength={320} placeholder="Email address" /><button type="submit" disabled={status === "sending"}>{status === "sending" ? "Sending" : "Email me a secure link"}<ArrowRight size={16} /></button></div>
       <p>No password to remember. The link signs you in securely and creates your account if this is your first visit.</p>
       {error && <p className="form-error" role="alert">{error}</p>}
     </form>

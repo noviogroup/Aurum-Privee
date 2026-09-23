@@ -58,7 +58,7 @@ export function Header() {
       </div>
       <div id="fragrance-menu" className={`fragrance-menu ${menuOpen ? "is-open" : ""}`} aria-hidden={!menuOpen}>
         <div className="fragrance-menu-inner">
-          <div className="fragrance-menu-intro"><p className="utility-label">The trade catalogue</p><h2>Build with intention.</h2><p>Begin with audience, scent character or a house already relevant to your customers.</p></div>
+          <div className="fragrance-menu-intro"><h2>Find products</h2><p>Browse by audience, scent family or brand.</p></div>
           <div className="fragrance-menu-group"><p>Catalogue</p><Link href="/shop" onClick={() => setMenuOpen(false)}>All fragrance</Link><Link href="/shop?family=New" onClick={() => setMenuOpen(false)}>New arrivals</Link><Link href="/shop?query=gift%20set" onClick={() => setMenuOpen(false)}>Gift sets</Link><Link href="/quote-list" onClick={() => setMenuOpen(false)}>Quote list</Link></div>
           <div className="fragrance-menu-group"><p>Audience</p><Link href="/shop?audience=Women" onClick={() => setMenuOpen(false)}>Women</Link><Link href="/shop?audience=Men" onClick={() => setMenuOpen(false)}>Men</Link><Link href="/shop?audience=Unisex" onClick={() => setMenuOpen(false)}>Unisex</Link></div>
           <div className="fragrance-menu-group"><p>Scent character</p>{['Floral', 'Fresh', 'Woody', 'Amber', 'Gourmand'].map((family) => <Link key={family} href={`/shop?family=${family}`} onClick={() => setMenuOpen(false)}>{family}</Link>)}</div>

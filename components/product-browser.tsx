@@ -126,8 +126,8 @@ export function ProductBrowser({ products, compact = false, searchable = false, 
       {searchable && (
         <section className="shop-editorial-intro" aria-labelledby="shop-title">
           <div className="shop-editorial-copy">
-            <h1 id="shop-title">Build an assortment worth returning to.</h1>
-            <p>Explore designer, niche and Arabian fragrance, then add the right editions and quantities to a private quote request.</p>
+            <h1 id="shop-title">Trade fragrance catalogue.</h1>
+            <p>Browse products, select editions and add quantities to a private quote request.</p>
             <div className="catalog-search-wrap" id="catalog-search">
               <div className="catalog-search">
                 <MagnifyingGlass size={22} weight="light" />

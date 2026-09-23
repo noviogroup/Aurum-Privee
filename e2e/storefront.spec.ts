@@ -15,6 +15,12 @@ async function expectMinimumTapTarget(locator: Locator) {
   expect(box!.height).toBeGreaterThanOrEqual(44);
 }
 
+async function expectNoDraftOrFillerCopy(page: Page) {
+  const copy = await page.locator("body").innerText();
+  expect(copy).not.toMatch(/\b(?:demo|sample|placeholder|lorem ipsum)\b/i);
+  expect(copy).not.toMatch(/(?:considered edit|built with intention|created with intention|a thoughtful answer)/i);
+}
+
 async function navigate(page: Page, path: string) {
   const response = await page.goto(path, { waitUntil: "domcontentloaded", timeout: 30_000 });
   await page.locator('html[data-hydrated="true"]').waitFor({ state: "attached", timeout: 20_000 });
@@ -24,7 +30,7 @@ async function navigate(page: Page, path: string) {
 test("homepage presents the primary action without layout overflow", async ({ page }) => {
   await navigate(page, "/");
 
-  await expect(page.getByRole("heading", { level: 1, name: "A considered catalogue for modern fragrance retail." })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Wholesale fragrance for professional buyers." })).toBeVisible();
   await expect(page.getByRole("link", { name: "Browse trade catalogue" })).toBeInViewport();
   await expect(page.getByRole("button", { name: /Open bag/ })).toHaveCount(0);
   await expect(page.getByText(/Nassau|The Bahamas|Harbour Island|New Providence/i)).toHaveCount(0);
@@ -41,6 +47,7 @@ test("homepage presents the primary action without layout overflow", async ({ pa
   expect(layout.scrollWidth).toBeLessThanOrEqual(layout.clientWidth + 1);
 
   await expectNoWcagViolations(page);
+  await expectNoDraftOrFillerCopy(page);
 });
 
 test("catalog search returns useful results and preserves a stable layout", async ({ page }) => {
@@ -154,7 +161,7 @@ test("trade catalogue and quote-list product flow behave coherently", async ({ p
 
   await navigate(page, "/checkout");
   await expect(page).toHaveURL(/\/shop$/);
-  await expect(page.getByRole("heading", { level: 1, name: "Build an assortment worth returning to." })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Trade fragrance catalogue." })).toBeVisible();
 });
 
 test("buyer can submit a structured quote request without price data", async ({ page }) => {
@@ -247,6 +254,7 @@ test("core public pages pass automated WCAG A and AA checks", async ({ page }) =
     await navigate(page, path);
     await page.getByRole("heading", { level: 1 }).waitFor({ state: "visible" });
     await expectNoWcagViolations(page);
+    await expectNoDraftOrFillerCopy(page);
   }
 });
 
@@ -268,6 +276,7 @@ test("public support routes, redirects and private-page metadata are coherent", 
     const hasOverflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
     expect(hasOverflow).toBe(false);
     await expectNoWcagViolations(page);
+    await expectNoDraftOrFillerCopy(page);
   }
 
   await navigate(page, "/pages/aurum-room");
@@ -296,7 +305,7 @@ test("public support routes, redirects and private-page metadata are coherent", 
 test("unexpected routes keep a branded and accessible recovery path", async ({ page }) => {
   const response = await navigate(page, "/this-page-does-not-exist");
   expect(response?.status()).toBe(404);
-  await expect(page.getByRole("heading", { level: 1, name: "That page is out of view." })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "Page not found." })).toBeVisible();
   await expect(page.getByRole("link", { name: "Browse fragrance" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Return home" })).toBeVisible();
   const hasOverflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);

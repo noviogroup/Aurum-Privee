@@ -53,7 +53,7 @@ const pages: Record<string, ContentPage> = {
   },
   "aurum-room": {
     title: "The Aurum Room",
-    intro: "A private buyer consultation for assortment planning, product discovery and a more considered way to navigate the catalogue.",
+    intro: "A private buyer consultation for assortment planning and product selection.",
     sections: [
       { heading: "Assortment guidance", body: "Share your customer profile, existing range or sourcing priorities. We will help narrow the catalogue into a more relevant working selection." },
       { heading: "Formats and opportunities", body: "Explore gift sets, fragrance families and complementary formats that may help broaden a retail or corporate programme." },
@@ -109,8 +109,7 @@ export default async function ContentPage({ params }: { params: Promise<{ slug: 
             <Image src="/images/campaign/signature-consultation.webp" alt="Aurum Privée fragrance consultation with selected bottles and scent strips" fill sizes="(max-width: 767px) calc(100vw - 32px), 48vw" />
           </div>
           <div className="aurum-room-consultation-copy">
-            <p className="utility-label">Begin with a conversation</p>
-            <h2>Your assortment, considered together.</h2>
+            <h2>Discuss your assortment with the trade team.</h2>
             <p>Tell us about your customers, target formats or the range you want to build. The trade team will respond with the next consultation options.</p>
             <Link className="text-link" href="/contact">Request a consultation <ArrowRight size={16} /></Link>
           </div>
